@@ -1,6 +1,6 @@
 # Revisionable
 
-Revisionable is a package that allows you to keep a revision history for your models without thinking, extending the handy [Ardent](https://github.com/laravelbook/ardent) package.
+Revisionable is a laravel package that allows you to keep a revision history for your models without thinking, extending the handy [Ardent](https://github.com/laravelbook/ardent) package.
 
 ## Installation
 

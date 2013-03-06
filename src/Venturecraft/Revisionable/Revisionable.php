@@ -16,6 +16,15 @@ class Revisionable extends Ardent {
 	private $updated_data;
 
 
+    
+    public function revisionHistory()
+    {
+
+        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+
+    }
+
+
 
     /**
      * Invoked before a model is saved. Return false to abort the operation.
