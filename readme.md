@@ -31,6 +31,16 @@ class Comment extends Ardent { }
 Ardent gives you access to more control over the model, but only when you need it. [Check out its docs here](https://github.com/laravelbook/ardent)
 
 
+### Load revision history
+
+To load the revision history for a given model, simply call the `revisionHistory` method on that model, e.g., 
+
+````
+$article = Article::find($id);
+$history = $article->revisionHistory;
+````
+
+
 ## Contributing
 
 Contributions are encouraged and welcome; to keep things organised, all bugs and requests should be
