@@ -13,10 +13,11 @@ use laravelbook\Ardent\Ardent;
 class Revisionable extends Ardent {
 
 	private $original_data;
-	private $updated_data;
+    private $updated_data;
+    private $updating;
 
 
-    
+
     public function revisionHistory()
     {
 
@@ -39,6 +40,8 @@ class Revisionable extends Ardent {
     	$this->original_data 	= $this->original;
     	$this->updated_data 	= $this->attributes;
 
+        $this->updating         = $this->exists;
+
     	// call parent beforeSave from Ardent
         return parent::beforeSave( $forced );
 
@@ -59,7 +62,7 @@ class Revisionable extends Ardent {
     protected function afterSave( $success, $forced = false ) {
 
     	// check if the model already exists
-		if($this->exists) {
+		if($success AND $this->updating) {
 			// if it does, it means we're updating
 
 			$changes = array_diff($this->updated_data, $this->original_data);
