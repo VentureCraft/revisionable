@@ -8,7 +8,7 @@
  */
 
 use Illuminate\Support\ServiceProvider;
-use laravelbook\Ardent\Ardent;
+use LaravelBook\Ardent\Ardent;
 
 class Revisionable extends Ardent {
 
