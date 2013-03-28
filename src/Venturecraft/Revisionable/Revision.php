@@ -42,12 +42,12 @@ class Revision extends \Eloquent {
 
 
     /**
-     * Item Field
+     * Field Name
      * Returns the field that was updated, in the case that it's a foreighn key
      * denoted by a suffic of "_id", then "_id" is simply stripped
      * @return string field
      */
-    public function itemField()
+    public function fieldName()
     {
         if (strpos($this->key, '_id')) {
             return str_replace('_id', '', $this->key);
