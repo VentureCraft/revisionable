@@ -1,6 +1,6 @@
 # Revisionable
 
-Revisionable is a laravel package that allows you to keep a revision history for your models without thinking, extending the handy [Ardent](https://github.com/laravelbook/ardent) package.
+Revisionable is a laravel package that allows you to keep a revision history for your models without thinking, extending the handy [Ardent](https://github.com/laravelbook/ardent) package. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
 ## Installation
 
@@ -13,14 +13,14 @@ Add the following to the `require` section of your projects composer.json file:
 
 ## Effortless revision history
 
-For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g., 
+For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
 ````
 use Venturecraft\Revisionable\Revisionable;
 
 class Article extends Revisionable { }
 ````
 
-For any models you don't wish to keep a revision history for, we recommend extending Ardent (which is also installed when revisionable is installed via composer), e.g., 
+For any models you don't wish to keep a revision history for, we recommend extending Ardent (which is also installed when revisionable is installed via composer), e.g.,
 
 ````
 use laravelbook\Ardent
@@ -33,7 +33,7 @@ Ardent gives you access to more control over the model, but only when you need i
 
 ### Load revision history
 
-To load the revision history for a given model, simply call the `revisionHistory` method on that model, e.g., 
+To load the revision history for a given model, simply call the `revisionHistory` method on that model, e.g.,
 
 ````
 $article = Article::find($id);
