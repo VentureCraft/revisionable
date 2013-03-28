@@ -46,7 +46,7 @@ $history = $article->revisionHistory;
 
 For the most part, the revision history will hold enough information to directly output a change history, however in the cases where a foreign key is updated we need to be able to do some mapping and display something nicer than `plan_id changed from 3 to 1`.
 
-To help with this, there's a few helper methods to display more insightful information, so you can display something like `James changed plan from bronze to gold'.
+To help with this, there's a few helper methods to display more insightful information, so you can display something like `James changed plan from bronze to gold`.
 
 The above would be the result from this:
 ````
