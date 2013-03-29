@@ -1,5 +1,13 @@
 # Revisionable
 
+Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable form your model, you can instantly have just that, and be able to display a history similar to this:
+
+* James changed title from 'Something' to 'Something else'
+* James changed category from 'News' to 'Breaking news'
+* Steve changed category from 'Breaking news' to 'News'
+
+So not only can you see a history of what happened, but who did what, so there's accountability.
+
 Revisionable is a laravel package that allows you to keep a revision history for your models without thinking, extending the handy [Ardent](https://github.com/laravelbook/ardent) package. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 > Ardent gives you access to more control over the model, but only when you need it. [Check out its docs here](https://github.com/laravelbook/ardent)
 
@@ -10,6 +18,16 @@ Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.m
 Add the following to the `require` section of your projects composer.json file:
 ```php
 "venturecraft/revisionable": "dev-master",
+```
+
+Run composer update to download the package
+```
+php composer.phar update
+```
+
+Finally, you'll also need to run migration on the package
+```
+php artisan migrate --package=venturecraft/revisionable
 ```
 
 ## Docs
