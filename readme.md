@@ -2,9 +2,9 @@
 
 Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable form your model, you can instantly have just that, and be able to display a history similar to this:
 
-* James changed title from 'Something' to 'Something else'
-* James changed category from 'News' to 'Breaking news'
-* Steve changed category from 'Breaking news' to 'News'
+* Chris changed title from 'Something' to 'Something else'
+* Chris changed category from 'News' to 'Breaking news'
+* Matt changed category from 'Breaking news' to 'News'
 
 So not only can you see a history of what happened, but who did what, so there's accountability.
 
@@ -73,7 +73,7 @@ $history = $article->revisionHistory;
 
 For the most part, the revision history will hold enough information to directly output a change history, however in the cases where a foreign key is updated we need to be able to do some mapping and display something nicer than `plan_id changed from 3 to 1`.
 
-To help with this, there's a few helper methods to display more insightful information, so you can display something like `James changed plan from bronze to gold`.
+To help with this, there's a few helper methods to display more insightful information, so you can display something like `Chris changed plan from bronze to gold`.
 
 The above would be the result from this:
 ```php
