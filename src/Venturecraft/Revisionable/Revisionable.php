@@ -8,9 +8,8 @@
  */
 
 use Illuminate\Support\ServiceProvider;
-use LaravelBook\Ardent\Ardent;
 
-class Revisionable extends Ardent {
+class Revisionable extends \Eloquent {
 
 	private $original_data;
     private $updated_data;
@@ -18,34 +17,62 @@ class Revisionable extends Ardent {
 
     protected $revisionEnabled = true;
 
-    public function revisionHistory()
+    public function __construct(array $attributes = array())
     {
-
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
-
+        $this->createEventListener();
     }
 
+    public function revisionHistory()
+    {
+        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+    }
+
+
+    /**
+     * Create the event listeners for the saving and saved events
+     * This lets us save revisions whenever a save is made, no matter the
+     * http method.
+     *
+     */
+    private function createEventListener()
+    {
+
+        \Event::listen('eloquent.saving: '.get_called_class(), function()
+        {
+            return $this->beforeSave();
+        });
+        \Event::listen('eloquent.saved: '.get_called_class(), function()
+        {
+            return $this->afterSave();
+        });
+
+    }
 
 
     /**
      * Invoked before a model is saved. Return false to abort the operation.
      *
-     * Overriding Ardent method, Ardent version called once this is finished
-     *
      * @param bool    $forced Indicates whether the model is being saved forcefully
      * @return bool
      */
-    protected function beforeSave( $forced = false ) {
+    protected function beforeSave()
+    {
 
         if ($this->revisionEnabled) {
         	$this->original_data 	= $this->original;
         	$this->updated_data 	= $this->attributes;
 
+            // we can only safely compare basic items,
+            // so for now we drop any object based items, like DateTime
+            foreach ($this->updated_data as $key => $val) {
+                if (gettype($val) == 'object') {
+                    unset($this->original_data[$key]);
+                    unset($this->updated_data[$key]);
+                }
+            }
+
             $this->updating         = $this->exists;
         }
-
-    	// call parent beforeSave from Ardent
-        return parent::beforeSave( $forced );
 
     }
 
@@ -54,17 +81,15 @@ class Revisionable extends Ardent {
 
     /**
      * Called after a model is successfully saved.
-	 *
-     * Overriding Ardent method, Ardent version called once this is finished
      *
      * @param bool    $success Indicates whether the database save operation succeeded
      * @param bool    $forced  Indicates whether the model is being saved forcefully
      * @return void
      */
-    protected function afterSave( $success, $forced = false ) {
-
+    protected function afterSave()
+    {
     	// check if the model already exists
-		if($this->revisionEnabled AND $success AND $this->updating) {
+		if($this->revisionEnabled AND $this->updating) {
 			// if it does, it means we're updating
 
 			$changes = array_diff($this->updated_data, $this->original_data);
@@ -84,11 +109,7 @@ class Revisionable extends Ardent {
 
 		}
 
-    	// call parent beforeSave from Ardent
-        return parent::afterSave( $success, $forced );
-
     }
-
 
 
 }

@@ -8,8 +8,7 @@ Wouldn't it be nice to have a revision history for any model in your project, wi
 
 So not only can you see a history of what happened, but who did what, so there's accountability.
 
-Revisionable is a laravel package that allows you to keep a revision history for your models without thinking, extending the handy [Ardent](https://github.com/laravelbook/ardent) package. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
-> Ardent gives you access to more control over the model, but only when you need it. [Check out its docs here](https://github.com/laravelbook/ardent)
+Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
 ## Installation
 
