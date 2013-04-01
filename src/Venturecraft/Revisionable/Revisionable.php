@@ -35,6 +35,7 @@ class Revisionable extends \Eloquent {
         $this->createEventListener();
     }
 
+
     public function revisionHistory()
     {
         return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
@@ -168,6 +169,12 @@ class Revisionable extends \Eloquent {
         if (in_array($key, $this->dontKeepRevisionOf)) return false;
 
         return empty($this->keepRevisionOf);
+    }
+
+
+    public function getRevisionFormattedFields()
+    {
+        return $this->revisionFormattedFields;
     }
 
 }

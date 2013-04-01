@@ -13,6 +13,13 @@ class Revision extends \Eloquent {
 
 
 	public $table = 'revisions';
+    protected $revisionFormattedFields = array();
+    private $parent;
+
+    public function __construct(array $attributes = array())
+    {
+        parent::__construct($attributes);
+    }
 
 
     /**
@@ -70,7 +77,7 @@ class Revision extends \Eloquent {
             if (strpos($this->key, '_id')) {
                 $model = str_replace('_id', '', $this->key);
                 $item = $model::find($this->old_value);
-                return $item->identifiableName();
+                return $this->format($this->key, $item->identifiableName());
             }
         } catch (Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
@@ -79,7 +86,7 @@ class Revision extends \Eloquent {
 
         // if there was an issue
         // or, if it's a normal value
-        return $this->old_value;
+        return $this->format($this->key, $this->old_value);
 
     }
 
@@ -97,7 +104,7 @@ class Revision extends \Eloquent {
             if (strpos($this->key, '_id')) {
                 $model = str_replace('_id', '', $this->key);
                 $item = $model::find($this->new_value);
-                return $item->identifiableName();
+                return $this->format($this->key, $item->identifiableName());
             }
         } catch (Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
@@ -106,7 +113,7 @@ class Revision extends \Eloquent {
 
         // if there was an issue
         // or, if it's a normal value
-        return $this->new_value;
+        return $this->format($this->key, $this->new_value);
 
     }
 
@@ -120,6 +127,32 @@ class Revision extends \Eloquent {
         return \User::find($this->user_id);
     }
 
+
+
+    /*
+    array(
+        'public' => 'boolean:Yes|No',
+        'minimum'  => 'string:Min: %s'
+    )
+     */
+    /**
+     * Format the value according to the $revisionFormattedFields array
+     * @param  $key
+     * @param  $value
+     * @return string formated value
+     */
+    public function format($key, $value) {
+        $model = $this->revisionable_type;
+        $model = new $model;
+        $revisionFormattedFields = $model->getRevisionFormattedFields();
+
+        if (isset($revisionFormattedFields[$key])) {
+            $format = $revisionFormattedFields[$key];
+            return FieldFormatter::format($key, $value, $revisionFormattedFields);
+        } else {
+            return $value;
+        }
+    }
 
 
 }

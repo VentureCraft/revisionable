@@ -33,6 +33,7 @@ php artisan migrate --package=venturecraft/revisionable
 
 * [Effortless revision history](#intro)
 * [More control](#control)
+* [Format output](#formatoutput)
 * [Load revision history](#loadhistory)
 * [Display history](#display)
 * [Contributing](#contributing)
@@ -78,6 +79,26 @@ protected $dontKeepRevisionOf = array(
 
 > The `$keepRevisionOf` setting takes precendence over `$dontKeepRevisionOf`
 
+<a name="formatoutput"></a>
+## Format output
+
+In cases where you want to have control over the format of the output of the values, for example a boolean field, you can set them in the `$revisionFormattedFields` array in your model. e.g.,
+
+```php
+protected $revisionFormattedFields = array(
+    'title'  => 'string:<strong>%s</strong>',
+    'public' => 'boolean:No|Yes'
+);
+```
+
+### String
+To format a string, simply prefix the value with `string:` and be sure to include `%s` (this is where the actual value will appear in the formatted response)
+
+### Boolean
+Booleans by default will display as a 0 or a 1, which is pretty bland and won't mean much to the end user, so this formatter can be used to output something a bit nicer. Prefix the value with `boolean:` and then add your false and true options separated by a pipe, e.g.,
+```boolean:Yes|no```
+
+> If you don't set a format for a certain field, it will default to simply being exactly what's in the database
 
 <a name="loadhistory"></a>
 ## Load revision history
