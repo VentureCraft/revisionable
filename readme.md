@@ -32,6 +32,7 @@ php artisan migrate --package=venturecraft/revisionable
 ## Docs
 
 * [Effortless revision history](#intro)
+* [More control](#control)
 * [Load revision history](#loadhistory)
 * [Display history](#display)
 * [Contributing](#contributing)
@@ -56,6 +57,27 @@ class Article extends Revisionable
     protected $revisionEnabled = false;
 }
 ```
+
+<a name="control"></a>
+## More control
+
+No doubt, there'll be cases where you don't want to store a revision history only for certain fields of the model, this is supported in two different ways. In your model you can either specifiy which fields you explicitly want to track and all other fields are ignored:
+
+```
+protected $keepRevisionOf = array(
+    'title'
+);
+```
+
+Or, you can specify which fields you explicitly don't want to track. All other fields will be tracked.
+```
+protected $dontKeepRevisionOf = array(
+    'category_id'
+);
+```
+
+> The `$keepRevisionOf` setting takes precendence over `$dontKeepRevisionOf`
+
 
 <a name="loadhistory"></a>
 ## Load revision history
