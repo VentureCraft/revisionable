@@ -63,14 +63,14 @@ class Article extends Revisionable
 
 No doubt, there'll be cases where you don't want to store a revision history only for certain fields of the model, this is supported in two different ways. In your model you can either specifiy which fields you explicitly want to track and all other fields are ignored:
 
-```
+```php
 protected $keepRevisionOf = array(
     'title'
 );
 ```
 
 Or, you can specify which fields you explicitly don't want to track. All other fields will be tracked.
-```
+```php
 protected $dontKeepRevisionOf = array(
     'category_id'
 );
