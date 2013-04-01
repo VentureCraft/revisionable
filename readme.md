@@ -92,13 +92,17 @@ protected $revisionFormattedFields = array(
 ```
 
 ### String
-To format a string, simply prefix the value with `string:` and be sure to include `%s` (this is where the actual value will appear in the formatted response)
+To format a string, simply prefix the value with `string:` and be sure to include `%s` (this is where the actual value will appear in the formatted response), e.g.,
+
+```
+string:<strong>%s</strong>
+```
 
 ### Boolean
 Booleans by default will display as a 0 or a 1, which is pretty bland and won't mean much to the end user, so this formatter can be used to output something a bit nicer. Prefix the value with `boolean:` and then add your false and true options separated by a pipe, e.g.,
 
 ```
-boolean:Yes|No
+boolean:No|Yes
 ```
 
 > If you don't set a format for a certain field, it will default to simply being exactly what's in the database
