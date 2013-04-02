@@ -32,7 +32,7 @@ class Revisionable extends \Eloquent {
 
     public function __construct(array $attributes = array())
     {
-        $this->createEventListener();
+        // $this->createEventListener();
     }
 
 
@@ -48,17 +48,16 @@ class Revisionable extends \Eloquent {
      * http method.
      *
      */
-    private function createEventListener()
+    public function save(array $options = array())
     {
 
-        \Event::listen('eloquent.saving: '.get_called_class(), function($model)
-        {
-            return $model->beforeSave();
-        });
-        \Event::listen('eloquent.saved: '.get_called_class(), function($model)
-        {
-            return $model->afterSave();
-        });
+        $this->beforeSave();
+        $saved = parent::save($options);
+        if ($saved) {
+            $this->afterSave();
+        }
+
+        return $saved;
 
     }
 
