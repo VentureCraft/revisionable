@@ -51,13 +51,13 @@ class Revisionable extends \Eloquent {
     private function createEventListener()
     {
 
-        \Event::listen('eloquent.saving: '.get_called_class(), function()
+        \Event::listen('eloquent.saving: '.get_called_class(), function($model)
         {
-            return $this->beforeSave();
+            return $model->beforeSave();
         });
-        \Event::listen('eloquent.saved: '.get_called_class(), function()
+        \Event::listen('eloquent.saved: '.get_called_class(), function($model)
         {
-            return $this->afterSave();
+            return $model->afterSave();
         });
 
     }
@@ -69,7 +69,7 @@ class Revisionable extends \Eloquent {
      * @param bool    $forced Indicates whether the model is being saved forcefully
      * @return bool
      */
-    protected function beforeSave()
+    public function beforeSave()
     {
 
         if ($this->revisionEnabled) {
@@ -100,7 +100,7 @@ class Revisionable extends \Eloquent {
      * @param bool    $forced  Indicates whether the model is being saved forcefully
      * @return void
      */
-    protected function afterSave()
+    public function afterSave()
     {
     	// check if the model already exists
 		if($this->revisionEnabled AND $this->updating) {
