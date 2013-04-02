@@ -30,12 +30,6 @@ class Revisionable extends \Eloquent {
     protected $dontKeepRevisionOf = array();
 
 
-    public function __construct(array $attributes = array())
-    {
-        // $this->createEventListener();
-    }
-
-
     public function revisionHistory()
     {
         return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
