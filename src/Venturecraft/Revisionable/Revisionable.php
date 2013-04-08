@@ -9,9 +9,10 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class Revisionable extends \Eloquent {
+class Revisionable extends \Eloquent
+{
 
-	private $originalData;
+    private $originalData;
     private $updatedData;
     private $updating;
 
@@ -59,16 +60,14 @@ class Revisionable extends \Eloquent {
     /**
      * Invoked before a model is saved. Return false to abort the operation.
      *
-     * @param bool    $forced Indicates whether the model is being saved forcefully
      * @return bool
      */
     public function beforeSave()
     {
 
         if ($this->revisionEnabled) {
-        	$this->originalData 	= $this->original;
-        	$this->updatedData 	= $this->attributes;
-
+            $this->originalData = $this->original;
+            $this->updatedData  = $this->attributes;
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
@@ -78,43 +77,39 @@ class Revisionable extends \Eloquent {
                 }
             }
 
-            $this->updating         = $this->exists;
+            $this->updating = $this->exists;
         }
 
     }
 
 
-
-
     /**
      * Called after a model is successfully saved.
      *
-     * @param bool    $success Indicates whether the database save operation succeeded
-     * @param bool    $forced  Indicates whether the model is being saved forcefully
      * @return void
      */
     public function afterSave()
     {
-    	// check if the model already exists
-		if($this->revisionEnabled AND $this->updating) {
-			// if it does, it means we're updating
+        // check if the model already exists
+        if ($this->revisionEnabled AND $this->updating) {
+            // if it does, it means we're updating
 
             $changes_to_record = $this->changedRevisionableFields();
 
-			foreach( $changes_to_record as $key => $change ) {
+            foreach ($changes_to_record as $key => $change) {
 
-				$revision = new Revision();
-				$revision->revisionable_type 	= get_class($this);
-				$revision->revisionable_id 		= $this->id;
-				$revision->key 					= $key;
-				$revision->old_value			= $this->originalData[$key];
-				$revision->new_value 			= $this->updatedData[$key];
-				$revision->user_id 				= \Auth::user()->id;
-				$revision->save();
+                $revision                    = new Revision();
+                $revision->revisionable_type = get_class($this);
+                $revision->revisionable_id   = $this->id;
+                $revision->key               = $key;
+                $revision->old_value         = $this->originalData[$key];
+                $revision->new_value         = $this->updatedData[$key];
+                $revision->user_id           = \Auth::user()->id;
+                $revision->save();
 
-			}
+            }
 
-		}
+        }
 
     }
 
@@ -126,12 +121,20 @@ class Revisionable extends \Eloquent {
      */
     private function changedRevisionableFields()
     {
+        var_dump($this->originalData);
+        var_dump($this->updatedData);
 
-        $changes = array_diff($this->updatedData, $this->originalData);
+//        $changes = array_diff($this->updatedData, $this->originalData);
+        $changes = array();
+        foreach ($this->originalData as $field => $val) {
+            if ($this->originalData[$field] != $this->updatedData[$field]) {
+                $changes[$field] = $val;
+            }
+        }
 
         $changes_to_record = array();
         foreach ($changes as $key => $value) {
-            if ($this->isRevisionable($key))  {
+            if ($this->isRevisionable($key)) {
                 $changes_to_record[$key] = $value;
             } else {
                 // we don't need these any more, and they could
@@ -148,7 +151,9 @@ class Revisionable extends \Eloquent {
 
     /**
      * Check if this field should have a revision kept
-     * @param  string  $key
+     *
+     * @param  string $key
+     *
      * @return boolean
      */
     private function isRevisionable($key)

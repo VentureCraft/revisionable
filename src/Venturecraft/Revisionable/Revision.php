@@ -9,10 +9,11 @@
  * (c) Venture Craft <http://www.venturecraft.com.au>
  */
 
-class Revision extends \Eloquent {
+class Revision extends \Eloquent
+{
 
 
-	public $table = 'revisions';
+    public $table = 'revisions';
     protected $revisionFormattedFields = array();
     private $parent;
 
@@ -31,7 +32,6 @@ class Revision extends \Eloquent {
     {
         return $this->morphTo();
     }
-
 
 
     /**
@@ -64,7 +64,6 @@ class Revision extends \Eloquent {
     }
 
 
-
     /**
      * Old Value
      * Grab the old value of the field, if it was a foreign key
@@ -76,7 +75,8 @@ class Revision extends \Eloquent {
         try {
             if (strpos($this->key, '_id')) {
                 $model = str_replace('_id', '', $this->key);
-                $item = $model::find($this->old_value);
+                $item  = $model::find($this->old_value);
+
                 return $this->format($this->key, $item->identifiableName());
             }
         } catch (Exception $e) {
@@ -91,7 +91,6 @@ class Revision extends \Eloquent {
     }
 
 
-
     /**
      * New Value
      * Grab the new value of the field, if it was a foreign key
@@ -103,7 +102,8 @@ class Revision extends \Eloquent {
         try {
             if (strpos($this->key, '_id')) {
                 $model = str_replace('_id', '', $this->key);
-                $item = $model::find($this->new_value);
+                $item  = $model::find($this->new_value);
+
                 return $this->format($this->key, $item->identifiableName());
             }
         } catch (Exception $e) {
@@ -128,7 +128,6 @@ class Revision extends \Eloquent {
     }
 
 
-
     /*
     array(
         'public' => 'boolean:Yes|No',
@@ -137,17 +136,21 @@ class Revision extends \Eloquent {
      */
     /**
      * Format the value according to the $revisionFormattedFields array
+     *
      * @param  $key
      * @param  $value
+     *
      * @return string formated value
      */
-    public function format($key, $value) {
-        $model = $this->revisionable_type;
-        $model = new $model;
+    public function format($key, $value)
+    {
+        $model                   = $this->revisionable_type;
+        $model                   = new $model;
         $revisionFormattedFields = $model->getRevisionFormattedFields();
 
         if (isset($revisionFormattedFields[$key])) {
             $format = $revisionFormattedFields[$key];
+
             return FieldFormatter::format($key, $value, $revisionFormattedFields);
         } else {
             return $value;

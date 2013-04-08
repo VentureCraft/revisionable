@@ -14,12 +14,15 @@ class FieldFormatter
 
     /**
      * Format the value according to the provided formats
+     *
      * @param  $key
      * @param  $value
      * @param  $formats
+     *
      * @return string formated value
      */
-    public static function format($key, $value, $formats) {
+    public static function format($key, $value, $formats)
+    {
 
         foreach ($formats as $pkey => $format) {
             $parts = explode(':', $format);
@@ -44,8 +47,10 @@ class FieldFormatter
 
     /**
      * Boolean
-     * @param  $value
+     *
+     * @param        $value
      * @param  array $options The false / true values to return
+     *
      * @return string   Formatted version of the boolean field
      */
     public static function boolean($value, $options = null)
@@ -65,8 +70,10 @@ class FieldFormatter
 
     /**
      * Format the string response, default is to just return the string
+     *
      * @param  $value
      * @param  $format
+     *
      * @return formatted string
      */
     public static function string($value, $format = null)
@@ -74,6 +81,7 @@ class FieldFormatter
         if (is_null($format)) {
             $format = '%s';
         }
+
         return sprintf($format, $value);
     }
 
