@@ -66,11 +66,7 @@ class Revision extends \Eloquent
                 $model = str_replace('_id', '', $this->key);
                 $item  = $model::find($this->old_value);
 
-                if (method_exists($item, 'identifiableName')) {
-                    return $this->format($this->key, $item->identifiableName());
-                } else {
-                    return $this->format($this->key, $item->id);
-                }
+                return $this->format($this->key, $item->identifiableName());
             }
         } catch (Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
@@ -97,11 +93,7 @@ class Revision extends \Eloquent
                 $model = str_replace('_id', '', $this->key);
                 $item  = $model::find($this->new_value);
 
-                if (method_exists($item, 'identifiableName')) {
-                    return $this->format($this->key, $item->identifiableName());
-                } else {
-                    return $this->format($this->key, $item->id);
-                }
+                return $this->format($this->key, $item->identifiableName());
             }
         } catch (Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
