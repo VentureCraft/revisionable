@@ -34,18 +34,7 @@ class Revision extends \Eloquent
     }
 
 
-    /**
-     * Identifiable Name
-     * When displaying revision history, when a foreigh key is updated
-     * instead of displaying the ID, you can choose to display a string
-     * of your choice, just override this method in your model
-     * By default, it will fall back to the models ID.
-     * @return string an identifying name for the model
-     */
-    public function identifiableName()
-    {
-        return $this->id;
-    }
+
 
 
     /**
@@ -77,7 +66,11 @@ class Revision extends \Eloquent
                 $model = str_replace('_id', '', $this->key);
                 $item  = $model::find($this->old_value);
 
-                return $this->format($this->key, $item->identifiableName());
+                if (method_exists($item, 'identifiableName')) {
+                    return $this->format($this->key, $item->identifiableName());
+                } else {
+                    return $this->format($this->key, $item->id);
+                }
             }
         } catch (Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
@@ -104,7 +97,11 @@ class Revision extends \Eloquent
                 $model = str_replace('_id', '', $this->key);
                 $item  = $model::find($this->new_value);
 
-                return $this->format($this->key, $item->identifiableName());
+                if (method_exists($item, 'identifiableName')) {
+                    return $this->format($this->key, $item->identifiableName());
+                } else {
+                    return $this->format($this->key, $item->id);
+                }
             }
         } catch (Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
@@ -129,6 +126,7 @@ class Revision extends \Eloquent
 
 
     /*
+     * Egzamples:
     array(
         'public' => 'boolean:Yes|No',
         'minimum'  => 'string:Min: %s'
