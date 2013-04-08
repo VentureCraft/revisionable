@@ -16,7 +16,7 @@ Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.m
 
 Add the following to the `require` section of your projects composer.json file:
 ```php
-"venturecraft/revisionable": "dev-master",
+"venturecraft/revisionable": "1.*",
 ```
 
 Run composer update to download the package
