@@ -12,10 +12,8 @@
 class Revision extends \Eloquent
 {
 
-
     public $table = 'revisions';
     protected $revisionFormattedFields = array();
-    private $parent;
 
     public function __construct(array $attributes = array())
     {
@@ -32,9 +30,6 @@ class Revision extends \Eloquent
     {
         return $this->morphTo();
     }
-
-
-
 
 
     /**
