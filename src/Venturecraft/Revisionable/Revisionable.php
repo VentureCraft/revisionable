@@ -31,6 +31,12 @@ class Revisionable extends \Eloquent
     protected $dontKeepRevisionOf = array();
 
 
+    /**
+     * Keeps the list of values that have been updated
+     * @var array
+     */
+    protected $dirty = array();
+
     public function revisionHistory()
     {
         return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
@@ -77,6 +83,7 @@ class Revisionable extends \Eloquent
                 }
             }
 
+            $this->dirty = $this->getDirty();
             $this->updating = $this->exists;
         }
 
@@ -121,19 +128,9 @@ class Revisionable extends \Eloquent
      */
     private function changedRevisionableFields()
     {
-        var_dump($this->originalData);
-        var_dump($this->updatedData);
-
-//        $changes = array_diff($this->updatedData, $this->originalData);
-        $changes = array();
-        foreach ($this->originalData as $field => $val) {
-            if ($this->originalData[$field] != $this->updatedData[$field]) {
-                $changes[$field] = $val;
-            }
-        }
 
         $changes_to_record = array();
-        foreach ($changes as $key => $value) {
+        foreach ($this->dirty as $key => $value) {
             if ($this->isRevisionable($key)) {
                 $changes_to_record[$key] = $value;
             } else {
@@ -143,7 +140,6 @@ class Revisionable extends \Eloquent
                 unset($this->originalData[$key]);
             }
         }
-
 
         return $changes_to_record;
 
