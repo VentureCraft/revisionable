@@ -161,6 +161,14 @@ class Article extends Revisionable
 
 Get the value of the model before or after the update. If it was a foreign key, identifiableName() is called.
 
+### Unknown or invalid foreign keys as revisions
+In cases where the old or new version of a value is a foreign key that no longer exists, or indeed was null, there are two variables that you can set in your model to control the output in these situations:
+
+```php
+protected $revisionNullString = 'nothing';
+protected $revisionUnknownString = 'unknown';
+```
+
 <a name="contributing"></a>
 ## Contributing
 

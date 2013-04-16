@@ -15,6 +15,11 @@ class Revision extends \Eloquent
     public $table = 'revisions';
     protected $revisionFormattedFields = array();
 
+    protected $revisionNullString = 'nothing';
+
+    protected $revisionUnknownString = 'unknown';
+
+
     public function __construct(array $attributes = array())
     {
         parent::__construct($attributes);
@@ -56,10 +61,19 @@ class Revision extends \Eloquent
      */
     public function oldValue()
     {
+
+        if (is_null($this->old_value) OR $this->old_value == '') {
+            return $this->revisionNullString;
+        }
+
         try {
             if (strpos($this->key, '_id')) {
                 $model = str_replace('_id', '', $this->key);
                 $item  = $model::find($this->old_value);
+
+                if (!$item) {
+                    return $this->format($this->key, $this->revisionUnknownString);
+                }
 
                 return $this->format($this->key, $item->identifiableName());
             }
@@ -83,10 +97,19 @@ class Revision extends \Eloquent
      */
     public function newValue()
     {
+
+        if (is_null($this->new_value) OR $this->new_value == '') {
+            return $this->revisionNullString;
+        }
+
         try {
             if (strpos($this->key, '_id')) {
                 $model = str_replace('_id', '', $this->key);
                 $item  = $model::find($this->new_value);
+
+                if (!$item) {
+                    return $this->format($this->key, $this->revisionUnknownString);
+                }
 
                 return $this->format($this->key, $item->identifiableName());
             }
@@ -134,8 +157,6 @@ class Revision extends \Eloquent
         $revisionFormattedFields = $model->getRevisionFormattedFields();
 
         if (isset($revisionFormattedFields[$key])) {
-            $format = $revisionFormattedFields[$key];
-
             return FieldFormatter::format($key, $value, $revisionFormattedFields);
         } else {
             return $value;
