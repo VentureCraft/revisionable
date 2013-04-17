@@ -109,9 +109,9 @@ class Revisionable extends \Eloquent
                 $revision->revisionable_type = get_class($this);
                 $revision->revisionable_id   = $this->id;
                 $revision->key               = $key;
-                $revision->old_value         = $this->originalData[$key];
+                $revision->old_value         = (isset($this->originalData[$key]) ? $this->originalData[$key]: null);
                 $revision->new_value         = $this->updatedData[$key];
-                $revision->user_id           = \Auth::user()->id;
+                $revision->user_id           = (\Auth::user() ? \Auth::user()->id : null);
                 $revision->save();
 
             }
