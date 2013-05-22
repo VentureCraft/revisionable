@@ -185,4 +185,19 @@ class Revisionable extends \Eloquent
         return $this->id;
     }
 
+    /**
+     * Disable a revisionable field temporarily
+     * 
+     * @param mixed $field
+     * 
+     * @return void
+     */
+    public function disableRevisionField($field)
+    {
+        if(is_array($field))
+            $this->dontKeepRevisionOf = array_merge($field, $this->dontKeepRevisionOf);
+        else
+            $this->dontKeepRevisionOf[] = $field;
+    }
+
 }
