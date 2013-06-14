@@ -169,6 +169,19 @@ protected $revisionNullString = 'nothing';
 protected $revisionUnknownString = 'unknown';
 ```
 
+### disableRevisionField()
+Sometimes temporarily disabling a revisionable field can come in handy, if you want to be able to save an update however don't need to keep a record of the changes.
+
+```php
+$object->disableRevisionField('title'); // Disables title
+```
+
+or:
+
+```php
+$object->disableRevisionField(array('title', 'content')); // Disables title and content
+```
+
 <a name="contributing"></a>
 ## Contributing
 
