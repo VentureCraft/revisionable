@@ -131,7 +131,9 @@ class Revisionable extends \Eloquent
 
         $changes_to_record = array();
         foreach ($this->dirty as $key => $value) {
-            if ($this->isRevisionable($key)) {
+            // check that the field is revisionable, and double check
+            // that it's actually new data in case dirty is, well, clean
+            if ($this->isRevisionable($key) AND $this->originalData[$key] != $this->updatedData[$key]) {
                 $changes_to_record[$key] = $value;
             } else {
                 // we don't need these any more, and they could
