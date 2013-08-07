@@ -87,6 +87,7 @@ class Revision extends \Eloquent
 
                 // Now we can find out the namespace of of related model
                 if (! method_exists($main_model, $related_model)) {
+                    throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
                 }
                 $related_class = $main_model->$related_model()->getRelated();
 
@@ -146,6 +147,9 @@ class Revision extends \Eloquent
                 // data source, please suggest / make a pull request
 
                 // Now we can find out the namespace of of related model
+                if (! method_exists($main_model, $related_model)) {
+                    throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                }
                 $related_class = $main_model->$related_model()->getRelated();
 
                 // Finally, now that we know the namespace of the related model
