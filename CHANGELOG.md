@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.1.1 (2013-08-07)
+------------------
+
+* Bug fix: Fixed naming convention for accessor methods
+
 1.1.0 (2013-08-07)
 ------------------
 

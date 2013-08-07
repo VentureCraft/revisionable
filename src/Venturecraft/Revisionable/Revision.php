@@ -120,7 +120,7 @@ class Revision extends \Eloquent
                     }
 
                     // see if there's an available mutator
-                    $mutator = 'get' . studly_case($this->key);
+                    $mutator = 'get' . studly_case($this->key) . 'Attribute';
                     if (method_exists($item, $mutator)) {
                         return $this->format($item->$mutator($this->key), $item->identifiableName());
                     }
