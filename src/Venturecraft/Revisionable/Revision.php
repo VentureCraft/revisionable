@@ -151,11 +151,6 @@ class Revision extends \Eloquent
                 // Finally, now that we know the namespace of the related model
                 // we can load it, to find the information we so desire
                 $item  = $related_class::find($this->new_value);
-                // var_dump($main_model);
-                // var_dump($related_model);
-                // var_dump($main_model->$related_model);
-                // var_dump($related_class);
-                // var_dump($this->new_value);
 
                 if (!$item) {
                     return $this->format($this->key, $this->revisionUnknownString);
