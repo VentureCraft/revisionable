@@ -82,10 +82,6 @@ class Revision extends \Eloquent
 
                 $main_model = new $main_model;
 
-                // NB If someone can find a more elegant way of doing this
-                // by using reflection rather than loading data from the
-                // data source, please suggest / make a pull request
-
                 // Now we can find out the namespace of of related model
                 if (! method_exists($main_model, $related_model)) {
                     throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
@@ -141,10 +137,6 @@ class Revision extends \Eloquent
                 }
 
                 $main_model = new $main_model;
-
-                // NB If someone can find a more elegant way of doing this
-                // by using reflection rather than loading data from the
-                // data source, please suggest / make a pull request
 
                 // Now we can find out the namespace of of related model
                 if (! method_exists($main_model, $related_model)) {
