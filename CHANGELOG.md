@@ -5,7 +5,12 @@ CHANGELOG
 ------------------
 
 * Added support for namespaced models extending the revisionable model
+  See https://github.com/VentureCraft/revisionable/issues/18
 * Added changelog, tried to backfill, some information will be missing... carry on
+* Added a final check to the old vs new before saving (thanks to @dnstbr)
+* Changed this->id to this->getKey() so you can still use $primaryKey in the model (thanks to @maclof)
+* Changed revision storing to be done in batch
+  See https://github.com/VentureCraft/revisionable/issues/14
 
 1.0.7 (2013-06-13)
 ------------------

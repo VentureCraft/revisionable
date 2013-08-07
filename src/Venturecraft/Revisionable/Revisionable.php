@@ -103,17 +103,26 @@ class Revisionable extends \Eloquent
 
             $changes_to_record = $this->changedRevisionableFields();
 
+            $revisions = array();
+
             foreach ($changes_to_record as $key => $change) {
 
-                $revision                    = new Revision();
-                $revision->revisionable_type = get_class($this);
-                $revision->revisionable_id   = $this->getKey();
-                $revision->key               = $key;
-                $revision->old_value         = (isset($this->originalData[$key]) ? $this->originalData[$key]: null);
-                $revision->new_value         = $this->updatedData[$key];
-                $revision->user_id           = (\Auth::user() ? \Auth::user()->id : null);
-                $revision->save();
+                $revisions[] = array(
+                    'revisionable_type'     => get_class($this),
+                    'revisionable_id'       => $this->getKey(),
+                    'key'                   => $key,
+                    'old_value'             => (isset($this->originalData[$key]) ? $this->originalData[$key]: null),
+                    'new_value'             => $this->updatedData[$key],
+                    'user_id'               => (\Auth::user() ? \Auth::user()->id : null),
+                    'created_at'            => new \DateTime(),
+                    'updated_at'            => new \DateTime(),
+                );
 
+            }
+
+            if (count($revisions) > 0) {
+                $revision = new Revision;
+                \DB::table($revision->getTable())->insert($revisions);
             }
 
         }
