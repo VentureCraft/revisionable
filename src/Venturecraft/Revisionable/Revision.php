@@ -16,11 +16,6 @@ class Revision extends \Eloquent
 
     protected $revisionFormattedFields = array();
 
-    protected $revisionNullString = 'nothing';
-
-    protected $revisionUnknownString = 'unknown';
-
-
     public function __construct(array $attributes = array())
     {
         parent::__construct($attributes);
@@ -63,50 +58,7 @@ class Revision extends \Eloquent
     public function oldValue()
     {
 
-        if (is_null($this->old_value) OR $this->old_value == '') {
-            return $this->revisionNullString;
-        }
-
-        try {
-
-            if (strpos($this->key, '_id')) {
-
-                $related_model = str_replace('_id', '', $this->key);
-
-                // First find the main model that was updated
-                $main_model = $this->revisionable_type;
-                // Load it, WITH the related model
-                if( !class_exists($main_model) ) {
-                    throw new \Exception('Class ' . $main_model . ' does not exist');
-                }
-
-                $main_model = new $main_model;
-
-                // Now we can find out the namespace of of related model
-                if (! method_exists($main_model, $related_model)) {
-                    throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
-                }
-                $related_class = $main_model->$related_model()->getRelated();
-
-                // Finally, now that we know the namespace of the related model
-                // we can load it, to find the information we so desire
-                $item  = $related_class::find($this->old_value);
-
-                if (!$item) {
-                    return $this->format($this->key, $this->revisionUnknownString);
-                }
-
-                return $this->format($this->key, $item->identifiableName());
-            }
-        } catch (\Exception $e) {
-            // Just a failsafe, in the case the data setup isn't as expected
-            // Nothing to do here.
-            \Log::info('Revisionable: ' . $e);
-        }
-
-        // if there was an issue
-        // or, if it's a normal value
-        return $this->format($this->key, $this->old_value);
+        return $this->getValue('old');
 
     }
 
@@ -120,9 +72,21 @@ class Revision extends \Eloquent
     public function newValue()
     {
 
-        if (is_null($this->new_value) OR $this->new_value == '') {
-            return $this->revisionNullString;
-        }
+        return $this->getValue('new');
+
+    }
+
+
+    /**
+     * Resposible for actually doing the grunt work for getting the
+     * old or new value for the revision
+     * @param  string $which old or new
+     * @return string value
+     */
+    private function getValue($which = 'new')
+    {
+
+        $which_value = $which . '_value';
 
         try {
             if (strpos($this->key, '_id')) {
@@ -146,14 +110,20 @@ class Revision extends \Eloquent
 
                 // Finally, now that we know the namespace of the related model
                 // we can load it, to find the information we so desire
-                $item  = $related_class::find($this->new_value);
+                $item  = $related_class::find($this->$which_value);
 
                 if (!$item) {
-                    return $this->format($this->key, $this->revisionUnknownString);
+                    $item = new $related_class;
+                    return $this->format($this->key, $item->getRevisionUnknownString());
+                }
+                if (is_null($this->$which_value) OR $this->$which_value == '') {
+                    $item = new $related_class;
+                    return $item->getRevisionNullString();
                 }
 
                 return $this->format($this->key, $item->identifiableName());
             }
+
         }
         catch (\Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
@@ -163,7 +133,7 @@ class Revision extends \Eloquent
 
         // if there was an issue
         // or, if it's a normal value
-        return $this->format($this->key, $this->new_value);
+        return $this->format($this->key, $this->$which_value);
 
     }
 

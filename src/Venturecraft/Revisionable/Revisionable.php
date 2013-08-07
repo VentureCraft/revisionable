@@ -30,6 +30,10 @@ class Revisionable extends \Eloquent
      */
     protected $dontKeepRevisionOf = array();
 
+    protected $revisionNullString = 'nothing';
+
+    protected $revisionUnknownString = 'unknown';
+
 
     /**
      * Keeps the list of values that have been updated
@@ -195,7 +199,34 @@ class Revisionable extends \Eloquent
      */
     public function identifiableName()
     {
-        return $this->id;
+        return $this->getKey();
+    }
+
+
+    /**
+     * Revision Unknown String
+     * When displaying revision history, when a foreigh key is updated
+     * instead of displaying the ID, you can choose to display a string
+     * of your choice, just override this method in your model
+     * By default, it will fall back to the models ID.
+     * @return string an identifying name for the model
+     */
+    public function getRevisionNullString()
+    {
+        return $this->revisionNullString;
+    }
+
+
+    /**
+     * No revision string
+     * When displaying revision history, if the revisions value
+     * cant be figured out, this is used instead.
+     * It can be overridden.
+     * @return string an identifying name for the model
+     */
+    public function getRevisionUnknownString()
+    {
+        return $this->revisionUnknownString;
     }
 
     /**

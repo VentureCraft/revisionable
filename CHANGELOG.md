@@ -11,6 +11,8 @@ CHANGELOG
 * Changed this->id to this->getKey() so you can still use $primaryKey in the model (thanks to @maclof)
 * Changed revision storing to be done in batch
   See https://github.com/VentureCraft/revisionable/issues/14
+* Bug fix: the fallback strings for null or unknown revisions weren't being overridden correctly
+  See https://github.com/VentureCraft/revisionable/issues/19
 
 1.0.7 (2013-06-13)
 ------------------
