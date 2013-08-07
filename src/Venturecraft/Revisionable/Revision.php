@@ -79,7 +79,8 @@ class Revision extends \Eloquent
                 if( !class_exists($main_model) ) {
                     throw new \Exception('Class ' . $main_model . ' does not exist');
                 }
-                $main_model = $main_model::with($related_model)->find($this->revisionable_id);
+
+                $main_model = new $main_model;
 
                 // NB If someone can find a more elegant way of doing this
                 // by using reflection rather than loading data from the
@@ -138,7 +139,6 @@ class Revision extends \Eloquent
                 if( !class_exists($main_model) ) {
                     throw new \Exception('Class ' . $main_model . ' does not exist');
                 }
-                // $main_model = $main_model::with($related_model)->find($this->revisionable_id);
 
                 $main_model = new $main_model;
 
