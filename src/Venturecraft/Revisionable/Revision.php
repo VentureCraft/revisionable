@@ -13,6 +13,7 @@ class Revision extends \Eloquent
 {
 
     public $table = 'revisions';
+
     protected $revisionFormattedFields = array();
 
     protected $revisionNullString = 'nothing';
@@ -67,9 +68,31 @@ class Revision extends \Eloquent
         }
 
         try {
+
             if (strpos($this->key, '_id')) {
-                $model = str_replace('_id', '', $this->key);
-                $item  = $model::find($this->old_value);
+
+                $related_model = str_replace('_id', '', $this->key);
+
+                // First find the main model that was updated
+                $main_model = $this->revisionable_type;
+                // Load it, WITH the related model
+                if( !class_exists($main_model) ) {
+                    throw new \Exception('Class ' . $main_model . ' does not exist');
+                }
+                $main_model = $main_model::with($related_model)->find($this->revisionable_id);
+
+                // NB If someone can find a more elegant way of doing this
+                // by using reflection rather than loading data from the
+                // data source, please suggest / make a pull request
+
+                // Now we can find out the namespace of of related model
+                if (! method_exists($main_model, $related_model)) {
+                }
+                $related_class = $main_model->$related_model()->getRelated();
+
+                // Finally, now that we know the namespace of the related model
+                // we can load it, to find the information we so desire
+                $item  = $related_class::find($this->old_value);
 
                 if (!$item) {
                     return $this->format($this->key, $this->revisionUnknownString);
@@ -77,9 +100,10 @@ class Revision extends \Eloquent
 
                 return $this->format($this->key, $item->identifiableName());
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
             // Nothing to do here.
+            \Log::info('Revisionable: ' . $e);
         }
 
         // if there was an issue
@@ -104,8 +128,34 @@ class Revision extends \Eloquent
 
         try {
             if (strpos($this->key, '_id')) {
-                $model = str_replace('_id', '', $this->key);
-                $item  = $model::find($this->new_value);
+
+                $related_model = str_replace('_id', '', $this->key);
+
+                // First find the main model that was updated
+                $main_model = $this->revisionable_type;
+                // Load it, WITH the related model
+                if( !class_exists($main_model) ) {
+                    throw new \Exception('Class ' . $main_model . ' does not exist');
+                }
+                // $main_model = $main_model::with($related_model)->find($this->revisionable_id);
+
+                $main_model = new $main_model;
+
+                // NB If someone can find a more elegant way of doing this
+                // by using reflection rather than loading data from the
+                // data source, please suggest / make a pull request
+
+                // Now we can find out the namespace of of related model
+                $related_class = $main_model->$related_model()->getRelated();
+
+                // Finally, now that we know the namespace of the related model
+                // we can load it, to find the information we so desire
+                $item  = $related_class::find($this->new_value);
+                // var_dump($main_model);
+                // var_dump($related_model);
+                // var_dump($main_model->$related_model);
+                // var_dump($related_class);
+                // var_dump($this->new_value);
 
                 if (!$item) {
                     return $this->format($this->key, $this->revisionUnknownString);
@@ -113,9 +163,12 @@ class Revision extends \Eloquent
 
                 return $this->format($this->key, $item->identifiableName());
             }
-        } catch (Exception $e) {
+        }
+        catch (\Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
             // Nothing to do here.
+            echo($e);
+            \Log::info('Revisionable: ' . $e);
         }
 
         // if there was an issue
@@ -152,9 +205,9 @@ class Revision extends \Eloquent
      */
     public function format($key, $value)
     {
-        $model                   = $this->revisionable_type;
-        $model                   = new $model;
-        $revisionFormattedFields = $model->getRevisionFormattedFields();
+        $related_model                   = $this->revisionable_type;
+        $related_model                   = new $related_model;
+        $revisionFormattedFields = $related_model->getRevisionFormattedFields();
 
         if (isset($revisionFormattedFields[$key])) {
             return FieldFormatter::format($key, $value, $revisionFormattedFields);

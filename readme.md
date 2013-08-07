@@ -1,5 +1,12 @@
 # Revisionable
 
+<a href="https://github.com/VentureCraft/revisionable">
+    <img src="https://poser.pugx.org/venturecraft/revisionable/version.png" style="vertical-align: text-top">
+</a>
+<a href="https://github.com/VentureCraft/revisionable">
+    <img src="https://poser.pugx.org/venturecraft/revisionable/d/total.png" style="vertical-align: text-top">
+</a>
+
 Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable form your model, you can instantly have just that, and be able to display a history similar to this:
 
 * Chris changed title from 'Something' to 'Something else'
@@ -45,8 +52,12 @@ For any model that you want to keep a revision history for, include the revision
 ```php
 use Venturecraft\Revisionable\Revisionable;
 
+namespace MyApp\Models;
+
 class Article extends Revisionable { }
 ```
+
+Note that it also works with namespaced models.
 
 If needed, you can disable the revisioning by setting `$revisionEnabled` to false in your model. This can be handy if you want to temporarily disable revisioning, or if you want to create your own base model that extends revisionable, which all of your models extend, but you want to turn revisionable off for certain models.
 
