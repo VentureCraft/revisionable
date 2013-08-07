@@ -107,7 +107,7 @@ class Revisionable extends \Eloquent
 
                 $revision                    = new Revision();
                 $revision->revisionable_type = get_class($this);
-                $revision->revisionable_id   = $this->id;
+                $revision->revisionable_id   = $this->getKey();
                 $revision->key               = $key;
                 $revision->old_value         = (isset($this->originalData[$key]) ? $this->originalData[$key]: null);
                 $revision->new_value         = $this->updatedData[$key];
@@ -187,9 +187,9 @@ class Revisionable extends \Eloquent
 
     /**
      * Disable a revisionable field temporarily
-     * 
+     *
      * @param mixed $field
-     * 
+     *
      * @return void
      */
     public function disableRevisionField($field)
