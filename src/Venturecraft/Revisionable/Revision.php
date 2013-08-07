@@ -137,7 +137,7 @@ class Revision extends \Eloquent
             // if there was an issue
             // or, if it's a normal value
 
-            $mutator = 'get' . studly_case($this->key);
+            $mutator = 'get' . studly_case($this->key) . 'Attribute';
             if (method_exists($main_model, $mutator)) {
                 return $this->format($this->key, $main_model->$mutator($this->$which_value));
             }
