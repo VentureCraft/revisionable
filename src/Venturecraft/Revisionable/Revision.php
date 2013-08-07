@@ -167,7 +167,6 @@ class Revision extends \Eloquent
         catch (\Exception $e) {
             // Just a failsafe, in the case the data setup isn't as expected
             // Nothing to do here.
-            echo($e);
             \Log::info('Revisionable: ' . $e);
         }
 
