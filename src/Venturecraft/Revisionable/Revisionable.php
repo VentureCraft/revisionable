@@ -133,8 +133,10 @@ class Revisionable extends \Eloquent
         foreach ($this->dirty as $key => $value) {
             // check that the field is revisionable, and double check
             // that it's actually new data in case dirty is, well, clean
-            if ($this->isRevisionable($key) AND $this->originalData[$key] != $this->updatedData[$key]) {
-                $changes_to_record[$key] = $value;
+            if ($this->isRevisionable($key)) {
+                if(!isset($this->originalData[$key]) || $this->originalData[$key] != $this->updatedData[$key]) {
+                    $changes_to_record[$key] = $value;
+                }
             } else {
                 // we don't need these any more, and they could
                 // contain a lot of data, so lets trash them.
