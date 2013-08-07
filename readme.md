@@ -93,6 +93,10 @@ protected $dontKeepRevisionOf = array(
 <a name="formatoutput"></a>
 ## Format output
 
+> You can continue (and are encouraged to) use `eloquent accessors` in your model to set the
+output of your values, see the [laravel docs for more information on accessors](http://laravel.com/docs/eloquent#accessors-and-mutators)
+> The below documentation is therefor deprecated
+
 In cases where you want to have control over the format of the output of the values, for example a boolean field, you can set them in the `$revisionFormattedFields` array in your model. e.g.,
 
 ```php
@@ -115,8 +119,6 @@ Booleans by default will display as a 0 or a 1, which is pretty bland and won't 
 ```
 boolean:No|Yes
 ```
-
-> If you don't set a format for a certain field, it will default to simply being exactly what's in the database
 
 <a name="loadhistory"></a>
 ## Load revision history

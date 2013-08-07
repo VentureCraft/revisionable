@@ -13,6 +13,7 @@ CHANGELOG
   See https://github.com/VentureCraft/revisionable/issues/14
 * Bug fix: the fallback strings for null or unknown revisions weren't being overridden correctly
   See https://github.com/VentureCraft/revisionable/issues/19
+* Added support for using eloquent model accessors
 
 1.0.7 (2013-06-13)
 ------------------

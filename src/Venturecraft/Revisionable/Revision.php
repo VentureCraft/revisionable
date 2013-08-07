@@ -88,51 +88,62 @@ class Revision extends \Eloquent
 
         $which_value = $which . '_value';
 
-        try {
-            if (strpos($this->key, '_id')) {
+        // First find the main model that was updated
+        $main_model = $this->revisionable_type;
+        // Load it, WITH the related model
+        if( class_exists($main_model) ) {
 
-                $related_model = str_replace('_id', '', $this->key);
+            $main_model = new $main_model;
 
-                // First find the main model that was updated
-                $main_model = $this->revisionable_type;
-                // Load it, WITH the related model
-                if( !class_exists($main_model) ) {
-                    throw new \Exception('Class ' . $main_model . ' does not exist');
+            try {
+                if (strpos($this->key, '_id')) {
+
+                    $related_model = str_replace('_id', '', $this->key);
+
+                    // Now we can find out the namespace of of related model
+                    if (! method_exists($main_model, $related_model)) {
+                        throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                    }
+                    $related_class = $main_model->$related_model()->getRelated();
+
+                    // Finally, now that we know the namespace of the related model
+                    // we can load it, to find the information we so desire
+                    $item  = $related_class::find($this->$which_value);
+
+                    if (!$item) {
+                        $item = new $related_class;
+                        return $this->format($this->key, $item->getRevisionUnknownString());
+                    }
+                    if (is_null($this->$which_value) OR $this->$which_value == '') {
+                        $item = new $related_class;
+                        return $item->getRevisionNullString();
+                    }
+
+                    // see if there's an available mutator
+                    $mutator = 'get' . studly_case($this->key);
+                    if (method_exists($item, $mutator)) {
+                        return $this->format($item->$mutator($this->key), $item->identifiableName());
+                    }
+                    return $this->format($this->key, $item->identifiableName());
                 }
 
-                $main_model = new $main_model;
+            }
+            catch (\Exception $e) {
+                // Just a failsafe, in the case the data setup isn't as expected
+                // Nothing to do here.
+                \Log::info('Revisionable: ' . $e);
+            }
 
-                // Now we can find out the namespace of of related model
-                if (! method_exists($main_model, $related_model)) {
-                    throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
-                }
-                $related_class = $main_model->$related_model()->getRelated();
+            // if there was an issue
+            // or, if it's a normal value
 
-                // Finally, now that we know the namespace of the related model
-                // we can load it, to find the information we so desire
-                $item  = $related_class::find($this->$which_value);
-
-                if (!$item) {
-                    $item = new $related_class;
-                    return $this->format($this->key, $item->getRevisionUnknownString());
-                }
-                if (is_null($this->$which_value) OR $this->$which_value == '') {
-                    $item = new $related_class;
-                    return $item->getRevisionNullString();
-                }
-
-                return $this->format($this->key, $item->identifiableName());
+            $mutator = 'get' . studly_case($this->key);
+            if (method_exists($main_model, $mutator)) {
+                return $this->format($this->key, $main_model->$mutator($this->$which_value));
             }
 
         }
-        catch (\Exception $e) {
-            // Just a failsafe, in the case the data setup isn't as expected
-            // Nothing to do here.
-            \Log::info('Revisionable: ' . $e);
-        }
 
-        // if there was an issue
-        // or, if it's a normal value
         return $this->format($this->key, $this->$which_value);
 
     }
