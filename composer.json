@@ -1,7 +1,8 @@
 {
     "name": "venturecraft/revisionable",
     "license": "MIT",
-    "description": "Revisionable is a laravel package that allows you to keep a revision history for your models without thinking, built on top of Ardent",
+    "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel 4",
+    "version": "0.3.0",
     "keywords": ["model", "laravel", "ardent", "revision", "history"],
     "homepage": "http://github.com/venturecraft/revisionable",
     "authors": [
@@ -10,6 +11,10 @@
             "email": "me@chrisduell.com"
         }
     ],
+    "support": {
+        "issues": "https://github.com/VentureCraft/revisionable/issues",
+        "source": "https://github.com/VentureCraft/revisionable"
+    },
     "require": {
         "php": ">=5.3.0",
         "illuminate/support": "4.0.x"
