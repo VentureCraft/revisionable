@@ -155,7 +155,8 @@ class Revision extends \Eloquent
      */
     public function userResponsible()
     {
-        return \User::find($this->user_id);
+        $user_model = \Config::get('auth.model');
+        return $user_model::find($this->user_id);
     }
 
 
