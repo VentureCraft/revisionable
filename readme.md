@@ -150,6 +150,8 @@ The above would be the result from this:
 
 Returns the User that was responsible for making the revision. A user model is returned, or null if there was no user recorded.
 
+The user model that is loaded depends on what you have set in your `config/auth.php` file for the `model` variable.
+
 ### fieldName()
 
 Returns the name of the field that was updated, if the field that was updated was a foreign key (at this stage, it simply looks to see if the field has the suffix of `_id`) then the text before `_id` is returned. e.g., if the field was `plan_id`, then `plan` would be returned.
