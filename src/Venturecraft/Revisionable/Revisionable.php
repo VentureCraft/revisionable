@@ -7,8 +7,7 @@
  *
  */
 
-use Illuminate\Support\ServiceProvider,
-    Config;
+use Illuminate\Support\ServiceProvider;
 
 class Revisionable extends \Eloquent
 {
@@ -113,7 +112,7 @@ class Revisionable extends \Eloquent
             foreach ($changes_to_record as $key => $change) {
 
                 $user_id = (\Auth::user() ? \Auth::user()->id : null);
-                if( Config::get('revisionable::config.sentry') ){
+                if( \Config::get('revisionable::config.sentry') ){
                     $user_id = (\Sentry::check() ? \Sentry::getUser()->id : null);
                 }
 
