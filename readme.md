@@ -38,6 +38,11 @@ Finally, you'll also need to run migration on the package
 php artisan migrate --package=venturecraft/revisionable
 ```
 
+Optional, if you wan't to use it with Sentry
+```
+php artisan config:publish venturecraft/revisionable
+```
+
 ## Docs
 
 * [Effortless revision history](#intro)
