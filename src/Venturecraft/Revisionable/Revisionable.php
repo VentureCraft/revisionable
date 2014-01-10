@@ -7,7 +7,8 @@
  *
  */
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ServiceProvider,
+    Config;
 
 class Revisionable extends \Eloquent
 {
