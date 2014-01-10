@@ -111,13 +111,18 @@ class Revisionable extends \Eloquent
 
             foreach ($changes_to_record as $key => $change) {
 
+                $user_id = (\Auth::user() ? \Auth::user()->id : null);
+                if( \Config::get('revisionable::config.sentry') ){
+                    $user_id = (\Sentry::check() ? \Sentry::getUser()->id : null);
+                }
+
                 $revisions[] = array(
                     'revisionable_type'     => get_class($this),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
                     'old_value'             => (isset($this->originalData[$key]) ? $this->originalData[$key]: null),
                     'new_value'             => $this->updatedData[$key],
-                    'user_id'               => (\Auth::user() ? \Auth::user()->id : null),
+                    'user_id'               => $user_id,
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
                 );
