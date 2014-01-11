@@ -38,6 +38,20 @@ Finally, you'll also need to run migration on the package
 php artisan migrate --package=venturecraft/revisionable
 ```
 
+#### Optional steps for additional conguration (such as adding Sentry support)
+
+Add the following to the list of service providers in app/config/app.php.
+```php
+'Venturecraft\Revisionable\RevisionableServiceProvider',
+```
+
+Publish the package's configuration file into your application, by running the following command:
+```
+php artisan config:publish venturecraft/revisionable
+```
+This will publish the config file to app/config/packages/venturecraft/revisionable/config.php where you modify the package configuration.
+
+
 ## Docs
 
 * [Effortless revision history](#intro)

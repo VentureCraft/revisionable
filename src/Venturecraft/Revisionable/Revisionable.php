@@ -107,6 +107,8 @@ class Revisionable extends \Eloquent
 
             $changes_to_record = $this->changedRevisionableFields();
 
+            $user_id = $this->getUserId();
+
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
@@ -117,7 +119,7 @@ class Revisionable extends \Eloquent
                     'key'                   => $key,
                     'old_value'             => (isset($this->originalData[$key]) ? $this->originalData[$key]: null),
                     'new_value'             => $this->updatedData[$key],
-                    'user_id'               => (\Auth::user() ? \Auth::user()->id : null),
+                    'user_id'               => $user_id,
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
                 );
@@ -242,6 +244,18 @@ class Revisionable extends \Eloquent
             $this->dontKeepRevisionOf = array_merge($field, $this->dontKeepRevisionOf);
         else
             $this->dontKeepRevisionOf[] = $field;
+    }
+
+    /**
+     * Get user id from user currently logged in
+     * @return int if user is logged in or NULL if not
+     */
+    public function getUserId()
+    {
+        if(\Config::get('revisionable::sentry'))
+            return (\Sentry::check() ? \Sentry::getUser()->id : null);
+        else
+            return (\Auth::user() ? \Auth::user()->id : null);
     }
 
 }
