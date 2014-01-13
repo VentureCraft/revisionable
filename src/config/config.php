@@ -12,6 +12,6 @@ return array(
 	|
 	*/
 	
-	'sentry' => true
+	'sentry' => false
 
 );
