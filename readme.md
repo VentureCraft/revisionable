@@ -206,3 +206,5 @@ Contributions are encouraged and welcome; to keep things organised, all bugs and
 opened in the github issues tab for the main project, at [venturecraft/revisionable/issues](https://github.com/venturecraft/revisionable/issues)
 
 All pull requests should be made to the develop branch, so they can be tested before being merged into the master branch.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/VentureCraft/revisionable/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
