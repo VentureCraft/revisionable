@@ -19,6 +19,8 @@ So not only can you see a history of what happened, but who did what, so there's
 
 Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
+> Revisionable now has support for Sentry by Cartalyst
+
 ## Installation
 
 Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.md), the details are on [packagist, here.](https://packagist.org/packages/venturecraft/revisionable)
