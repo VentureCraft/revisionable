@@ -117,7 +117,7 @@ class Revisionable extends \Eloquent
                     'key'                   => $key,
                     'old_value'             => (isset($this->originalData[$key]) ? $this->originalData[$key]: null),
                     'new_value'             => $this->updatedData[$key],
-                    'user_id'               => (\Auth::user() ? \Auth::user()->id : null),
+                    'user_id'               => $this->getUserId(),
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
                 );
@@ -131,6 +131,28 @@ class Revisionable extends \Eloquent
 
         }
 
+    }
+
+
+    /**
+     * Attempt to find the user id of the currently logged in user
+     * Supports Sentry based authentication, as well as stock Auth
+     **/
+    private function getUserId()
+    {
+
+        try {
+            if (class_exists('Sentry') AND \Sentry::check()) {
+                $user = \Sentry::getUser();
+                return $user->id;
+            } else if (\Auth::check()) {
+                return \Auth::user()->id;
+            }
+        } catch (Exception $e) {
+            return null;
+        }
+
+        return null;
     }
 
 
@@ -243,5 +265,4 @@ class Revisionable extends \Eloquent
         else
             $this->dontKeepRevisionOf[] = $field;
     }
-
 }

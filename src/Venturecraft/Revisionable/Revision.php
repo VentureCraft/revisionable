@@ -155,8 +155,12 @@ class Revision extends \Eloquent
      */
     public function userResponsible()
     {
-        $user_model = \Config::get('auth.model');
-        return $user_model::find($this->user_id);
+        if (class_exists('Sentry')) {
+            return \Sentry::findUserById($this->user_id);
+        } else {
+            $user_model = \Config::get('auth.model');
+            return $user_model::find($this->user_id);
+        }
     }
 
 
@@ -187,6 +191,4 @@ class Revision extends \Eloquent
             return $value;
         }
     }
-
-
 }
