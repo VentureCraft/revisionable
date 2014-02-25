@@ -63,7 +63,7 @@ php artisan migrate --package=venturecraft/revisionable
 <a name="intro"></a>
 ## Implementation
 
-### The new, trait based approach
+### The new, trait based implementation
 
 For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
 
@@ -77,7 +77,9 @@ class Article extends Eloquent {
 
 > Being a trait, revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent, like [Ardent](https://github.com/laravelbook/ardent) for example.
 
-### Legacy implementation
+> Traits require PHP >= 5.4
+
+### Legacy class based implementation
 
 > The new trait based approach is backwards compatible with existing installations of Revisionable. You can still use the below installation instructions, which essentially is extending a wrapper for the trait.
 
