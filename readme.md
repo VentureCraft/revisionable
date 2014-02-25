@@ -19,7 +19,8 @@ So not only can you see a history of what happened, but who did what, so there's
 
 Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
-> Revisionable now has support for Sentry by Cartalyst
+> Revisionable now has support for **Sentry by Cartalyst**
+> Revisionable can also now be used **as a trait**, so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent))
 
 ## Installation
 
@@ -42,7 +43,7 @@ php artisan migrate --package=venturecraft/revisionable
 
 ## Docs
 
-* [Effortless revision history](#intro)
+* [Implementation](#intro)
 * [More control](#control)
 * [Format output](#formatoutput)
 * [Load revision history](#loadhistory)
@@ -50,7 +51,23 @@ php artisan migrate --package=venturecraft/revisionable
 * [Contributing](#contributing)
 
 <a name="intro"></a>
-## Effortless revision history
+## Implementation
+
+### The new, trait based approach
+
+For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
+```php namespace MyApp\Models;
+
+class Article extends Eloquent {
+    use \Venturecraft\Revisionable\RevisionableTrait;
+}
+```
+
+> Being a trait, revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent, like [Ardent](https://github.com/laravelbook/ardent) for example.
+
+### Legacy implementation
+
+> The new trait based approach is backwards compatible with existing installations of Revisionable. You can still use the below installation instructions, which essentially is extending a wrapper for the trait.
 
 For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
 ```php
@@ -63,13 +80,15 @@ class Article extends Revisionable { }
 
 Note that it also works with namespaced models.
 
+### Implementation notes
+
 If needed, you can disable the revisioning by setting `$revisionEnabled` to false in your model. This can be handy if you want to temporarily disable revisioning, or if you want to create your own base model that extends revisionable, which all of your models extend, but you want to turn revisionable off for certain models.
 
-```php
-use Venturecraft\Revisionable\Revisionable;
+```php namespace MyApp\Models;
 
-class Article extends Revisionable
-{
+class Article extends Eloquent {
+    use Venturecraft\Revisionable\RevisionableTrait;
+
     protected $revisionEnabled = false;
 }
 ```
