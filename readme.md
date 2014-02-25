@@ -27,16 +27,19 @@ Revisionable is a laravel package that allows you to keep a revision history for
 Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.md), the details are on [packagist, here.](https://packagist.org/packages/venturecraft/revisionable)
 
 Add the following to the `require` section of your projects composer.json file:
+
 ```php
 "venturecraft/revisionable": "1.*",
 ```
 
 Run composer update to download the package
+
 ```
 php composer.phar update
 ```
 
 Finally, you'll also need to run migration on the package
+
 ```
 php artisan migrate --package=venturecraft/revisionable
 ```
@@ -56,6 +59,7 @@ php artisan migrate --package=venturecraft/revisionable
 ### The new, trait based approach
 
 For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
+
 ```php namespace MyApp\Models;
 
 class Article extends Eloquent {
@@ -70,6 +74,7 @@ class Article extends Eloquent {
 > The new trait based approach is backwards compatible with existing installations of Revisionable. You can still use the below installation instructions, which essentially is extending a wrapper for the trait.
 
 For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
+
 ```php
 use Venturecraft\Revisionable\Revisionable;
 
@@ -105,6 +110,7 @@ protected $keepRevisionOf = array(
 ```
 
 Or, you can specify which fields you explicitly don't want to track. All other fields will be tracked.
+
 ```php
 protected $dontKeepRevisionOf = array(
     'category_id'
@@ -161,6 +167,7 @@ For the most part, the revision history will hold enough information to directly
 To help with this, there's a few helper methods to display more insightful information, so you can display something like `Chris changed plan from bronze to gold`.
 
 The above would be the result from this:
+
 ```php
 @foreach($account->revisionHistory as $history )
     <li>{{ $history->userResponsible()->first_name }} changed {{ $history->fieldName() }} from {{ $history->oldValue() }} to {{ $history->newValue() }}</li>
@@ -182,6 +189,7 @@ Returns the name of the field that was updated, if the field that was updated wa
 This is used when the value (old or new) is the id of a foreign key relationship.
 
 By default, it simply returns the ID of the model that was updated. It is up to you to override this method in your own models to return something meaningful. e.g.,
+
 ```php
 use Venturecraft\Revisionable\Revisionable;
 
@@ -192,7 +200,6 @@ class Article extends Revisionable
         return $this->title;
     }
 }
-
 ```
 
 ### oldValue() and newValue()
