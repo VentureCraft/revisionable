@@ -21,7 +21,7 @@ Revisionable is a laravel package that allows you to keep a revision history for
 
 ## Working with third party Auth / Eloquent extensions
 
-Revisionable now has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry.)
+Revisionable now has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
 
 Revisionable can also now be used [as a trait](#the-new-trait-based-approach), so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent)).
 
@@ -46,6 +46,10 @@ Finally, you'll also need to run migration on the package
 ```
 php artisan migrate --package=venturecraft/revisionable
 ```
+
+> If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
+
+> `cp vendor/venturecraft/revisionable/src/migrations/2013_04_09_062329_create_revisions_table.php app/database/migrations/`
 
 ## Docs
 
