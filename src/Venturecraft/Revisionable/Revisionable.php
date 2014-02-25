@@ -17,23 +17,6 @@ class Revisionable extends \Eloquent
     private $updating;
     private $dontKeep = array();
     private $doKeep = array();
-    // protected $revisionEnabled = true;
-
-    /**
-     * A list of fields that should have
-     * revisions kept for the model.
-     */
-    // protected $keepRevisionOf = array();
-
-    /**
-     * A list of fields that should be ignored when keeping
-     * revisions of the model.
-     */
-    // protected $dontKeepRevisionOf = array();
-
-    // protected $revisionNullString = 'nothing';
-
-    // protected $revisionUnknownString = 'unknown';
 
 
     /**
@@ -53,12 +36,12 @@ class Revisionable extends \Eloquent
     {
         parent::boot();
 
-        static::saving(function($model)
+        static::updating(function($model)
         {
             $model->preSave();
         });
 
-        static::saved(function($model)
+        static::updated(function($model)
         {
             $model->postSave();
         });
@@ -94,15 +77,21 @@ class Revisionable extends \Eloquent
                 }
             }
 
-            $this->dirtyData = $this->getDirty();
-            $this->updating = $this->exists;
-
             // the below is ugly, for sure, but it's required so we can save the standard model
             // then use the keep / dontkeep values for later, in the isRevisionable method
-            $this->dontKeep = isset($this->dontKeepRevisionOf)?$this->dontKeepRevisionOf:array();
-            $this->doKeep = isset($this->keepRevisionOf)?$this->keepRevisionOf:array();
+            $this->dontKeep = isset($this->dontKeepRevisionOf) ?
+                $this->dontKeepRevisionOf + $this->dontKeep
+                : $this->dontKeep;
+
+            $this->doKeep = isset($this->keepRevisionOf) ?
+                $this->keepRevisionOf + $this->doKeep
+                : $this->doKeep;
+
             unset($this->attributes['dontKeepRevisionOf']);
             unset($this->attributes['keepRevisionOf']);
+
+            $this->dirtyData = $this->getDirty();
+            $this->updating = $this->exists;
 
         }
 
@@ -195,10 +184,6 @@ class Revisionable extends \Eloquent
                 unset($this->originalData[$key]);
             }
         }
-
-        // make sure we're not trying to save revisions of these!
-        // unset($changes_to_record['dontKeepRevisionOf']);
-        // unset($changes_to_record['keepRevisionOf']);
 
         return $changes_to_record;
 
