@@ -19,8 +19,11 @@ So not only can you see a history of what happened, but who did what, so there's
 
 Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
-> Revisionable now has support for **Sentry by Cartalyst**
-> Revisionable can also now be used **as a trait**, so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent))
+## Working with third party Auth / Eloquent extensions
+
+Revisionable now has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry.)
+
+Revisionable can also now be used [as a trait](#the-new-trait-based-approach), so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent)).
 
 ## Installation
 
