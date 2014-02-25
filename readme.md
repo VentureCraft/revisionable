@@ -60,7 +60,8 @@ php artisan migrate --package=venturecraft/revisionable
 
 For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
 
-```php namespace MyApp\Models;
+```php
+namespace MyApp\Models;
 
 class Article extends Eloquent {
     use \Venturecraft\Revisionable\RevisionableTrait;
@@ -89,7 +90,8 @@ Note that it also works with namespaced models.
 
 If needed, you can disable the revisioning by setting `$revisionEnabled` to false in your model. This can be handy if you want to temporarily disable revisioning, or if you want to create your own base model that extends revisionable, which all of your models extend, but you want to turn revisionable off for certain models.
 
-```php namespace MyApp\Models;
+```php
+namespace MyApp\Models;
 
 class Article extends Eloquent {
     use Venturecraft\Revisionable\RevisionableTrait;
