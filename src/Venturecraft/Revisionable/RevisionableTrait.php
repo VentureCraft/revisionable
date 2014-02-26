@@ -36,12 +36,12 @@ trait RevisionableTrait
     {
         parent::boot();
 
-        static::updating(function($model)
+        static::saving(function($model)
         {
             $model->preSave();
         });
 
-        static::updated(function($model)
+        static::saved(function($model)
         {
             $model->postSave();
         });
@@ -68,6 +68,7 @@ trait RevisionableTrait
 
             $this->originalData = $this->original;
             $this->updatedData  = $this->attributes;
+
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
@@ -173,7 +174,7 @@ trait RevisionableTrait
         foreach ($this->dirtyData as $key => $value) {
             // check that the field is revisionable, and double check
             // that it's actually new data in case dirty is, well, clean
-            if ($this->isRevisionable($key)) {
+            if ($this->isRevisionable($key) and !is_array($value)) {
                 if(!isset($this->originalData[$key]) || $this->originalData[$key] != $this->updatedData[$key]) {
                     $changes_to_record[$key] = $value;
                 }
