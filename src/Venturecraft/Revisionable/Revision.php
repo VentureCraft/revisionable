@@ -102,7 +102,10 @@ class Revision extends \Eloquent
 
                     // Now we can find out the namespace of of related model
                     if (! method_exists($main_model, $related_model)) {
-                        throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                        $related_model = camel_case($related_model); // for cases like published_status_id
+                        if (! method_exists($main_model, $related_model)) {
+                            throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                        }
                     }
                     $related_class = $main_model->$related_model()->getRelated();
 
