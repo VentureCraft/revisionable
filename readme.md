@@ -19,30 +19,41 @@ So not only can you see a history of what happened, but who did what, so there's
 
 Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
-> Revisionable now has support for Sentry by Cartalyst
+## Working with third party Auth / Eloquent extensions
+
+Revisionable now has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
+
+Revisionable can also now be used [as a trait](#the-new-trait-based-approach), so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent)).
 
 ## Installation
 
 Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.md), the details are on [packagist, here.](https://packagist.org/packages/venturecraft/revisionable)
 
 Add the following to the `require` section of your projects composer.json file:
+
 ```php
 "venturecraft/revisionable": "1.*",
 ```
 
 Run composer update to download the package
+
 ```
 php composer.phar update
 ```
 
 Finally, you'll also need to run migration on the package
+
 ```
 php artisan migrate --package=venturecraft/revisionable
 ```
 
+> If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
+
+> `cp vendor/venturecraft/revisionable/src/migrations/2013_04_09_062329_create_revisions_table.php app/database/migrations/`
+
 ## Docs
 
-* [Effortless revision history](#intro)
+* [Implementation](#intro)
 * [More control](#control)
 * [Format output](#formatoutput)
 * [Load revision history](#loadhistory)
@@ -50,9 +61,30 @@ php artisan migrate --package=venturecraft/revisionable
 * [Contributing](#contributing)
 
 <a name="intro"></a>
-## Effortless revision history
+## Implementation
+
+### The new, trait based implementation
 
 For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
+
+```php
+namespace MyApp\Models;
+
+class Article extends Eloquent {
+    use \Venturecraft\Revisionable\RevisionableTrait;
+}
+```
+
+> Being a trait, revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent, like [Ardent](https://github.com/laravelbook/ardent) for example.
+
+> Traits require PHP >= 5.4
+
+### Legacy class based implementation
+
+> The new trait based approach is backwards compatible with existing installations of Revisionable. You can still use the below installation instructions, which essentially is extending a wrapper for the trait.
+
+For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
+
 ```php
 use Venturecraft\Revisionable\Revisionable;
 
@@ -63,13 +95,16 @@ class Article extends Revisionable { }
 
 Note that it also works with namespaced models.
 
+### Implementation notes
+
 If needed, you can disable the revisioning by setting `$revisionEnabled` to false in your model. This can be handy if you want to temporarily disable revisioning, or if you want to create your own base model that extends revisionable, which all of your models extend, but you want to turn revisionable off for certain models.
 
 ```php
-use Venturecraft\Revisionable\Revisionable;
+namespace MyApp\Models;
 
-class Article extends Revisionable
-{
+class Article extends Eloquent {
+    use Venturecraft\Revisionable\RevisionableTrait;
+
     protected $revisionEnabled = false;
 }
 ```
@@ -86,6 +121,7 @@ protected $keepRevisionOf = array(
 ```
 
 Or, you can specify which fields you explicitly don't want to track. All other fields will be tracked.
+
 ```php
 protected $dontKeepRevisionOf = array(
     'category_id'
@@ -142,6 +178,7 @@ For the most part, the revision history will hold enough information to directly
 To help with this, there's a few helper methods to display more insightful information, so you can display something like `Chris changed plan from bronze to gold`.
 
 The above would be the result from this:
+
 ```php
 @foreach($account->revisionHistory as $history )
     <li>{{ $history->userResponsible()->first_name }} changed {{ $history->fieldName() }} from {{ $history->oldValue() }} to {{ $history->newValue() }}</li>
@@ -163,6 +200,7 @@ Returns the name of the field that was updated, if the field that was updated wa
 This is used when the value (old or new) is the id of a foreign key relationship.
 
 By default, it simply returns the ID of the model that was updated. It is up to you to override this method in your own models to return something meaningful. e.g.,
+
 ```php
 use Venturecraft\Revisionable\Revisionable;
 
@@ -173,7 +211,6 @@ class Article extends Revisionable
         return $this->title;
     }
 }
-
 ```
 
 ### oldValue() and newValue()

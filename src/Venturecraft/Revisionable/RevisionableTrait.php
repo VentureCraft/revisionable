@@ -9,7 +9,7 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class Revisionable extends \Eloquent
+trait RevisionableTrait
 {
 
     private $originalData;

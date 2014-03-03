@@ -102,7 +102,10 @@ class Revision extends \Eloquent
 
                     // Now we can find out the namespace of of related model
                     if (! method_exists($main_model, $related_model)) {
-                        throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                        $related_model = camel_case($related_model); // for cases like published_status_id
+                        if (! method_exists($main_model, $related_model)) {
+                            throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                        }
                     }
                     $related_class = $main_model->$related_model()->getRelated();
 
@@ -110,14 +113,15 @@ class Revision extends \Eloquent
                     // we can load it, to find the information we so desire
                     $item  = $related_class::find($this->$which_value);
 
-                    if (!$item) {
-                        $item = new $related_class;
-                        return $this->format($this->key, $item->getRevisionUnknownString());
-                    }
                     if (is_null($this->$which_value) OR $this->$which_value == '') {
                         $item = new $related_class;
                         return $item->getRevisionNullString();
                     }
+                    if (!$item) {
+                        $item = new $related_class;
+                        return $this->format($this->key, $item->getRevisionUnknownString());
+                    }
+
 
                     // see if there's an available mutator
                     $mutator = 'get' . studly_case($this->key) . 'Attribute';
