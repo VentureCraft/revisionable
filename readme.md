@@ -75,6 +75,16 @@ class Article extends Eloquent {
 }
 ```
 
+Optionally, you may implement the RevisionableInterface (fulfilling the contract via the RevisionableTrait) to facilitate type-hinting againt Revisionable models, e.g.,
+
+```php
+namespace MyApp\Models;
+
+class Article extends Eloquent implements RevisionableInterface {
+    use \Venturecraft\Revisionable\RevisionableTrait;
+}
+```
+
 > Being a trait, revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent, like [Ardent](https://github.com/laravelbook/ardent) for example.
 
 > Traits require PHP >= 5.4
