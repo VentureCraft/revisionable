@@ -65,7 +65,7 @@ php artisan migrate --package=venturecraft/revisionable
 
 ### The new, trait based implementation
 
-For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
+For any model that you want to keep a revision history for, include the revisionable namespace and use the `RevisionableTrait` in your model, e.g.,
 
 ```php
 namespace MyApp\Models;
