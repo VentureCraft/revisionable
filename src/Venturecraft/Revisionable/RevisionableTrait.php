@@ -121,7 +121,7 @@ trait RevisionableTrait
                     'revisionable_type'     => get_class($this),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
-                    'old_value'             => (isset($this->originalData[$key]) ? $this->originalData[$key]: null),
+                    'old_value'             => array_get($this->originalData, $key),
                     'new_value'             => $this->updatedData[$key],
                     'user_id'               => $this->getUserId(),
                     'created_at'            => new \DateTime(),
