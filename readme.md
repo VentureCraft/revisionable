@@ -9,7 +9,7 @@
 
 If revisionable saves you time, please consider [tipping via gittip](https://www.gittip.com/duellsy)
 
-Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable form your model, you can instantly have just that, and be able to display a history similar to this:
+Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable from your model, you can instantly have just that, and be able to display a history similar to this:
 
 * Chris changed title from 'Something' to 'Something else'
 * Chris changed category from 'News' to 'Breaking news'
