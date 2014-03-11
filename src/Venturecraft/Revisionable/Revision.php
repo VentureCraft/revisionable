@@ -167,6 +167,14 @@ class Revision extends \Eloquent
         }
     }
 
+    /**
+    * Revision History Pre-formatted
+    * @return RevisionHistory full revision history pre-formatted string
+    */
+    public function preFormatted($date = null)
+    {
+        return $this->userResponsible() . ' changed ' . $this->fieldName() . ' from ' . $this->oldValue() . ' to ' . $this->newValue() . ( $date && $this->created_at ? ' on ' . $this->created_at->format('l jS \\of F Y \\a\t h:i:s A') : '' ) ;
+    }
 
     /*
      * Egzamples:
