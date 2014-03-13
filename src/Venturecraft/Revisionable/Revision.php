@@ -113,7 +113,7 @@ class Revision extends \Eloquent
                     // we can load it, to find the information we so desire
                     $item  = $related_class::find($this->$which_value);
 
-                    if (is_null($this->$which_value) OR $this->$which_value == '') {
+                    if (is_null($this->$which_value) || $this->$which_value == '') {
                         $item = new $related_class;
                         return $item->getRevisionNullString();
                     }
