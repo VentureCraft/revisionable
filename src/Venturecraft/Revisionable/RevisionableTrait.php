@@ -7,8 +7,6 @@
  *
  */
 
-use Illuminate\Support\ServiceProvider;
-
 trait RevisionableTrait
 {
 
@@ -63,7 +61,7 @@ trait RevisionableTrait
     public function preSave()
     {
 
-        if (!isset($this->revisionEnabled) or $this->revisionEnabled) {
+        if (!isset($this->revisionEnabled) || $this->revisionEnabled) {
             // if there's no revisionEnabled. Or if there is, if it's true
 
             $this->originalData = $this->original;
@@ -108,7 +106,7 @@ trait RevisionableTrait
     {
 
         // check if the model already exists
-        if ((!isset($this->revisionEnabled) or $this->revisionEnabled) and $this->updating) {
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) {
             // if it does, it means we're updating
 
             $changes_to_record = $this->changedRevisionableFields();
@@ -121,7 +119,7 @@ trait RevisionableTrait
                     'revisionable_type'     => get_class($this),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
-                    'old_value'             => (isset($this->originalData[$key]) ? $this->originalData[$key]: null),
+                    'old_value'             => array_get($this->originalData, $key),
                     'new_value'             => $this->updatedData[$key],
                     'user_id'               => $this->getUserId(),
                     'created_at'            => new \DateTime(),
@@ -148,13 +146,13 @@ trait RevisionableTrait
     {
 
         try {
-            if (class_exists('Sentry') and \Sentry::check()) {
+            if (class_exists('Sentry') && \Sentry::check()) {
                 $user = \Sentry::getUser();
                 return $user->id;
             } else if (\Auth::check()) {
                 return \Auth::user()->id;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
 
@@ -174,7 +172,7 @@ trait RevisionableTrait
         foreach ($this->dirtyData as $key => $value) {
             // check that the field is revisionable, and double check
             // that it's actually new data in case dirty is, well, clean
-            if ($this->isRevisionable($key) and !is_array($value)) {
+            if ($this->isRevisionable($key) && !is_array($value)) {
                 if(!isset($this->originalData[$key]) || $this->originalData[$key] != $this->updatedData[$key]) {
                     $changes_to_record[$key] = $value;
                 }
@@ -204,8 +202,8 @@ trait RevisionableTrait
         // If it's explicitly not revisionable, return false.
         // Otherwise, if neither condition is met, only return true if
         // we aren't specifying revisionable fields.
-        if (isset($this->doKeep) and in_array($key, $this->doKeep)) return true;
-        if (isset($this->dontKeep) and in_array($key, $this->dontKeep)) return false;
+        if (isset($this->doKeep) && in_array($key, $this->doKeep)) return true;
+        if (isset($this->dontKeep) && in_array($key, $this->dontKeep)) return false;
 
         return empty($this->doKeep);
     }
