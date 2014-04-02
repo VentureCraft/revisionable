@@ -150,7 +150,7 @@ class Revisionable extends \Eloquent
                 $user = \Sentry::getUser();
                 return $user->id;
             } else if (\Auth::check()) {
-                return \Auth::user()->getAuthIdentifier()
+                return \Auth::user()->getAuthIdentifier();
             }
         } catch (\Exception $e) {
             return null;
