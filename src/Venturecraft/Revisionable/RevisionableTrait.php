@@ -150,7 +150,8 @@ trait RevisionableTrait
                 $user = \Sentry::getUser();
                 return $user->id;
             } else if (\Auth::check()) {
-                return \Auth::user()->id;
+                $userModel = new \User;
+                return \Auth::user()->{$userModel->getKeyName()};
             }
         } catch (\Exception $e) {
             return null;
