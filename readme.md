@@ -109,6 +109,14 @@ class Article extends Eloquent {
 }
 ```
 
+### Storing soft deletes
+
+By default, if your model supports soft deletes, revisionable will store this and any restores as updates on the model.
+
+You can choose to ignore deletes and restores by adding `deleted_at` to your `$dontKeepRevisionOf` array.
+
+To better format the output for `deleted_at` entries, you can use the `isEmpty` formatter (see <a href="#format-output">Format output</a> for an example of this.)
+
 <a name="control"></a>
 ## More control
 
@@ -143,6 +151,7 @@ In cases where you want to have control over the format of the output of the val
 protected $revisionFormattedFields = array(
     'title'  => 'string:<strong>%s</strong>',
     'public' => 'boolean:No|Yes'
+    'deleted_at' => 'isEmpty:Active|Deleted'
 );
 ```
 
@@ -158,6 +167,13 @@ Booleans by default will display as a 0 or a 1, which is pretty bland and won't 
 
 ```
 boolean:No|Yes
+```
+
+### Is Empty
+This piggy backs off boolean, but instead of testing for a true or false value, it checks if the value is either null or an empty string.
+
+```
+isEmpty:No|Yes
 ```
 
 <a name="loadhistory"></a>
