@@ -44,6 +44,12 @@ trait RevisionableTrait
             $model->postSave();
         });
 
+        static::deleted(function($model)
+        {
+            $model->preSave();
+            $model->postDelete();
+        });
+
     }
 
 
@@ -135,6 +141,30 @@ trait RevisionableTrait
 
         }
 
+    }
+
+
+    /**
+     * If softdeletes are enabled, store the deleted time
+     */
+    public function postDelete()
+    {
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
+            && $this->softDelete
+            && $this->isRevisionable('deleted_at')) {
+            $revisions[] = array(
+                'revisionable_type' => get_class($this),
+                'revisionable_id' => $this->getKey(),
+                'key' => 'deleted_at',
+                'old_value' => null,
+                'new_value' => $this->deleted_at,
+                'user_id' => $this->getUserId(),
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+            );
+            $revision = new \Venturecraft\Revisionable\Revision;
+            \DB::table($revision->getTable())->insert($revisions);
+        }
     }
 
 

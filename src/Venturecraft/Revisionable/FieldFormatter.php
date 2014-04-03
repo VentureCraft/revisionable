@@ -46,6 +46,21 @@ class FieldFormatter
 
 
     /**
+     * Check if a field is empty
+     *
+     * @param $value
+     * @param array $options
+     *
+     * @return string
+     */
+    public static function isEmpty($value, $options = array())
+    {
+        $value_set = isset($value) && $value != '';
+        return self::boolean($value_set, $options);
+    }
+
+
+    /**
      * Boolean
      *
      * @param        $value
