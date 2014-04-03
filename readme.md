@@ -169,7 +169,7 @@ Booleans by default will display as a 0 or a 1, which is pretty bland and won't 
 boolean:No|Yes
 ```
 
-### Is Emptyy
+### Is Empty
 This piggy backs off boolean, but instead of testing for a true or false value, it checks if the value is either null or an empty string.
 
 ```
