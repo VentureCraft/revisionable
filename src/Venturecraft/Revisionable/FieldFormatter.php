@@ -56,7 +56,7 @@ class FieldFormatter
     public static function isEmpty($value, $options = array())
     {
         $value_set = isset($value) && $value != '';
-        return self::boolean($value_set, $options);
+        return sprintf(self::boolean($value_set, $options), $value);
     }
 
 

@@ -176,6 +176,12 @@ This piggy backs off boolean, but instead of testing for a true or false value, 
 isEmpty:No|Yes
 ```
 
+This can also accept `%s` if you'd like to output the value, something like the following will display 'Nothing' if the value is empty, or the actual value if something exists:
+
+```
+isEmpty:Nothing:%s
+```
+
 <a name="loadhistory"></a>
 ## Load revision history
 
