@@ -41,13 +41,31 @@ class Revision extends \Eloquent
      */
     public function fieldName()
     {
-        if (strpos($this->key, '_id')) {
+        if ($formatted = $this->formatFieldName($this->key)) {
+            return $formatted;
+        } else if (strpos($this->key, '_id')) {
             return str_replace('_id', '', $this->key);
         } else {
             return $this->key;
         }
     }
 
+    /**
+     * Format field name
+     * Allow overrides for field names
+     **/
+    private function formatFieldName($key)
+    {
+        $related_model = $this->revisionable_type;
+        $related_model = new $related_model;
+        $revisionFormattedFieldNames = $related_model->getRevisionFormattedFieldNames();
+
+        if (isset($revisionFormattedFieldNames[$key])) {
+            return $revisionFormattedFieldNames[$key];
+        }
+
+        return false;
+    }
 
     /**
      * Old Value
