@@ -1,13 +1,13 @@
 # Revisionable
 
-<a href="https://github.com/VentureCraft/revisionable">
-    <img src="https://poser.pugx.org/venturecraft/revisionable/version.png" style="vertical-align: text-top">
+<a href="https://packagist.org/packages/venturecraft/revisionable">
+    <img src="http://img.shields.io/packagist/v/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
-<a href="https://github.com/VentureCraft/revisionable">
-    <img src="https://poser.pugx.org/venturecraft/revisionable/d/total.png" style="vertical-align: text-top">
+<a href="https://packagist.org/packages/venturecraft/revisionable">
+    <img src="http://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
 
-If revisionable saves you time, please consider [tipping via gittip](https://www.gittip.com/duellsy)
+> If revisionable saves you time, please consider [tipping via gittip](https://www.gittip.com/duellsy)
 
 Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable form your model, you can instantly have just that, and be able to display a history similar to this:
 
@@ -19,7 +19,7 @@ So not only can you see a history of what happened, but who did what, so there's
 
 Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
-## Working with third party Auth / Eloquent extensions
+## Working with 3rd party Auth / Eloquent extensions
 
 Revisionable now has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
 
@@ -59,6 +59,7 @@ php artisan migrate --package=venturecraft/revisionable
 * [Load revision history](#loadhistory)
 * [Display history](#display)
 * [Contributing](#contributing)
+* [Having troubles?](#faq)
 
 <a name="intro"></a>
 ## Implementation
@@ -155,6 +156,18 @@ protected $revisionFormattedFields = array(
 );
 ```
 
+You can also override the field name output using the `$revisionFormattedFieldNames` array in your model, e.g.,
+
+```php
+protected $revisionFormattedFieldNamee = array(
+    'title' => 'Title',
+    'small_name' => 'Nickname'
+    'deleted_at' => 'Deleted At'
+);
+```
+
+This comes into play when you output the revision field name using `$revision->fieldName()`
+
 ### String
 To format a string, simply prefix the value with `string:` and be sure to include `%s` (this is where the actual value will appear in the formatted response), e.g.,
 
@@ -217,6 +230,8 @@ The user model that is loaded depends on what you have set in your `config/auth.
 
 Returns the name of the field that was updated, if the field that was updated was a foreign key (at this stage, it simply looks to see if the field has the suffix of `_id`) then the text before `_id` is returned. e.g., if the field was `plan_id`, then `plan` would be returned.
 
+> Remember from above, that you can override the output of a field name with the `$revisionFormattedFieldNames` array in your model.
+
 ### identifiableName()
 
 This is used when the value (old or new) is the id of a foreign key relationship.
@@ -268,4 +283,12 @@ opened in the github issues tab for the main project, at [venturecraft/revisiona
 
 All pull requests should be made to the develop branch, so they can be tested before being merged into the master branch.
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/VentureCraft/revisionable/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+<a name="faq"></a>
+## Having troubles?
+
+If you're having troubles with using this package, odds on someone else has already had the same problem. Two places you can look for common answers to your problems are:
+
+* [StackOverflow revisionable tag](http://stackoverflow.com/questions/tagged/revisionable?sort=newest&pageSize=50)
+* [Github Issues](https://github.com/VentureCraft/revisionable/issues?page=1&state=closed)
+
+> If you do prefer posting your questions to the public on StackOverflow, please use the 'revisionable' tag.

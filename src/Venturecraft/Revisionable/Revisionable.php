@@ -245,6 +245,12 @@ class Revisionable extends \Eloquent
     }
 
 
+    public function getRevisionFormattedFieldNames()
+    {
+        return $this->revisionFormattedFieldNames;
+    }
+
+
     /**
      * Identifiable Name
      * When displaying revision history, when a foreigh key is updated

@@ -245,6 +245,12 @@ trait RevisionableTrait
     }
 
 
+    public function getRevisionFormattedFieldNames()
+    {
+        return $this->revisionFormattedFieldNames;
+    }
+
+
     /**
      * Identifiable Name
      * When displaying revision history, when a foreigh key is updated
