@@ -159,7 +159,7 @@ protected $revisionFormattedFields = array(
 You can also override the field name output using the `$revisionFormattedFieldNames` array in your model, e.g.,
 
 ```php
-protected $revisionFormattedFieldNamee = array(
+protected $revisionFormattedFieldName = array(
     'title' => 'Title',
     'small_name' => 'Nickname'
     'deleted_at' => 'Deleted At'
