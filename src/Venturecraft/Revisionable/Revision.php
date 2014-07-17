@@ -1,5 +1,9 @@
 <?php namespace Venturecraft\Revisionable;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
 /**
  * Revision
  *
@@ -9,7 +13,7 @@
  * (c) Venture Craft <http://www.venturecraft.com.au>
  */
 
-class Revision extends \Eloquent
+class Revision extends Eloquent
 {
 
     public $table = 'revisions';
@@ -153,7 +157,7 @@ class Revision extends \Eloquent
             catch (\Exception $e) {
                 // Just a failsafe, in the case the data setup isn't as expected
                 // Nothing to do here.
-                \Log::info('Revisionable: ' . $e);
+                Log::info('Revisionable: ' . $e);
             }
 
             // if there was an issue
@@ -180,7 +184,7 @@ class Revision extends \Eloquent
         if (class_exists('Sentry')) {
             return \Sentry::findUserById($this->user_id);
         } else {
-            $user_model = \Config::get('auth.model');
+            $user_model = Config::get('auth.model');
             return $user_model::find($this->user_id);
         }
     }
