@@ -176,8 +176,8 @@ trait RevisionableTrait
     {
 
         try {
-            if (class_exists('Sentry') && \Sentry::check()) {
-                $user = \Sentry::getUser();
+            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry') && $class::check()) {
+                $user = $class::getUser();
                 return $user->id;
             } else if (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
