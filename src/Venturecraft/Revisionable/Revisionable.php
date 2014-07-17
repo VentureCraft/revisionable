@@ -1,5 +1,7 @@
 <?php namespace Venturecraft\Revisionable;
 
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
 /*
  * This file is part of the Revisionable package by Venture Craft
  *
@@ -7,7 +9,7 @@
  *
  */
 
-class Revisionable extends \Eloquent
+class Revisionable extends Eloquent
 {
 
     private $originalData;
