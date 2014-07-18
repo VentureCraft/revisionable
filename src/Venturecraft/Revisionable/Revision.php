@@ -25,7 +25,6 @@ class Revision extends Eloquent
         parent::__construct($attributes);
     }
 
-
     /**
      * Revisionable
      * Grab the revision history for the model that is calling
@@ -35,7 +34,6 @@ class Revision extends Eloquent
     {
         return $this->morphTo();
     }
-
 
     /**
      * Field Name
@@ -47,7 +45,7 @@ class Revision extends Eloquent
     {
         if ($formatted = $this->formatFieldName($this->key)) {
             return $formatted;
-        } else if (strpos($this->key, '_id')) {
+        } elseif (strpos($this->key, '_id')) {
             return str_replace('_id', '', $this->key);
         } else {
             return $this->key;
@@ -79,7 +77,6 @@ class Revision extends Eloquent
      */
     public function oldValue()
     {
-
         return $this->getValue('old');
 
     }
@@ -93,7 +90,6 @@ class Revision extends Eloquent
      */
     public function newValue()
     {
-
         return $this->getValue('new');
 
     }
@@ -113,7 +109,7 @@ class Revision extends Eloquent
         // First find the main model that was updated
         $main_model = $this->revisionable_type;
         // Load it, WITH the related model
-        if( class_exists($main_model) ) {
+        if ( class_exists($main_model) ) {
 
             $main_model = new $main_model;
 
@@ -137,10 +133,12 @@ class Revision extends Eloquent
 
                     if (is_null($this->$which_value) || $this->$which_value == '') {
                         $item = new $related_class;
+
                         return $item->getRevisionNullString();
                     }
                     if (!$item) {
                         $item = new $related_class;
+
                         return $this->format($this->key, $item->getRevisionUnknownString());
                     }
 
@@ -150,11 +148,11 @@ class Revision extends Eloquent
                     if (method_exists($item, $mutator)) {
                         return $this->format($item->$mutator($this->key), $item->identifiableName());
                     }
+
                     return $this->format($this->key, $item->identifiableName());
                 }
 
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 // Just a failsafe, in the case the data setup isn't as expected
                 // Nothing to do here.
                 Log::info('Revisionable: ' . $e);
@@ -174,7 +172,6 @@ class Revision extends Eloquent
 
     }
 
-
     /**
      * User Responsible
      * @return User user responsible for the change
@@ -185,10 +182,10 @@ class Revision extends Eloquent
             return $class::findUserById($this->user_id);
         } else {
             $user_model = Config::get('auth.model');
+
             return $user_model::find($this->user_id);
         }
     }
-
 
     /*
      * Egzamples:
