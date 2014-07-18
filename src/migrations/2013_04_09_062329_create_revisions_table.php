@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRevisionsTable extends Migration {
-
+class CreateRevisionsTable extends Migration
+{
 	/**
 	 * Run the migrations.
 	 *
@@ -11,7 +11,7 @@ class CreateRevisionsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('revisions', function($table) {
+		Schema::create('revisions', function ($table) {
 			$table->increments('id');
 			$table->string('revisionable_type');
 			$table->integer('revisionable_id');
