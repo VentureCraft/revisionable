@@ -1,5 +1,7 @@
 <?php namespace Venturecraft\Revisionable;
 
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
 /*
  * This file is part of the Revisionable package by Venture Craft
  *
@@ -7,7 +9,7 @@
  *
  */
 
-class Revisionable extends \Eloquent
+class Revisionable extends Eloquent
 {
 
     private $originalData;
@@ -16,13 +18,11 @@ class Revisionable extends \Eloquent
     private $dontKeep = array();
     private $doKeep = array();
 
-
     /**
      * Keeps the list of values that have been updated
      * @var array
      */
     protected $dirtyData = array();
-
 
     /**
      * Create the event listeners for the saving and saved events
@@ -34,30 +34,25 @@ class Revisionable extends \Eloquent
     {
         parent::boot();
 
-        static::saving(function($model)
-        {
+        static::saving(function ($model) {
             $model->preSave();
         });
 
-        static::saved(function($model)
-        {
+        static::saved(function ($model) {
             $model->postSave();
         });
 
-        static::deleted(function($model)
-        {
+        static::deleted(function ($model) {
             $model->preSave();
             $model->postDelete();
         });
 
     }
 
-
     public function revisionHistory()
     {
         return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
     }
-
 
     /**
      * Invoked before a model is saved. Return false to abort the operation.
@@ -143,7 +138,6 @@ class Revisionable extends \Eloquent
 
     }
 
-
     /**
      * If softdeletes are enabled, store the deleted time
      */
@@ -167,7 +161,6 @@ class Revisionable extends \Eloquent
         }
     }
 
-
     /**
      * Attempt to find the user id of the currently logged in user
      * Supports Sentry based authentication, as well as stock Auth
@@ -176,10 +169,11 @@ class Revisionable extends \Eloquent
     {
 
         try {
-            if (class_exists('Sentry') && \Sentry::check()) {
-                $user = \Sentry::getUser();
+            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry') && $class::check()) {
+                $user = $class::getUser();
+
                 return $user->id;
-            } else if (\Auth::check()) {
+            } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
             }
         } catch (\Exception $e) {
@@ -188,7 +182,6 @@ class Revisionable extends \Eloquent
 
         return null;
     }
-
 
     /**
      * Get all of the changes that have been made, that are also supposed
@@ -203,7 +196,7 @@ class Revisionable extends \Eloquent
             // check that the field is revisionable, and double check
             // that it's actually new data in case dirty is, well, clean
             if ($this->isRevisionable($key) && !is_array($value)) {
-                if(!isset($this->originalData[$key]) || $this->originalData[$key] != $this->updatedData[$key]) {
+                if (!isset($this->originalData[$key]) || $this->originalData[$key] != $this->updatedData[$key]) {
                     $changes_to_record[$key] = $value;
                 }
             } else {
@@ -221,7 +214,7 @@ class Revisionable extends \Eloquent
     /**
      * Check if this field should have a revision kept
      *
-     * @param  string $key
+     * @param string $key
      *
      * @return boolean
      */
@@ -234,22 +227,18 @@ class Revisionable extends \Eloquent
         // we aren't specifying revisionable fields.
         if (isset($this->doKeep) && in_array($key, $this->doKeep)) return true;
         if (isset($this->dontKeep) && in_array($key, $this->dontKeep)) return false;
-
         return empty($this->doKeep);
     }
-
 
     public function getRevisionFormattedFields()
     {
         return $this->revisionFormattedFields;
     }
 
-
     public function getRevisionFormattedFieldNames()
     {
         return $this->revisionFormattedFieldNames;
     }
-
 
     /**
      * Identifiable Name
@@ -264,7 +253,6 @@ class Revisionable extends \Eloquent
         return $this->getKey();
     }
 
-
     /**
      * Revision Unknown String
      * When displaying revision history, when a foreigh key is updated
@@ -277,7 +265,6 @@ class Revisionable extends \Eloquent
     {
         return isset($this->revisionNullString)?$this->revisionNullString:'nothing';
     }
-
 
     /**
      * No revision string
@@ -305,12 +292,11 @@ class Revisionable extends \Eloquent
         if (!isset($this->dontKeepRevisionOf)) {
             $this->dontKeepRevisionOf = array();
         }
-        if(is_array($field)) {
+        if (is_array($field)) {
             foreach ($field as $one_field) {
                 $this->disableRevisionField($one_field);
             }
-        }
-        else {
+        } else {
             $donts = $this->dontKeepRevisionOf;
             $donts[] = $field;
             $this->dontKeepRevisionOf = $donts;

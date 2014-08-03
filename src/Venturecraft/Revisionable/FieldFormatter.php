@@ -11,7 +11,6 @@
 class FieldFormatter
 {
 
-
     /**
      * Format the value according to the provided formats
      *
@@ -44,7 +43,6 @@ class FieldFormatter
 
     }
 
-
     /**
      * Check if a field is empty
      *
@@ -56,17 +54,17 @@ class FieldFormatter
     public static function isEmpty($value, $options = array())
     {
         $value_set = isset($value) && $value != '';
+
         return sprintf(self::boolean($value_set, $options), $value);
     }
-
 
     /**
      * Boolean
      *
-     * @param        $value
-     * @param  array $options The false / true values to return
+     * @param       $value
+     * @param array $options The false / true values to return
      *
-     * @return string   Formatted version of the boolean field
+     * @return string Formatted version of the boolean field
      */
     public static function boolean($value, $options = null)
     {
@@ -81,7 +79,6 @@ class FieldFormatter
 
         return $options[!!$value];
     }
-
 
     /**
      * Format the string response, default is to just return the string
