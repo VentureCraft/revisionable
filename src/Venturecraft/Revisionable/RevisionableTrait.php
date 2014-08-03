@@ -28,10 +28,8 @@ trait RevisionableTrait
      * http method.
      *
      */
-    public static function boot()
+    public static function bootRevisionableTrait()
     {
-        parent::boot();
-
         static::saving(function ($model) {
             $model->preSave();
         });
