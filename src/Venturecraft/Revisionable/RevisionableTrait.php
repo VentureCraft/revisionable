@@ -167,10 +167,13 @@ trait RevisionableTrait
     {
 
         try {
-            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry') && $class::check()) {
-                $user = $class::getUser();
-
-                return $user->id;
+            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')) {
+                if ($class::check()) {
+                    $user = $class::getUser();
+                    return $user->id;
+                } else {
+                    return null;
+                }
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
             }
