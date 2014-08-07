@@ -1,7 +1,5 @@
 <img src="http://venturecraft.com.au/wp-content/uploads/2014/08/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
 
-# Revisionable
-
 <a href="https://packagist.org/packages/venturecraft/revisionable">
     <img src="http://img.shields.io/github/tag/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
