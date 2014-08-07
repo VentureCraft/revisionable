@@ -1,3 +1,5 @@
+<img src="http://venturecraft.com.au/wp-content/uploads/2014/08/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
+
 # Revisionable
 
 <a href="https://packagist.org/packages/venturecraft/revisionable">
@@ -6,8 +8,6 @@
 <a href="https://packagist.org/packages/venturecraft/revisionable">
     <img src="http://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
-
-<img src="http://venturecraft.com.au/wp-content/uploads/2014/08/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
 
 > If revisionable saves you time, please consider [tipping via gittip](https://www.gittip.com/duellsy)
 
