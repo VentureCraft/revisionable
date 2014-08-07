@@ -3,7 +3,7 @@
 # Revisionable
 
 <a href="https://packagist.org/packages/venturecraft/revisionable">
-    <img src="http://img.shields.io/packagist/v/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
+    <img src="http://img.shields.io/github/tag/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
 <a href="https://packagist.org/packages/venturecraft/revisionable">
     <img src="http://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
