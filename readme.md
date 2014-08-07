@@ -7,6 +7,8 @@
     <img src="http://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
 
+<img src="http://venturecraft.com.au/wp-content/uploads/2014/08/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
+
 > If revisionable saves you time, please consider [tipping via gittip](https://www.gittip.com/duellsy)
 
 Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable from your model, you can instantly have just that, and be able to display a history similar to this:
@@ -21,7 +23,7 @@ Revisionable is a laravel package that allows you to keep a revision history for
 
 ## Working with 3rd party Auth / Eloquent extensions
 
-Revisionable now has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
+Revisionable has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
 
 Revisionable can also now be used [as a trait](#the-new-trait-based-implementation), so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent)).
 
