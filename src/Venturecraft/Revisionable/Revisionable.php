@@ -144,7 +144,7 @@ class Revisionable extends Eloquent
     public function postDelete()
     {
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
-            && $this->softDelete
+            && ( isset($this->forceDeleting) && (!$this->forceDeleting) )
             && $this->isRevisionable('deleted_at')) {
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
