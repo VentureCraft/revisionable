@@ -19,7 +19,9 @@ Revisionable is a laravel package that allows you to keep a revision history for
 
 ## Working with 3rd party Auth / Eloquent extensions
 
-Revisionable has support for Auth powered by [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
+Revisionable has support for Auth powered by
+* [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
+* [**Sentinel by Cartalyst**](https://cartalyst.com/manual/sentinel).
 
 Revisionable can also now be used [as a trait](#the-new-trait-based-implementation), so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent)).
 
