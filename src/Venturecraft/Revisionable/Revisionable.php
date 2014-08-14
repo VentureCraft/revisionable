@@ -163,19 +163,14 @@ class Revisionable extends Eloquent
 
     /**
      * Attempt to find the user id of the currently logged in user
-     * Supports Sentry based authentication, as well as stock Auth
+     * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
     private function getUserId()
     {
-
         try {
-            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')) {
-                if ($class::check()) {
-                    $user = $class::getUser();
-                    return $user->id;
-                } else {
-                    return null;
-                }
+            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
+                    || class_exists($class = '\Cartalyst\Sentinel\Facades\Laravel\Sentinel')) {
+                return ($class::check()) ? $class::getUser()->id : null;
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
             }

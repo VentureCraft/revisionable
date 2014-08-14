@@ -178,7 +178,8 @@ class Revision extends Eloquent
      */
     public function userResponsible()
     {
-        if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')) {
+        if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
+                || class_exists($class = '\Cartalyst\Sentinel\Facades\Laravel\Sentinel')) {
             return $class::findUserById($this->user_id);
         } else {
             $user_model = Config::get('auth.model');
