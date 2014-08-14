@@ -142,7 +142,11 @@ trait RevisionableTrait
     public function postDelete()
     {
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
-            && $this->softDelete
+            && (
+                (  isset($this->forceDeleting) && (!$this->forceDeleting)  )
+                ||
+                (  (!isset($this->forceDeleting)) && isset($this->softDelete) && ($this->softDelete)  )
+            )
             && $this->isRevisionable('deleted_at')) {
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
