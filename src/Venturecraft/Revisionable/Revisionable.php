@@ -144,11 +144,7 @@ class Revisionable extends Eloquent
     public function postDelete()
     {
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
-            && (
-                (  isset($this->forceDeleting) && (!$this->forceDeleting)  )
-                ||
-                (  (!isset($this->forceDeleting)) && isset($this->softDelete) && ($this->softDelete)  )
-            )
+            && $this->isSoftDelete()
             && $this->isRevisionable('deleted_at')) {
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
@@ -235,6 +231,21 @@ class Revisionable extends Eloquent
         if (isset($this->doKeep) && in_array($key, $this->doKeep)) return true;
         if (isset($this->dontKeep) && in_array($key, $this->dontKeep)) return false;
         return empty($this->doKeep);
+    }
+
+    /**
+     * Check if soft deletes are currently enabled on this model
+     * @return boolean
+     */
+    private function isSoftDelete()
+    {
+        // check flag variable used in laravel 4.2+
+        if (isset($this->forceDeleting)) return !$this->forceDeleting;
+        
+        // otherwise, look for flag used in older versions
+        if (isset($this->softDelete)) return $this->softDelete;
+        
+        return false;
     }
 
     public function getRevisionFormattedFields()
