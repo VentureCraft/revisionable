@@ -18,6 +18,7 @@ trait RevisionableTrait
 
     /**
      * Keeps the list of values that have been updated
+     *
      * @var array
      */
     protected $dirtyData = array();
@@ -182,6 +183,7 @@ trait RevisionableTrait
     /**
      * Get all of the changes that have been made, that are also supposed
      * to have their changes recorded
+     *
      * @return array fields with new data, that should be recorded
      */
     private function changedRevisionableFields()
@@ -212,7 +214,7 @@ trait RevisionableTrait
      *
      * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     private function isRevisionable($key)
     {
@@ -225,19 +227,20 @@ trait RevisionableTrait
         if (isset($this->dontKeep) && in_array($key, $this->dontKeep)) return false;
         return empty($this->doKeep);
     }
-    
+
     /**
      * Check if soft deletes are currently enabled on this model
-     * @return boolean
+     *
+     * @return bool
      */
     private function isSoftDelete()
     {
         // check flag variable used in laravel 4.2+
         if (isset($this->forceDeleting)) return !$this->forceDeleting;
-        
+
         // otherwise, look for flag used in older versions
         if (isset($this->softDelete)) return $this->softDelete;
-        
+
         return false;
     }
 
@@ -257,6 +260,7 @@ trait RevisionableTrait
      * instead of displaying the ID, you can choose to display a string
      * of your choice, just override this method in your model
      * By default, it will fall back to the models ID.
+     *
      * @return string an identifying name for the model
      */
     public function identifiableName()
@@ -270,6 +274,7 @@ trait RevisionableTrait
      * instead of displaying the ID, you can choose to display a string
      * of your choice, just override this method in your model
      * By default, it will fall back to the models ID.
+     *
      * @return string an identifying name for the model
      */
     public function getRevisionNullString()
