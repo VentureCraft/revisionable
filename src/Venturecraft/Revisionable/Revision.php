@@ -169,17 +169,17 @@ class Revision extends Eloquent
             // or, if it's a normal value
 
             // see if there's an available revision mutator
-            $revisionmutator = 'get' . studly_case($this->key) . 'RevisionAttribute';
-            if (method_exists($item, $revisionmutator)) {
-                return $this->format($item->$mutator($this->key), $item->identifiableName());
+            // see if there's an available revision mutator
+            $revisionMutator = 'get' . studly_case($this->key) . 'RevisionAttribute';
+            if (method_exists($main_model, $revisionMutator)) {
+                return $this->format($this->key, $main_model->$revisionMutator($this->$which_value));
             }
             else
             {
-                // see if there's an available default eloquent mutator
                 $mutator = 'get' . studly_case($this->key) . 'Attribute';
-                if (method_exists($item, $mutator)) {
-                    return $this->format($item->$mutator($this->key), $item->identifiableName());
-                }                        
+                if (method_exists($main_model, $mutator)) {
+                    return $this->format($this->key, $main_model->$mutator($this->$which_value));
+                }
             }
 
         }
