@@ -1,5 +1,9 @@
 # Revisionable
 
+This Fork allows you to save newly created data in database by using the attribute 'public keepCreateRevision=true' in your revisionable classes.
+
+It also allows you to use custom accessors for eloquent classes which goes as 'getFooRevisionAttribute', and falls back to default eloquent accessors.
+
 <a href="https://packagist.org/packages/venturecraft/revisionable">
     <img src="http://img.shields.io/packagist/v/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
