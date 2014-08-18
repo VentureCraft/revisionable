@@ -91,7 +91,7 @@ class Revisionable extends Eloquent
             unset($this->attributes['keepRevisionOf']);
 
             $this->dirtyData = $this->getDirty();
-            $this->updating = $this->exists;
+            $this->updating = $this->exists || (isset($this->keepCreateRevision) && $this->keepCreateRevision == true);
 
         }
 
