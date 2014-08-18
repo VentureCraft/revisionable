@@ -142,13 +142,20 @@ class Revision extends Eloquent
                         return $this->format($this->key, $item->getRevisionUnknownString());
                     }
 
-
-                    // see if there's an available mutator
-                    $mutator = 'get' . studly_case($this->key) . 'Attribute';
-                    if (method_exists($item, $mutator)) {
+                    // see if there's an available revision mutator
+                    $revisionmutator = 'get' . studly_case($this->key) . 'RevisionAttribute';
+                    if (method_exists($item, $revisionmutator)) {
                         return $this->format($item->$mutator($this->key), $item->identifiableName());
                     }
-
+                    else
+                    {
+                        // see if there's an available default eloquent mutator
+                        $mutator = 'get' . studly_case($this->key) . 'Attribute';
+                        if (method_exists($item, $mutator)) {
+                            return $this->format($item->$mutator($this->key), $item->identifiableName());
+                        }                        
+                    }
+                    
                     return $this->format($this->key, $item->identifiableName());
                 }
 
@@ -161,9 +168,18 @@ class Revision extends Eloquent
             // if there was an issue
             // or, if it's a normal value
 
-            $mutator = 'get' . studly_case($this->key) . 'Attribute';
-            if (method_exists($main_model, $mutator)) {
-                return $this->format($this->key, $main_model->$mutator($this->$which_value));
+            // see if there's an available revision mutator
+            $revisionmutator = 'get' . studly_case($this->key) . 'RevisionAttribute';
+            if (method_exists($item, $revisionmutator)) {
+                return $this->format($item->$mutator($this->key), $item->identifiableName());
+            }
+            else
+            {
+                // see if there's an available default eloquent mutator
+                $mutator = 'get' . studly_case($this->key) . 'Attribute';
+                if (method_exists($item, $mutator)) {
+                    return $this->format($item->$mutator($this->key), $item->identifiableName());
+                }                        
             }
 
         }
