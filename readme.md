@@ -1,9 +1,5 @@
 # Revisionable
 
-This Fork allows you to save newly created data in database by using the attribute 'public keepCreateRevision=true' in your revisionable classes.
-
-It also allows you to use custom accessors for eloquent classes which goes as 'getFooRevisionAttribute', and falls back to default eloquent accessors.
-
 <a href="https://packagist.org/packages/venturecraft/revisionable">
     <img src="http://img.shields.io/packagist/v/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
 </a>
@@ -143,6 +139,24 @@ protected $dontKeepRevisionOf = array(
 
 > The `$keepRevisionOf` setting takes precendence over `$dontKeepRevisionOf`
 
+<a name="createrevision"></a>
+## Create Revision
+
+If you wish to store revision of the creation of new instances of a model in its table (i.e sql INSERTs), set attribute $saveCreateRevision to TRUE;
+
+```php
+protected $saveCreateRevision = true;
+```
+
+<a name="classname"></a>
+## Class Name
+
+To provide a user-readable name for your eloquent classes, set attribute $revisionClassName to the desired name (expected format: string).
+
+```php
+protected $revisionClassName = "Foo Form";
+```
+
 <a name="formatoutput"></a>
 ## Format output
 
@@ -257,6 +271,23 @@ class Article extends Revisionable
 ### oldValue() and newValue()
 
 Get the value of the model before or after the update. If it was a foreign key, identifiableName() is called.
+
+### action()
+
+Returns the type of action performed on the model.
+Actions available: CREATE, INSERT, UPDATE, DELETE, REMOVE
+
+CREATE - created new instance of model in table. e.g: create new row in 'customer' table.
+INSERT - added new data of model in table. e.g: add name 'foo' to 'customer' row.
+UPDATE - changed data value in table. e.g: change name from 'foo' to 'faa' in 'customer' row.
+DELETE - removed data value in table. e.g: removed name 'faa' in 'customer' row.
+REMOVE - delete row in table. e.g: delete row in 'customer' table where name is 'faa'.
+
+Constants are available for referencing from class 'Revision'.
+E.g: to use constant CREATE 
+```php
+Venturecraft\Revisionable\Revision::CREATE
+```
 
 ### Unknown or invalid foreign keys as revisions
 In cases where the old or new version of a value is a foreign key that no longer exists, or indeed was null, there are two variables that you can set in your model to control the output in these situations:
