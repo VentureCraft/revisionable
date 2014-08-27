@@ -277,16 +277,25 @@ Get the value of the model before or after the update. If it was a foreign key, 
 Returns the type of action performed on the model.
 Actions available: CREATE, INSERT, UPDATE, DELETE, REMOVE
 
-CREATE - created new instance of model in table. e.g: create new row in 'customer' table.
-INSERT - added new data of model in table. e.g: add name 'foo' to 'customer' row.
-UPDATE - changed data value in table. e.g: change name from 'foo' to 'faa' in 'customer' row.
-DELETE - removed data value in table. e.g: removed name 'faa' in 'customer' row.
-REMOVE - delete row in table. e.g: delete row in 'customer' table where name is 'faa'.
+* CREATE - created new instance of model in table. e.g: create new row in 'customer' table.
+* INSERT - added new data of model in table. e.g: add name 'foo' to 'customer' row.
+* UPDATE - changed data value in table. e.g: change name from 'foo' to 'faa' in 'customer' row.
+* DELETE - removed data value in table. e.g: removed name 'faa' in 'customer' row.
+* REMOVE - delete row in table. e.g: delete row in 'customer' table where name is 'faa'.
 
 Constants are available for referencing from class 'Revision'.
 E.g: to use constant CREATE 
 ```php
 Venturecraft\Revisionable\Revision::CREATE
+```
+
+Use Case Example:
+
+```php
+//If revision is an 'update' action
+if ($revision->action() == Venturecraft\Revisionable\Revision::UPDATE)
+{
+   //Do update related stuff
 ```
 
 ### Unknown or invalid foreign keys as revisions
