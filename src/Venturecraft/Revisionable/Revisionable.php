@@ -296,6 +296,11 @@ class Revisionable extends Eloquent
     {
         return $this->revisionClassName;
     }    
+    
+    public function getRevisionPrimaryIdentifier()
+    {
+        return $this->revisionPrimaryIdentifier;
+    }    
 
     /**
      * Identifiable Name
