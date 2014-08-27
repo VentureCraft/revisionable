@@ -14,7 +14,6 @@ class Revisionable extends Eloquent
 
     private $originalData;
     private $updatedData;
-    private $updating;
     private $dontKeep = array();
     private $doKeep = array();
 
@@ -33,13 +32,22 @@ class Revisionable extends Eloquent
     public static function boot()
     {
         parent::boot();
-
-        static::saving(function ($model) {
-            $model->preSave();
+        
+        static::creating(function ($model) {
+            $model->preUpdate();
+        });
+        
+        static::created(function ($model) {
+            $model->postCreate();
+            $model->postUpdate();
+        });
+        
+        static::updating(function ($model) {
+            $model->preUpdate();
         });
 
-        static::saved(function ($model) {
-            $model->postSave();
+        static::updated(function ($model) {
+            $model->postUpdate();
         });
 
         static::deleted(function ($model) {
@@ -54,12 +62,12 @@ class Revisionable extends Eloquent
         return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
     }
 
-    /**
-     * Invoked before a model is saved. Return false to abort the operation.
+/**
+     * Invoked before a model is updated. Return false to abort the operation.
      *
      * @return bool
      */
-    public function preSave()
+    public function preUpdate()
     {
 
         if (!isset($this->revisionEnabled) || $this->revisionEnabled) {
@@ -91,7 +99,6 @@ class Revisionable extends Eloquent
             unset($this->attributes['keepRevisionOf']);
 
             $this->dirtyData = $this->getDirty();
-            $this->updating = $this->exists || (isset($this->keepCreateRevision) && $this->keepCreateRevision == true);
 
         }
 
@@ -99,44 +106,66 @@ class Revisionable extends Eloquent
 
 
     /**
-     * Called after a model is successfully saved.
+     * Called after a model is successfully updated.
      *
      * @return void
      */
-    public function postSave()
+    public function postUpdate()
     {
+        $changes_to_record = $this->changedRevisionableFields();
 
-        // check if the model already exists
-        if ((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) {
-            // if it does, it means we're updating
+        $revisions = array();
 
-            $changes_to_record = $this->changedRevisionableFields();
-
-            $revisions = array();
-
-            foreach ($changes_to_record as $key => $change) {
+        foreach ($changes_to_record as $key => $change) {
+            $old_value = array_get($this->originalData, $key);
+            $new_value = $this->updatedData[$key];
+             
+            if($old_value == "" && $new_value == "")
+            {
+                //Both old val and new val is empty, nothing has changed at all
+                //Skip this iteration then
+                continue;
+            }
+            else
+            {
+                /*
+                 * Verify action
+                 */
+                // check if inserting
+                if($old_value == "" && $new_value != "")
+                {
+                    $action = Revision::INSERT;
+                }
+                //check if updating
+                if($old_value != "" && $new_value != "")
+                {
+                    $action = Revision::UPDATE;
+                }
+                //check if deleting
+                if($old_value != "" && $new_value == "")
+                {
+                    $action = Revision::DELETE;
+                }
 
                 $revisions[] = array(
                     'revisionable_type'     => get_class($this),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
-                    'old_value'             => array_get($this->originalData, $key),
-                    'new_value'             => $this->updatedData[$key],
+                    'old_value'             => $old_value,
+                    'new_value'             => $new_value,
+                    'action'                => $action,
                     'user_id'               => $this->getUserId(),
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
                 );
-
             }
-
-            if (count($revisions) > 0) {
-                $revision = new Revision;
-                \DB::table($revision->getTable())->insert($revisions);
-            }
-
         }
-
+        
+        if (!empty($revisions)) {
+            $this->saveRevision($revisions);
+        }
     }
+
 
     /**
      * If softdeletes are enabled, store the deleted time
@@ -144,22 +173,45 @@ class Revisionable extends Eloquent
     public function postDelete()
     {
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
-            && $this->softDelete
-            && $this->isRevisionable('deleted_at')) {
+            && $this->softDelete) {
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
                 'revisionable_id' => $this->getKey(),
                 'key' => 'deleted_at',
                 'old_value' => null,
-                'new_value' => $this->deleted_at,
+                'new_value' => null,
+                'action'    => Revision::DELETE,
                 'user_id' => $this->getUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = new \Venturecraft\Revisionable\Revision;
-            \DB::table($revision->getTable())->insert($revisions);
+            
+            $this->saveRevision($revisions);
         }
     }
+    
+    /*
+     * If saveCreateRevisions is enabled, save Creates of new model in the database
+     */
+    public function postCreate()
+    {
+        if((!isset($this->revisionEnabled) || $this->revisionEnabled) && (isset($this->saveCreateRevision) && $this->saveCreateRevision))
+        {
+            $revisions[] = array(
+                'revisionable_type' => get_class($this),
+                'revisionable_id' => $this->getKey(),
+                'key' => null,
+                'old_value' => null,
+                'new_value' => null,
+                'action'    => Revision::CREATE,
+                'user_id' => $this->getUserId(),
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+            );
+            
+            $this->saveRevision($revisions);            
+        }
+    }    
 
     /**
      * Attempt to find the user id of the currently logged in user
@@ -239,6 +291,11 @@ class Revisionable extends Eloquent
     {
         return $this->revisionFormattedFieldNames;
     }
+    
+    public function getRevisionClassName()
+    {
+        return $this->revisionClassName;
+    }    
 
     /**
      * Identifiable Name
@@ -304,4 +361,17 @@ class Revisionable extends Eloquent
         }
 
     }
+    
+    /*
+     * Helper Function: saves revision data to revision table
+     * 
+     * @param array $revisions
+     * 
+     * @return bool;
+     */
+    private function saveRevision($revisions)
+    {
+        $revision = new \Venturecraft\Revisionable\Revision;
+        return \DB::table($revision->getTable())->insert($revisions);        
+    }    
 }
