@@ -51,7 +51,6 @@ class Revisionable extends Eloquent
         });
 
         static::deleted(function ($model) {
-            $model->preSave();
             $model->postDelete();
         });
 
