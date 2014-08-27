@@ -51,7 +51,6 @@ trait RevisionableTrait
         });
 
         static::deleted(function ($model) {
-            $model->preSave();
             $model->postDelete();
         });
 
@@ -176,10 +175,10 @@ trait RevisionableTrait
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
                 'revisionable_id' => $this->getKey(),
-                'key' => 'deleted_at',
+                'key' => null,
                 'old_value' => null,
                 'new_value' => null,
-                'action'    => Revision::DELETE,
+                'action'    => Revision::REMOVE,
                 'user_id' => $this->getUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
@@ -294,6 +293,11 @@ trait RevisionableTrait
     public function getRevisionClassName()
     {
         return $this->revisionClassName;
+    }
+    
+    public function getRevisionPrimaryIdentifier()
+    {
+        return $this->revisionPrimaryIdentifier;
     }
 
     /**
