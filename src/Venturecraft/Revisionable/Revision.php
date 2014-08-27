@@ -19,6 +19,18 @@ class Revision extends Eloquent
     public $table = 'revisions';
 
     protected $revisionFormattedFields = array();
+    
+    const CREATE = 1;
+    const INSERT = 2;
+    const UPDATE = 3;
+    const DELETE = 4;
+    const REMOVE = 5;
+    
+    private $actions = array(self::CREATE=> 'created', 
+                                self::INSERT => 'inserted', 
+                                self::UPDATE => 'changed', 
+                                self::DELETE => 'deleted', 
+                                self::REMOVE => 'removed');    
 
     public function __construct(array $attributes = array())
     {
@@ -169,13 +181,13 @@ class Revision extends Eloquent
             // or, if it's a normal value
 
             // see if there's an available revision mutator
-            // see if there's an available revision mutator
             $revisionMutator = 'get' . studly_case($this->key) . 'RevisionAttribute';
             if (method_exists($main_model, $revisionMutator)) {
                 return $this->format($this->key, $main_model->$revisionMutator($this->$which_value));
             }
             else
             {
+                //else fallback to default eloquent mutator
                 $mutator = 'get' . studly_case($this->key) . 'Attribute';
                 if (method_exists($main_model, $mutator)) {
                     return $this->format($this->key, $main_model->$mutator($this->$which_value));
@@ -229,5 +241,52 @@ class Revision extends Eloquent
         } else {
             return $value;
         }
+    }
+    
+    /*
+     * Create a preformatted revision string
+     */
+    public function getRevisionString()
+    {
+        switch($this->action)
+        {
+            //Creating model
+            case self::CREATE:
+                
+                break;
+            //Inserting a value
+            case self::INSERT:
+                
+                break;
+            //Updating a value
+            case self::UPDATE:
+                
+                break;
+            //Deleting a value
+            case self::DELETE:
+                return $this->actions[$this->action]." (".$revisionClassName.") ID:".$this->revisionable_id;
+                break;
+            //Deleting a model
+            case self::REMOVE:
+                $related_model     = $this->revisionable_type;
+                $related_model     = new $related_model;
+                $revisionClassName = $related_model->getRevisionClassName() ? $related_model->getRevisionClassName() : $this->revisionable_type;
+                
+                return $this->actions[$this->action]." (".$revisionClassName.") ID:".$this->revisionable_id;
+            default:
+                return "created unknown revision";
+                break;
+        }
+    }
+    
+    /*
+     * Accessor
+     */
+    
+    public function className()
+    {
+        $related_model                   = $this->revisionable_type;
+        $related_model                   = new $related_model;
+        return $related_model->getRevisionClassName() ? $related_model->getRevisionClassName() : $this->revisionable_type;
     }
 }
