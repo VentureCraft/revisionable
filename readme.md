@@ -298,6 +298,14 @@ if ($revision->action() == Venturecraft\Revisionable\Revision::UPDATE)
    //Do update related stuff
 ```
 
+### primaryIdentifierName()
+
+(Documentation coming soon)
+
+### primaryIdentifierValue()
+
+(Documentation coming soon)
+
 ### Unknown or invalid foreign keys as revisions
 In cases where the old or new version of a value is a foreign key that no longer exists, or indeed was null, there are two variables that you can set in your model to control the output in these situations:
 
