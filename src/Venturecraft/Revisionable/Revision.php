@@ -289,4 +289,77 @@ class Revision extends Eloquent
         $related_model                   = new $related_model;
         return $related_model->getRevisionClassName() ? $related_model->getRevisionClassName() : $this->revisionable_type;
     }
+    
+    /**
+     * Get Primary Identifier's Value
+     * 
+     * @param alternativeIdentifier string
+     * @return @string/@bool
+     **/
+    public function primaryIdentifierValue($alternativeIdentifier=false)
+    {
+        /*
+         * Get Primary Identifier from Revisionable model if alternative is not set
+         */
+        if($alternativeIdentifier === false)
+        {
+            $related_model = $this->revisionable_type;
+            $related_model = new $related_model;
+            $primaryIdentifier = $related_model->getRevisionPrimaryIdentifier();
+        }
+        else
+        {
+            $primaryIdentifier = $alternativeIdentifier;
+        }
+        
+        
+        //Verify if primary identifier attribute has been set in revisionable model
+        if($primaryIdentifier)
+        {
+            $related_model_object = $this->revisionable()->withTrashed()->first();
+            if(count($related_model_object))
+            {
+                /*
+                 * Check if attribute is present.
+                 */
+                if(isset($related_model_object->{$primaryIdentifier}))
+                {
+                    return $related_model_object->{$primaryIdentifier};
+                }
+                else
+                {
+                    throw New \RuntimeException("Primary Identifier Attribute not set in revisionable model '{$related_model}'");
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Get Primary Identifier's Human Readable Name
+     * 
+     * @param string $alternativeIdentifier
+     * @return string/boolean
+     */
+    public function primaryIdentifierName($alternativeIdentifier=false)
+    {
+        if($alternativeIdentifier === false)
+        {
+            $related_model = $this->revisionable_type;
+            $related_model = new $related_model;
+            $primaryIdentifier = $related_model->getRevisionPrimaryIdentifier();
+        }
+        else
+        {
+            $primaryIdentifier = $alternativeIdentifier;
+        }
+        
+        if($primaryIdentifier)
+        {        
+            return $this->formatFieldName($primaryIdentifier);
+        }
+        
+        return false;
+    }
 }
