@@ -328,7 +328,8 @@ class Revision extends Eloquent
                 }
                 else
                 {
-                    throw New \RuntimeException("Primary Identifier Attribute not set in revisionable model '{$related_model}'");
+                    return "(Unknown)";
+                    //throw New \RuntimeException("Primary Identifier Attribute '".$primaryIdentifier."' not set in revisionable model '".get_class($related_model_object)."'");                    
                 }
             }
         }
