@@ -125,7 +125,7 @@ class Revision extends Eloquent
 
             $main_model = new $main_model;
 
-            try {
+            /*try {
                 if (strpos($this->key, '_id')) {
 
                     $related_model = str_replace('_id', '', $this->key);
@@ -175,7 +175,7 @@ class Revision extends Eloquent
                 // Just a failsafe, in the case the data setup isn't as expected
                 // Nothing to do here.
                 Log::info('Revisionable: ' . $e);
-            }
+            }*/
 
             // if there was an issue
             // or, if it's a normal value
