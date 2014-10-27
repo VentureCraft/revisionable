@@ -1,7 +1,6 @@
 <?php namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
@@ -182,7 +181,7 @@ class Revision extends Eloquent
                 || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')) {
             return $class::findUserById($this->user_id);
         } else {
-            $user_model = Config::get('auth.model');
+            $user_model = \Config::get('auth.model');
 
             return $user_model::find($this->user_id);
         }
