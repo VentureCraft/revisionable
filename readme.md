@@ -151,7 +151,7 @@ In cases where you want to have control over the format of the output of the val
 ```php
 protected $revisionFormattedFields = array(
     'title'  => 'string:<strong>%s</strong>',
-    'public' => 'boolean:No|Yes'
+    'public' => 'boolean:No|Yes',
     'deleted_at' => 'isEmpty:Active|Deleted'
 );
 ```
