@@ -72,7 +72,7 @@ class Revisionable extends Eloquent
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
-                if (gettype($val) == 'object') {
+                if (gettype($val) == 'object' && ! method_exists($val, '__toString')) {
                     unset($this->originalData[$key]);
                     unset($this->updatedData[$key]);
                 }
