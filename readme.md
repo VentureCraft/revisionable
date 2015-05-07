@@ -76,9 +76,9 @@ class Article extends Eloquent {
     use \Venturecraft\Revisionable\RevisionableTrait;
 
     public static function boot()
-        {
-            parent::boot();
-        }
+    {
+        parent::boot();
+    }
 }
 ```
 
