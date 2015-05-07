@@ -32,7 +32,11 @@ trait RevisionableTrait
     public static function boot()
     {
         parent::boot();
+        static::bootRevisionableTrait();
+    }
 
+    public static function bootRevisionableTrait()
+    {
         static::saving(function ($model) {
             $model->preSave();
         });
@@ -45,7 +49,6 @@ trait RevisionableTrait
             $model->preSave();
             $model->postDelete();
         });
-
     }
 
     public function revisionHistory()
