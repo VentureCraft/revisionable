@@ -59,9 +59,9 @@ trait RevisionableTrait
      * @param int $limit
      * @return mixed
      */
-    public static function classRevisionHistory($limit=100)
+    public static function classRevisionHistory($limit=100,$order='desc')
     {
-        return \Venturecraft\Revisionable\Revision::where('revisionable_type',get_called_class())->orderBy('updated_at')->limit($limit)->get();
+        return \Venturecraft\Revisionable\Revision::where('revisionable_type',get_called_class())->orderBy('updated_at',$order)->limit($limit)->get();
     }
     /**
      * Invoked before a model is saved. Return false to abort the operation.
