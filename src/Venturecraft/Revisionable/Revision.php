@@ -179,12 +179,22 @@ class Revision extends Eloquent
     {
         if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
                 || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')) {
-            return $class::findUserById($this->user_id);
+            return $class::findUserById($this->revisionable_id);
         } else {
             $user_model = app('config')->get('auth.model');
 
             return $user_model::find($this->user_id);
         }
+    }
+
+
+    /**
+     * Returns the object we have the history of
+     * @return Object or false
+     */
+    public function historyOf()
+    {
+        return class_exists($class = $this->revisionable_type) ? $class::find($this->revisionable_id) : false;
     }
 
     /*
