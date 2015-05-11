@@ -57,6 +57,7 @@ trait RevisionableTrait
      * Generates a list of the last $limit revisions made to any objects of the class it is being called from.
      *
      * @param int $limit
+     * @param string $order
      * @return mixed
      */
     public static function classRevisionHistory($limit=100,$order='desc')
