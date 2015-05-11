@@ -179,7 +179,7 @@ class Revision extends Eloquent
     {
         if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
                 || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')) {
-            return $class::findUserById($this->revisionable_id);
+            return $class::findUserById($this->user_id);
         } else {
             $user_model = app('config')->get('auth.model');
 
