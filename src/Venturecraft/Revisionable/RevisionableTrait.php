@@ -71,13 +71,8 @@ trait RevisionableTrait
      */
     public function preSave()
     {
-        if (isset($this->historyLimit) && $this->revisionHistory()->count() >= $this->historyLimit){
-            $LimitReached=true;
-        }else{
-            $LimitReached=false;
-        }
 
-        if ((!isset($this->revisionEnabled) || $this->revisionEnabled) && !$LimitReached) {
+        if (!isset($this->revisionEnabled) || $this->revisionEnabled) {
             // if there's no revisionEnabled. Or if there is, if it's true
 
             $this->originalData = $this->original;
@@ -120,9 +115,14 @@ trait RevisionableTrait
      */
     public function postSave()
     {
+        if (isset($this->historyLimit) && $this->revisionHistory()->count() >= $this->historyLimit){
+            $LimitReached=true;
+        }else{
+            $LimitReached=false;
+        }
 
         // check if the model already exists
-        if ((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) {
+        if (((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) && !$LimitReached) {
             // if it does, it means we're updating
 
             $changes_to_record = $this->changedRevisionableFields();
