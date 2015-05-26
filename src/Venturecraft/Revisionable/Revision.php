@@ -196,8 +196,6 @@ class Revision extends Eloquent
     {
         if(class_exists($class = $this->revisionable_type))
         {
-            $dd = $class::find($this->revisionable_id);
-            dd($dd);
             return $class::find($this->revisionable_id);
         }
         return false;
