@@ -110,6 +110,19 @@ class Article extends Eloquent {
 }
 ```
 
+You can also disable revisioning after X many revisions have been made by setting `$historyLimit` to the number of revisions you want to keep before stopping revisions.
+
+```php
+namespace MyApp\Models;
+
+class Article extends Eloquent {
+    use Venturecraft\Revisionable\RevisionableTrait;
+
+    protected $revisionEnabled = true;
+    protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
+}
+```
+
 ### Storing soft deletes
 
 By default, if your model supports soft deletes, revisionable will store this and any restores as updates on the model.
