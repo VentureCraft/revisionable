@@ -194,7 +194,13 @@ class Revision extends Eloquent
      */
     public function historyOf()
     {
-        return class_exists($class = $this->revisionable_type) ? $class::find($this->revisionable_id) : false;
+        if(class_exists($class = $this->revisionable_type))
+        {
+            $dd = $class::find($this->revisionable_id);
+            dd($dd);
+            return $class::find($this->revisionable_id);
+        }
+        return false;
     }
 
     /*

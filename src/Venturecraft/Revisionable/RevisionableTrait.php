@@ -71,8 +71,13 @@ trait RevisionableTrait
      */
     public function preSave()
     {
+        if (isset($this->historyLimit) && $this->revisionHistory()->count() >= $this->historyLimit){
+            $LimitReached=true;
+        }else{
+            $LimitReached=false;
+        }
 
-        if (!isset($this->revisionEnabled) || $this->revisionEnabled) {
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled) && !$LimitReached) {
             // if there's no revisionEnabled. Or if there is, if it's true
 
             $this->originalData = $this->original;
