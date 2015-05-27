@@ -54,6 +54,17 @@ trait RevisionableTrait
     }
 
     /**
+     * Generates a list of the last $limit revisions made to any objects of the class it is being called from.
+     *
+     * @param int $limit
+     * @param string $order
+     * @return mixed
+     */
+    public static function classRevisionHistory($limit=100,$order='desc')
+    {
+        return \Venturecraft\Revisionable\Revision::where('revisionable_type',get_called_class())->orderBy('updated_at',$order)->limit($limit)->get();
+    }
+    /**
      * Invoked before a model is saved. Return false to abort the operation.
      *
      * @return bool
@@ -104,9 +115,14 @@ trait RevisionableTrait
      */
     public function postSave()
     {
+        if (isset($this->historyLimit) && $this->revisionHistory()->count() >= $this->historyLimit){
+            $LimitReached=true;
+        }else{
+            $LimitReached=false;
+        }
 
         // check if the model already exists
-        if ((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) {
+        if (((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) && !$LimitReached) {
             // if it does, it means we're updating
 
             $changes_to_record = $this->changedRevisionableFields();
