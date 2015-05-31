@@ -33,6 +33,14 @@ trait RevisionableTrait
     {
         parent::boot();
 
+        //This should give backwards comparability with Laravel 4
+        if(!method_exists(get_called_class(), 'bootTraits')){
+            static::bootRevisionableTrait();
+        }
+    }
+
+    public static function bootRevisionableTrait()
+    {
         static::saving(function ($model) {
             $model->preSave();
         });
@@ -45,7 +53,6 @@ trait RevisionableTrait
             $model->preSave();
             $model->postDelete();
         });
-
     }
 
     public function revisionHistory()
