@@ -33,8 +33,8 @@ trait RevisionableTrait
     {
         parent::boot();
 
-        //This should give backwards comparability with Laravel 4
         if(!method_exists(get_called_class(), 'bootTraits')){
+            // Laravel 4 still needs to call this manually.
             static::bootRevisionableTrait();
         }
     }
