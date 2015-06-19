@@ -144,7 +144,7 @@ trait RevisionableTrait
             foreach ($changes_to_record as $key => $change) {
 
                 $revisions[] = array(
-                    'revisionable_type'     => get_class($this),
+                    'revisionable_type'     => $this->morphClass ? $this->morphClass : get_class($this),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
                     'old_value'             => array_get($this->originalData, $key),
@@ -174,7 +174,7 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable('deleted_at')) {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->morphClass ? $this->morphClass : get_class($this),
                 'revisionable_id' => $this->getKey(),
                 'key' => 'deleted_at',
                 'old_value' => null,
