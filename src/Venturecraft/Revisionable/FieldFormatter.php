@@ -1,28 +1,32 @@
-<?php namespace Venturecraft\Revisionable;
+<?php
+
+namespace Venturecraft\Revisionable;
 
 /**
- * FieldFormatter
+ * FieldFormatter.
  *
  * Allows formatting of fields
  *
  * (c) Venture Craft <http://www.venturecraft.com.au>
  */
 
+/**
+ * Class FieldFormatter
+ * @package Venturecraft\Revisionable
+ */
 class FieldFormatter
 {
-
     /**
-     * Format the value according to the provided formats
+     * Format the value according to the provided formats.
      *
      * @param  $key
      * @param  $value
      * @param  $formats
      *
-     * @return string formated value
+     * @return string formatted value
      */
     public static function format($key, $value, $formats)
     {
-
         foreach ($formats as $pkey => $format) {
             $parts = explode(':', $format);
             if (sizeof($parts) === 1) {
@@ -40,11 +44,10 @@ class FieldFormatter
         }
 
         return $value;
-
     }
 
     /**
-     * Check if a field is empty
+     * Check if a field is empty.
      *
      * @param $value
      * @param array $options
@@ -59,7 +62,7 @@ class FieldFormatter
     }
 
     /**
-     * Boolean
+     * Boolean.
      *
      * @param       $value
      * @param array $options The false / true values to return
@@ -68,7 +71,6 @@ class FieldFormatter
      */
     public static function boolean($value, $options = null)
     {
-
         if (!is_null($options)) {
             $options = explode('|', $options);
         }
@@ -81,7 +83,7 @@ class FieldFormatter
     }
 
     /**
-     * Format the string response, default is to just return the string
+     * Format the string response, default is to just return the string.
      *
      * @param  $value
      * @param  $format
@@ -96,5 +98,4 @@ class FieldFormatter
 
         return sprintf($format, $value);
     }
-
 }
