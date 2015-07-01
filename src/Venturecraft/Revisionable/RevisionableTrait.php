@@ -156,9 +156,14 @@ trait RevisionableTrait
         } else {
             $LimitReached = false;
         }
+        if (isset($this->revisionCleanup)){
+            $RevisionCleanup=$this->revisionCleanup;
+        }else{
+            $RevisionCleanup=false;
+        }
 
         // check if the model already exists
-        if (((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) && !$LimitReached) {
+        if (((!isset($this->revisionEnabled) || $this->revisionEnabled) && $this->updating) && (!$LimitReached || $RevisionCleanup)) {
             // if it does, it means we're updating
 
             $changes_to_record = $this->changedRevisionableFields();
@@ -179,6 +184,12 @@ trait RevisionableTrait
             }
 
             if (count($revisions) > 0) {
+                if($LimitReached && $RevisionCleanup){
+                    $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
+                    foreach($toDelete as $delete){
+                        $delete->delete();
+                    }
+                }
                 $revision = new Revision;
                 \DB::table($revision->getTable())->insert($revisions);
             }
