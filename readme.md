@@ -128,6 +128,19 @@ class Article extends Eloquent {
     protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
 }
 ```
+In order to maintain a limit on history, but instead of stopping tracking revisions if you want to remove old revisions, you can accomodate that feature by setting `$revisionCleanup`. 
+
+```php
+namespace MyApp\Models;
+
+class Article extends Eloquent {
+    use Venturecraft\Revisionable\RevisionableTrait;
+
+    protected $revisionEnabled = true;
+    protected $revisionCleanup = true; //Remove old revisions (works only when used with $historyLimit)
+    protected $historyLimit = 500; //Maintain a maximum of 500 changes at any point of time, while cleaning up old revisions.
+}
+```
 
 ### Storing soft deletes
 
