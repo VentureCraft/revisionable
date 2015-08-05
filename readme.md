@@ -224,7 +224,7 @@ isEmpty:No|Yes
 This can also accept `%s` if you'd like to output the value, something like the following will display 'Nothing' if the value is empty, or the actual value if something exists:
 
 ```
-isEmpty:Nothing:%s
+isEmpty:Nothing|%s
 ```
 
 <a name="loadhistory"></a>
