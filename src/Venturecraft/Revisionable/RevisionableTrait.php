@@ -231,6 +231,11 @@ trait RevisionableTrait
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
             }
+            else
+            {
+                //Use System Id when in Queue
+                return \Config::get('website.system_user_id');
+            }            
         } catch (\Exception $e) {
             return null;
         }
