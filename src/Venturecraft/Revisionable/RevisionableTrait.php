@@ -1,4 +1,9 @@
-<?php namespace Venturecraft\Revisionable;
+<?php
+
+namespace Venturecraft\Revisionable;
+
+use DB;
+use DateTime;
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -156,9 +161,9 @@ trait RevisionableTrait
         } else {
             $LimitReached = false;
         }
-        if (isset($this->revisionCleanup)){
+        if (isset($this->revisionCleanup)) {
             $RevisionCleanup=$this->revisionCleanup;
-        }else{
+        } else {
             $RevisionCleanup=false;
         }
 
@@ -184,9 +189,9 @@ trait RevisionableTrait
             }
 
             if (count($revisions) > 0) {
-                if($LimitReached && $RevisionCleanup){
-                    $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
-                    foreach($toDelete as $delete){
+                if ($LimitReached && $RevisionCleanup) {
+                    $toDelete = $this->revisionHistory()->orderBy('id', 'asc')->limit(count($revisions))->get();
+                    foreach ($toDelete as $delete) {
                         $delete->delete();
                     }
                 }
@@ -218,6 +223,24 @@ trait RevisionableTrait
             $revision = new \Venturecraft\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
+    }
+
+    /**
+     * Insert revisions in database.
+     *
+     * We use the database query builder instead of Eloquent to make insert
+     * queries spanning multiple records more effecient.
+     *
+     * @param  array $revisions
+     *
+     * @return void
+     */
+    protected function dbInsert(array $revisions)
+    {
+        $revision = new Revision;
+        $table = $revision->getTable();
+
+        DB::table($table)->insert($revisions);
     }
 
     /**
@@ -266,6 +289,85 @@ trait RevisionableTrait
         }
 
         return $changes_to_record;
+    }
+
+    /**
+     * Prepare a revision entry for DB insertion.
+     *
+     * @param  string $key
+     * @param  mixed  $oldValue
+     * @param  mixed  $newValue
+     *
+     * @return array
+     */
+    protected function prepareRevision($key, $oldValue, $newValue)
+    {
+        return [
+            'revisionable_type' => get_class($this),
+            'revisionable_id' => $this->getKey(),
+            'key' => $key,
+            'old_value' => $oldValue,
+            'new_value' => $newValue,
+            'user_id' => $this->getUserId(),
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime(),
+        ];
+    }
+
+    /**
+     * Remove old revisions when the limit is reached if limit is enabled.
+     *
+     * @param  integer $count
+     *
+     * @return void
+     */
+    protected function cleanupRevisions($count = 1)
+    {
+        if ($this->isLimitReached() && $this->isRevisionCleanup()) {
+            $toDelete = $this->revisionHistory()
+                ->orderBy('created_at', 'asc')
+                ->limit($count)
+                ->get();
+
+            foreach ($toDelete as $delete) {
+                $delete->delete();
+            }
+        }
+    }
+
+    /**
+     * Determines if revisions are enabled.
+     *
+     * @return  boolean
+     */
+    protected function isRevisionEnabled()
+    {
+        return !isset($this->revisionEnabled) || $this->revisionEnabled;
+    }
+
+    /**
+     * Determines if revision limit for model is reached.
+     *
+     * @return boolean
+     */
+    protected function isLimitReached()
+    {
+        return isset($this->historyLimit)
+               && ($this->revisionHistory()->count() >= $this->historyLimit);
+    }
+
+    /**
+     * Determines if old revisions shall be removed.
+     *
+     * @return boolean
+     */
+    protected function isRevisionCleanup()
+    {
+        if (isset($this->revisionCleanup)) {
+            return $this->revisionCleanup;
+        }
+
+        return false;
     }
 
     /**
