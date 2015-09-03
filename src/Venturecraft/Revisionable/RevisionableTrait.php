@@ -3,19 +3,10 @@
 namespace Venturecraft\Revisionable;
 
 use DB;
+use App;
 use DateTime;
+use Spira\Model\Collection\Collection;
 
-/*
- * This file is part of the Revisionable package by Venture Craft
- *
- * (c) Venture Craft <http://www.venturecraft.com.au>
- *
- */
-
-/**
- * Class RevisionableTrait
- * @package Venturecraft\Revisionable
- */
 trait RevisionableTrait
 {
     /**
@@ -51,6 +42,84 @@ trait RevisionableTrait
     protected $dirtyData = array();
 
     /**
+     * Register a syncing model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function syncing($callback, $priority = 0)
+    {
+        static::registerModelEvent('syncing', $callback, $priority);
+    }
+
+    /**
+     * Register a synced model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function synced($callback, $priority = 0)
+    {
+        static::registerModelEvent('synced', $callback, $priority);
+    }
+
+    /**
+     * Register a savingmany model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function savingMany($callback, $priority = 0)
+    {
+        static::registerModelEvent('savingMany', $callback, $priority);
+    }
+
+    /**
+     * Register a savedmany model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function savedMany($callback, $priority = 0)
+    {
+        static::registerModelEvent('savedMany', $callback, $priority);
+    }
+
+    /**
+     * Register a deletingOneChild model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function deletingOneChild($callback, $priority = 0)
+    {
+        static::registerModelEvent('deletingOneChild', $callback, $priority);
+    }
+
+    /**
+     * Register a deletedOneChild model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function deletedOneChild($callback, $priority = 0)
+    {
+        static::registerModelEvent('deletedOneChild', $callback, $priority);
+    }
+
+    /**
      * Ensure that the bootRevisionableTrait is called only
      * if the current installation is a laravel 4 installation
      * Laravel 5 will call bootRevisionableTrait() automatically
@@ -65,13 +134,41 @@ trait RevisionableTrait
     }
 
     /**
-     * Create the event listeners for the saving and saved events
-     * This lets us save revisions whenever a save is made, no matter the
-     * http method.
+     * Create the event listeners for model events.
      *
+     * @return  void
      */
     public static function bootRevisionableTrait()
     {
+        static::savingMany(function ($model, $relation) {
+            $model->preSaveMany($relation);
+            return true;
+        });
+
+        static::savedMany(function ($model, $relation, $childModels) {
+            $model->postSaveMany($relation, $childModels);
+            return true;
+        });
+
+        static::syncing(function ($model, $relation) {
+            $model->preSync($relation);
+            return true;
+        });
+
+        static::synced(function ($model, $relation, $ids) {
+            $model->postSync($relation, $ids);
+            return true;
+        });
+
+        static::deletingOneChild(function ($model, $relation) {
+            return true;
+        });
+
+        static::deletedOneChild(function ($model, $relation, $child) {
+            $model->postDeleteOneChild($relation, $child);
+            return true;
+        });
+
         static::saving(function ($model) {
             $model->preSave();
         });
@@ -87,11 +184,13 @@ trait RevisionableTrait
     }
 
     /**
+     * Defines the polymorphic relationship
+     *
      * @return mixed
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+        return $this->morphMany(Revision::class, 'revisionable');
     }
 
     /**
@@ -105,6 +204,115 @@ trait RevisionableTrait
     {
         return \Venturecraft\Revisionable\Revision::where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
+    }
+
+    /**
+     * Invoked before a saveMany operation is performed.
+     *
+     * @param  string $key
+     *
+     * @return void
+     */
+    public function preSaveMany($relation)
+    {
+        if ($this->isRevisionEnabled()
+            && $this->isRelationRevisionable($relation)
+        ) {
+            // Get only the IDs from the relationship
+            $ids = array_keys($this->$relation->modelKeys());
+
+            // And store them under the relationship name
+            $this->originalData = [$relation => $ids];
+        }
+    }
+
+    /**
+     * Called after a model is successfully synced.
+     *
+     * @param  string     $key
+     * @param  Collection $childModels
+     *
+     * @return void
+     */
+    public function postSaveMany($key, Collection $childModels)
+    {
+        if ($this->isRevisionEnabled()
+            && (!$this->isLimitReached() || $this->isRevisionCleanup())
+        ) {
+            $revisions = [];
+            foreach ($childModels as $model) {
+                array_push(
+                    $revisions,
+                    $this->prepareRevision($key, null, $model->toJson())
+                );
+            }
+
+            if (count($revisions)) {
+                $this->cleanupRevisions(count($revisions));
+
+                $this->dbInsert($revisions);
+            }
+        }
+    }
+
+    /**
+     * Invoked before a model is synced.
+     *
+     * @param  string $key
+     *
+     * @return void
+     */
+    public function preSync($relation)
+    {
+        if ($this->isRevisionEnabled()
+            && $this->isRelationRevisionable($relation)
+        ) {
+            // Get only the IDs from the relationship
+            $ids = array_keys($this->$relation->modelKeys());
+
+            // And store them under the relationship name
+            $this->originalData = [$relation => $ids];
+        }
+    }
+
+    /**
+     * Called after a model is successfully synced.
+     *
+     * @param  string $key
+     * @param  array  $ids
+     *
+     * @return void
+     */
+    public function postSync($key, array $ids)
+    {
+        if (($this->isRevisionEnabled())
+            && (!$this->isLimitReached() || $this->isRevisionCleanup())
+            && array_key_exists($key, $this->originalData)
+        ) {
+            $revision = $this->prepareRevision($key, json_encode(array_get($this->originalData, $key)), json_encode($ids));
+
+            $this->cleanupRevisions();
+
+            $this->dbInsert($revision);
+        }
+    }
+
+    /**
+     * Called after a child model is deleted.
+     *
+     * @param  string    $key
+     * @param  BaseModel $model
+     *
+     * @return void
+     */
+    public function postDeleteOneChild($key, $model)
+    {
+        if ($this->isRevisionEnabled()) {
+            $revision = $this->prepareRevision($key, $model, null);
+
+            $this->cleanupRevisions();
+            $this->dbInsert($revision);
+        }
     }
 
     /**
@@ -244,21 +452,16 @@ trait RevisionableTrait
     }
 
     /**
-     * Attempt to find the user id of the currently logged in user
-     * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
-     **/
+     * Attempt to find the user id of the currently logged in user.
+     *
+     * @return string|null
+     */
     private function getUserId()
     {
-        try {
-            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
-                || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
-            ) {
-                return ($class::check()) ? $class::getUser()->id : null;
-            } elseif (\Auth::check()) {
-                return \Auth::user()->getAuthIdentifier();
-            }
-        } catch (\Exception $e) {
-            return null;
+        $jwtAuth = App::make('Tymon\JWTAuth\JWTAuth');
+
+        if ($user = $jwtAuth->user()) {
+            return $user->user_id;
         }
 
         return null;
@@ -392,6 +595,26 @@ trait RevisionableTrait
         }
 
         return empty($this->doKeep);
+    }
+
+    /**
+     * Determines if the relationship is revisionable.
+     *
+     * @param  string $relationship
+     *
+     * @return boolean
+     */
+    protected function isRelationRevisionable($relation)
+    {
+        if (isset($this->keepRevisionOf)) {
+            return in_array($relation, $this->keepRevisionOf);
+        }
+
+        if (isset($this->dontKeepRevisionOf)) {
+            return !in_array($relation, $this->dontKeepRevisionOf);
+        }
+
+        return true;
     }
 
     /**
