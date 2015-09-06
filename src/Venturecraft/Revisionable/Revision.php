@@ -4,6 +4,7 @@ namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Facades\Log;
 use Spira\Model\Model\BaseModel as Model;
+use Illuminate\Database\Eloquent\Collection;
 
 class Revision extends Model
 {
@@ -229,5 +230,16 @@ class Revision extends Model
         } else {
             return $value;
         }
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new Collection($models);
     }
 }
