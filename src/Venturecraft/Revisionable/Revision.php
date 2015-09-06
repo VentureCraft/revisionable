@@ -3,9 +3,9 @@
 namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use Spira\Model\Model\BaseModel as Model;
 
-class Revision extends Eloquent
+class Revision extends Model
 {
     /**
      * @var string
