@@ -6,6 +6,8 @@ use DB;
 use App;
 use DateTime;
 use Spira\Model\Collection\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 trait RevisionableTrait
 {
@@ -68,32 +70,6 @@ trait RevisionableTrait
     }
 
     /**
-     * Register a savingmany model event with the dispatcher.
-     *
-     * @param  \Closure|string  $callback
-     * @param  int  $priority
-     *
-     * @return void
-     */
-    public static function savingMany($callback, $priority = 0)
-    {
-        static::registerModelEvent('savingMany', $callback, $priority);
-    }
-
-    /**
-     * Register a savedmany model event with the dispatcher.
-     *
-     * @param  \Closure|string  $callback
-     * @param  int  $priority
-     *
-     * @return void
-     */
-    public static function savedMany($callback, $priority = 0)
-    {
-        static::registerModelEvent('savedMany', $callback, $priority);
-    }
-
-    /**
      * Register a deletingOneChild model event with the dispatcher.
      *
      * @param  \Closure|string  $callback
@@ -140,16 +116,6 @@ trait RevisionableTrait
      */
     public static function bootRevisionableTrait()
     {
-        static::savingMany(function ($model, $relation) {
-            $model->preSaveMany($relation);
-            return true;
-        });
-
-        static::savedMany(function ($model, $relation, $childModels) {
-            $model->postSaveMany($relation, $childModels);
-            return true;
-        });
-
         static::syncing(function ($model, $relation) {
             $model->preSync($relation);
             return true;
@@ -204,6 +170,72 @@ trait RevisionableTrait
     {
         return \Venturecraft\Revisionable\Revision::where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
+    }
+
+    /**
+     * Define a one-to-many relationship that can track revisions.
+     *
+     * @param  string  $related
+     * @param  string  $relation
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     *
+     * @return HasManyRevisionable
+     */
+    public function hasManyRevisionable($related, $relation, $foreignKey = null, $localKey = null)
+    {
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+
+        $instance = new $related;
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return new HasManyRevisionable($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey, $relation);
+    }
+
+    /**
+     * Invoked before a save child operation is performed.
+     *
+     * @param  string $relation
+     * @param  Model  $model
+     *
+     * @return void
+     */
+    public function preSaveChild($relation, Model $model)
+    {
+        if ($this->isRevisionEnabled()
+            && $this->isRelationRevisionable($relation)
+        ) {
+            $id = $model->{$model->getKeyName()};
+            $model = $model->find($id);
+
+            $this->originalData = $model ? $model->toJson() : null;
+        }
+    }
+
+    /**
+     * Invoked after a save child operation is successfully performed.
+     *
+     * @param  string $relation
+     * @param  Model  $model
+     *
+     * @return void
+     */
+    public function postSaveChild($relation, Model $model)
+    {
+        if ($this->isRevisionEnabled()
+            && (!$this->isLimitReached() || $this->isRevisionCleanup())
+        ) {
+            $revision = $this->prepareRevision(
+                $relation,
+                $this->originalData,
+                $model->toJson()
+            );
+
+            $this->cleanupRevisions();
+
+            $this->dbInsert($revision);
+        }
     }
 
     /**
