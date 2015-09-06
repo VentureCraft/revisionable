@@ -70,32 +70,6 @@ trait RevisionableTrait
     }
 
     /**
-     * Register a deletingOneChild model event with the dispatcher.
-     *
-     * @param  \Closure|string  $callback
-     * @param  int  $priority
-     *
-     * @return void
-     */
-    public static function deletingOneChild($callback, $priority = 0)
-    {
-        static::registerModelEvent('deletingOneChild', $callback, $priority);
-    }
-
-    /**
-     * Register a deletedOneChild model event with the dispatcher.
-     *
-     * @param  \Closure|string  $callback
-     * @param  int  $priority
-     *
-     * @return void
-     */
-    public static function deletedOneChild($callback, $priority = 0)
-    {
-        static::registerModelEvent('deletedOneChild', $callback, $priority);
-    }
-
-    /**
      * Ensure that the bootRevisionableTrait is called only
      * if the current installation is a laravel 4 installation
      * Laravel 5 will call bootRevisionableTrait() automatically
@@ -126,15 +100,6 @@ trait RevisionableTrait
             return true;
         });
 
-        static::deletingOneChild(function ($model, $relation) {
-            return true;
-        });
-
-        static::deletedOneChild(function ($model, $relation, $child) {
-            $model->postDeleteOneChild($relation, $child);
-            return true;
-        });
-
         static::saving(function ($model) {
             $model->preSave();
         });
@@ -144,6 +109,7 @@ trait RevisionableTrait
         });
 
         static::deleted(function ($model) {
+
             $model->preSave();
             $model->postDelete();
         });
@@ -239,51 +205,37 @@ trait RevisionableTrait
     }
 
     /**
-     * Invoked before a saveMany operation is performed.
+     * Delete child model from the database.
      *
-     * @param  string $key
+     * @param  Model  $model
+     * @param  string $relation
      *
-     * @return void
+     * @return bool|null
      */
-    public function preSaveMany($relation)
+    public function deleteChild(Model $model, $relation)
     {
-        if ($this->isRevisionEnabled()
-            && $this->isRelationRevisionable($relation)
-        ) {
-            // Get only the IDs from the relationship
-            $ids = array_keys($this->$relation->modelKeys());
-
-            // And store them under the relationship name
-            $this->originalData = [$relation => $ids];
+        if ($result = $model->delete()) {
+            $this->postDeleteChild($model, $relation);
         }
+
+        return $result;
     }
 
     /**
-     * Called after a model is successfully synced.
+     * Called after a child model is deleted.
      *
-     * @param  string     $key
-     * @param  Collection $childModels
+     * @param  string    $key
+     * @param  BaseModel $model
      *
      * @return void
      */
-    public function postSaveMany($key, Collection $childModels)
+    public function postDeleteChild(Model $model, $relation)
     {
-        if ($this->isRevisionEnabled()
-            && (!$this->isLimitReached() || $this->isRevisionCleanup())
-        ) {
-            $revisions = [];
-            foreach ($childModels as $model) {
-                array_push(
-                    $revisions,
-                    $this->prepareRevision($key, null, $model->toJson())
-                );
-            }
+        if ($this->isRevisionEnabled()) {
+            $revision = $this->prepareRevision($relation, $model->toJson(), null);
 
-            if (count($revisions)) {
-                $this->cleanupRevisions(count($revisions));
-
-                $this->dbInsert($revisions);
-            }
+            $this->cleanupRevisions();
+            $this->dbInsert($revision);
         }
     }
 
@@ -325,24 +277,6 @@ trait RevisionableTrait
 
             $this->cleanupRevisions();
 
-            $this->dbInsert($revision);
-        }
-    }
-
-    /**
-     * Called after a child model is deleted.
-     *
-     * @param  string    $key
-     * @param  BaseModel $model
-     *
-     * @return void
-     */
-    public function postDeleteOneChild($key, $model)
-    {
-        if ($this->isRevisionEnabled()) {
-            $revision = $this->prepareRevision($key, $model, null);
-
-            $this->cleanupRevisions();
             $this->dbInsert($revision);
         }
     }
