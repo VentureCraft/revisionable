@@ -44,6 +44,19 @@ trait RevisionableTrait
     protected $dirtyData = array();
 
     /**
+     * Register a deleting a child model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function deleteChild($callback, $priority = 0)
+    {
+        static::registerModelEvent('deleteChild', $callback, $priority);
+    }
+
+    /**
      * Ensure that the bootRevisionableTrait is called only
      * if the current installation is a laravel 4 installation
      * Laravel 5 will call bootRevisionableTrait() automatically
@@ -64,6 +77,12 @@ trait RevisionableTrait
      */
     public static function bootRevisionableTrait()
     {
+        static::deleteChild(function ($model, $childModel, $relation) {
+            $model->postDeleteChild($childModel, $relation);
+
+            return true;
+        });
+
         static::saving(function ($model) {
             $model->preSave();
         });
@@ -213,23 +232,6 @@ trait RevisionableTrait
     }
 
     /**
-     * Delete child model from the database.
-     *
-     * @param  Model  $model
-     * @param  string $relation
-     *
-     * @return bool|null
-     */
-    public function deleteChild(Model $model, $relation)
-    {
-        if ($result = $model->delete()) {
-            $this->postDeleteChild($model, $relation);
-        }
-
-        return $result;
-    }
-
-    /**
      * Called after a child model is deleted.
      *
      * @param  string    $key
@@ -243,6 +245,7 @@ trait RevisionableTrait
             $revision = $this->prepareRevision($relation, $model->toJson(), null);
 
             $this->cleanupRevisions();
+
             $this->dbInsert($revision);
         }
     }
