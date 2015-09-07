@@ -10,3 +10,4 @@ php:
 
 install:
  - composer install
+
