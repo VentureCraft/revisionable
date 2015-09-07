@@ -432,9 +432,7 @@ trait RevisionableTrait
      */
     private function getUserId()
     {
-        $jwtAuth = App::make('Tymon\JWTAuth\JWTAuth');
-
-        if ($user = $jwtAuth->user()) {
+        if ($user = \Request::user()) {
             return $user->user_id;
         }
 
