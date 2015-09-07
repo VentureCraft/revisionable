@@ -2,8 +2,6 @@
 
 namespace Spira\Revisionable\Tests;
 
-use Venturecraft\Revisionable\RevisionableTrait;
-
 class RevisionableTraitTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -11,7 +9,7 @@ class RevisionableTraitTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldGetMockForTrait()
     {
-        $mock = $this->getMockForTrait(RevisionableTrait::class);
+        $mock = $this->getMockForTrait('Venturecraft\Revisionable\RevisionableTrait');
 
         $this->assertContains('RevisionableTrait', get_class($mock));
     }
