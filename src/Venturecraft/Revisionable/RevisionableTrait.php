@@ -86,7 +86,7 @@ trait RevisionableTrait
      */
     public function revisionHistory()
     {
-        return $this->morphMany(Revision::class, 'revisionable');
+        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
     }
 
     /**
