@@ -2,18 +2,11 @@
 
 namespace Venturecraft\Revisionable;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Log;
+use Spira\Model\Model\BaseModel as Model;
+use Illuminate\Database\Eloquent\Collection;
 
-/**
- * Revision.
- *
- * Base model to allow for revision history on
- * any model that extends this model
- *
- * (c) Venture Craft <http://www.venturecraft.com.au>
- */
-class Revision extends Eloquent
+class Revision extends Model
 {
     /**
      * @var string
@@ -190,19 +183,11 @@ class Revision extends Eloquent
     /**
      * User Responsible.
      *
-     * @return User user responsible for the change
+     * @return User
      */
     public function userResponsible()
     {
-        if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
-            || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
-        ) {
-            return $class::findUserById($this->user_id);
-        } else {
-            $user_model = app('config')->get('auth.model');
-
-            return $user_model::find($this->user_id);
-        }
+        return User::find($this->user_id);
     }
 
     /**
@@ -245,5 +230,16 @@ class Revision extends Eloquent
         } else {
             return $value;
         }
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new Collection($models);
     }
 }

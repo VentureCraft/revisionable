@@ -1,16 +1,15 @@
-<?php namespace Venturecraft\Revisionable;
+<?php
 
-/*
- * This file is part of the Revisionable package by Venture Craft
- *
- * (c) Venture Craft <http://www.venturecraft.com.au>
- *
- */
+namespace Venturecraft\Revisionable;
 
-/**
- * Class RevisionableTrait
- * @package Venturecraft\Revisionable
- */
+use DB;
+use App;
+use DateTime;
+use Spira\Model\Collection\Collection;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 trait RevisionableTrait
 {
     /**
@@ -46,6 +45,19 @@ trait RevisionableTrait
     protected $dirtyData = array();
 
     /**
+     * Register a deleting a child model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     *
+     * @return void
+     */
+    public static function deleteChild($callback, $priority = 0)
+    {
+        static::registerModelEvent('deleteChild', $callback, $priority);
+    }
+
+    /**
      * Ensure that the bootRevisionableTrait is called only
      * if the current installation is a laravel 4 installation
      * Laravel 5 will call bootRevisionableTrait() automatically
@@ -60,13 +72,18 @@ trait RevisionableTrait
     }
 
     /**
-     * Create the event listeners for the saving and saved events
-     * This lets us save revisions whenever a save is made, no matter the
-     * http method.
+     * Create the event listeners for model events.
      *
+     * @return  void
      */
     public static function bootRevisionableTrait()
     {
+        static::deleteChild(function ($model, $childModel, $relation) {
+            $model->postDeleteChild($childModel, $relation);
+
+            return true;
+        });
+
         static::saving(function ($model) {
             $model->preSave();
         });
@@ -76,12 +93,15 @@ trait RevisionableTrait
         });
 
         static::deleted(function ($model) {
+
             $model->preSave();
             $model->postDelete();
         });
     }
 
     /**
+     * Defines the polymorphic relationship
+     *
      * @return mixed
      */
     public function revisionHistory()
@@ -100,6 +120,177 @@ trait RevisionableTrait
     {
         return \Venturecraft\Revisionable\Revision::where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
+    }
+
+    /**
+     * Define a one-to-many relationship that can track revisions.
+     *
+     * @param  string  $related
+     * @param  string  $relation
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     *
+     * @return HasManyRevisionable
+     */
+    public function hasManyRevisionable($related, $relation, $foreignKey = null, $localKey = null)
+    {
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+
+        $instance = new $related;
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return new HasManyRevisionable($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey, $relation);
+    }
+
+    /**
+     * Define a many-to-many relationship that can track revisions.
+     *
+     * @param  string  $related
+     * @param  string  $table
+     * @param  string  $foreignKey
+     * @param  string  $otherKey
+     * @param  string  $relation
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function belongsToManyRevisionable($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
+    {
+        // If no relationship name was passed, we will pull backtraces to get the
+        // name of the calling function. We will use that function name as the
+        // title of this relation since that is a great convention to apply.
+        if (is_null($relation)) {
+            $relation = $this->getBelongsToManyCaller();
+        }
+
+        // First, we'll need to determine the foreign key and "other key" for the
+        // relationship. Once we have determined the keys we'll make the query
+        // instances as well as the relationship instances we need for this.
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+
+        $instance = new $related;
+
+        $otherKey = $otherKey ?: $instance->getForeignKey();
+
+        // If no table name was provided, we can guess it by concatenating the two
+        // models using underscores in alphabetical order. The two model names
+        // are transformed to snake case from their default CamelCase also.
+        if (is_null($table)) {
+            $table = $this->joiningTable($related);
+        }
+
+        // Now we're ready to create a new query builder for the related model and
+        // the relationship instances for the relation. The relations will set
+        // appropriate query constraint and entirely manages the hydrations.
+        $query = $instance->newQuery();
+
+        return new BelongsToManyRevisionable($query, $this, $table, $foreignKey, $otherKey, $relation);
+    }
+
+    /**
+     * Invoked before a save child operation is performed.
+     *
+     * @param  string $relation
+     * @param  Model  $model
+     *
+     * @return void
+     */
+    public function preSaveChild($relation, Model $model)
+    {
+        if ($this->isRevisionEnabled()
+            && $this->isRelationRevisionable($relation)
+        ) {
+            $id = $model->{$model->getKeyName()};
+            $model = $model->find($id);
+
+            $this->originalData = $model ? $model->toJson() : null;
+        }
+    }
+
+    /**
+     * Invoked after a save child operation is successfully performed.
+     *
+     * @param  string $relation
+     * @param  Model  $model
+     *
+     * @return void
+     */
+    public function postSaveChild($relation, Model $model)
+    {
+        if ($this->isRevisionEnabled()
+            && (!$this->isLimitReached() || $this->isRevisionCleanup())
+        ) {
+            $revision = $this->prepareRevision(
+                $relation,
+                $this->originalData,
+                $model->toJson()
+            );
+
+            $this->cleanupRevisions();
+
+            $this->dbInsert($revision);
+        }
+    }
+
+    /**
+     * Called after a child model is deleted.
+     *
+     * @param  string    $key
+     * @param  BaseModel $model
+     *
+     * @return void
+     */
+    public function postDeleteChild(Model $model, $relation)
+    {
+        if ($this->isRevisionEnabled()) {
+            $revision = $this->prepareRevision($relation, $model->toJson(), null);
+
+            $this->cleanupRevisions();
+
+            $this->dbInsert($revision);
+        }
+    }
+
+    /**
+     * Invoked before a model is synced.
+     *
+     * @param  string $key
+     *
+     * @return void
+     */
+    public function preSync($relation)
+    {
+        if ($this->isRevisionEnabled()
+            && $this->isRelationRevisionable($relation)
+        ) {
+            // Get only the IDs from the relationship
+            $ids = array_keys($this->$relation->modelKeys());
+
+            // And store them under the relationship name
+            $this->originalData = [$relation => $ids];
+        }
+    }
+
+    /**
+     * Called after a model is successfully synced.
+     *
+     * @param  string $key
+     * @param  array  $ids
+     *
+     * @return void
+     */
+    public function postSync($key, array $ids)
+    {
+        if (($this->isRevisionEnabled())
+            && (!$this->isLimitReached() || $this->isRevisionCleanup())
+            && array_key_exists($key, $this->originalData)
+        ) {
+            $revision = $this->prepareRevision($key, json_encode(array_get($this->originalData, $key)), json_encode($ids));
+
+            $this->cleanupRevisions();
+
+            $this->dbInsert($revision);
+        }
     }
 
     /**
@@ -156,9 +347,9 @@ trait RevisionableTrait
         } else {
             $LimitReached = false;
         }
-        if (isset($this->revisionCleanup)){
+        if (isset($this->revisionCleanup)) {
             $RevisionCleanup=$this->revisionCleanup;
-        }else{
+        } else {
             $RevisionCleanup=false;
         }
 
@@ -184,9 +375,9 @@ trait RevisionableTrait
             }
 
             if (count($revisions) > 0) {
-                if($LimitReached && $RevisionCleanup){
-                    $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
-                    foreach($toDelete as $delete){
+                if ($LimitReached && $RevisionCleanup) {
+                    $toDelete = $this->revisionHistory()->orderBy('id', 'asc')->limit(count($revisions))->get();
+                    foreach ($toDelete as $delete) {
                         $delete->delete();
                     }
                 }
@@ -221,21 +412,32 @@ trait RevisionableTrait
     }
 
     /**
-     * Attempt to find the user id of the currently logged in user
-     * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
-     **/
+     * Insert revisions in database.
+     *
+     * We use the database query builder instead of Eloquent to make insert
+     * queries spanning multiple records more effecient.
+     *
+     * @param  array $revisions
+     *
+     * @return void
+     */
+    protected function dbInsert(array $revisions)
+    {
+        $revision = new Revision;
+        $table = $revision->getTable();
+
+        DB::table($table)->insert($revisions);
+    }
+
+    /**
+     * Attempt to find the user id of the currently logged in user.
+     *
+     * @return string|null
+     */
     private function getUserId()
     {
-        try {
-            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
-                || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
-            ) {
-                return ($class::check()) ? $class::getUser()->id : null;
-            } elseif (\Auth::check()) {
-                return \Auth::user()->getAuthIdentifier();
-            }
-        } catch (\Exception $e) {
-            return null;
+        if ($user = Request::user()) {
+            return $user->user_id;
         }
 
         return null;
@@ -269,6 +471,85 @@ trait RevisionableTrait
     }
 
     /**
+     * Prepare a revision entry for DB insertion.
+     *
+     * @param  string $key
+     * @param  mixed  $oldValue
+     * @param  mixed  $newValue
+     *
+     * @return array
+     */
+    protected function prepareRevision($key, $oldValue, $newValue)
+    {
+        return [
+            'revisionable_type' => get_class($this),
+            'revisionable_id' => $this->getKey(),
+            'key' => $key,
+            'old_value' => $oldValue,
+            'new_value' => $newValue,
+            'user_id' => $this->getUserId(),
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime(),
+        ];
+    }
+
+    /**
+     * Remove old revisions when the limit is reached if limit is enabled.
+     *
+     * @param  integer $count
+     *
+     * @return void
+     */
+    protected function cleanupRevisions($count = 1)
+    {
+        if ($this->isLimitReached() && $this->isRevisionCleanup()) {
+            $toDelete = $this->revisionHistory()
+                ->orderBy('created_at', 'asc')
+                ->limit($count)
+                ->get();
+
+            foreach ($toDelete as $delete) {
+                $delete->delete();
+            }
+        }
+    }
+
+    /**
+     * Determines if revisions are enabled.
+     *
+     * @return  boolean
+     */
+    protected function isRevisionEnabled()
+    {
+        return !isset($this->revisionEnabled) || $this->revisionEnabled;
+    }
+
+    /**
+     * Determines if revision limit for model is reached.
+     *
+     * @return boolean
+     */
+    protected function isLimitReached()
+    {
+        return isset($this->historyLimit)
+               && ($this->revisionHistory()->count() >= $this->historyLimit);
+    }
+
+    /**
+     * Determines if old revisions shall be removed.
+     *
+     * @return boolean
+     */
+    protected function isRevisionCleanup()
+    {
+        if (isset($this->revisionCleanup)) {
+            return $this->revisionCleanup;
+        }
+
+        return false;
+    }
+
+    /**
      * Check if this field should have a revision kept
      *
      * @param string $key
@@ -290,6 +571,26 @@ trait RevisionableTrait
         }
 
         return empty($this->doKeep);
+    }
+
+    /**
+     * Determines if the relationship is revisionable.
+     *
+     * @param  string $relationship
+     *
+     * @return boolean
+     */
+    protected function isRelationRevisionable($relation)
+    {
+        if (isset($this->keepRevisionOf)) {
+            return in_array($relation, $this->keepRevisionOf);
+        }
+
+        if (isset($this->dontKeepRevisionOf)) {
+            return !in_array($relation, $this->dontKeepRevisionOf);
+        }
+
+        return true;
     }
 
     /**
