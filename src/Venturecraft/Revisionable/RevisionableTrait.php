@@ -6,6 +6,7 @@ use DB;
 use App;
 use DateTime;
 use Spira\Model\Collection\Collection;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -435,7 +436,7 @@ trait RevisionableTrait
      */
     private function getUserId()
     {
-        if ($user = \Request::user()) {
+        if ($user = Request::user()) {
             return $user->user_id;
         }
 
