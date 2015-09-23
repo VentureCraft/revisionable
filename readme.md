@@ -128,7 +128,7 @@ class Article extends Eloquent {
     protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
 }
 ```
-In order to maintain a limit on history, but instead of stopping tracking revisions if you want to remove old revisions, you can accomodate that feature by setting `$revisionCleanup`. 
+In order to maintain a limit on history, but instead of stopping tracking revisions if you want to remove old revisions, you can accomodate that feature by setting `$revisionCleanup`.
 
 ```php
 namespace MyApp\Models;
@@ -151,6 +151,16 @@ You can choose to ignore deletes and restores by adding `deleted_at` to your `$d
 To better format the output for `deleted_at` entries, you can use the `isEmpty` formatter (see <a href="#format-output">Format output</a> for an example of this.)
 
 <a name="control"></a>
+
+### Storing creations
+By default the creation of a new model is not stored as a revision.
+Only subsequent changes to a model is stored.
+
+If you want to store the creation as a revision you can override this behavior by setting `revisionCreationsEnabled` to `true` by adding the following to your model:
+```php
+protected $revisionCreationsEnabled = true;
+```
+
 ## More control
 
 No doubt, there'll be cases where you don't want to store a revision history only for certain fields of the model, this is supported in two different ways. In your model you can either specifiy which fields you explicitly want to track and all other fields are ignored:
@@ -249,6 +259,17 @@ The above would be the result from this:
 ```php
 @foreach($account->revisionHistory as $history )
     <li>{{ $history->userResponsible()->first_name }} changed {{ $history->fieldName() }} from {{ $history->oldValue() }} to {{ $history->newValue() }}</li>
+@endforeach
+```
+
+If you have enabled revisions of creations as well you can display it like this:
+```php
+@foreach($resource->revisionHistory as $history)
+  @if($history->key == 'created_at' && !$history->old_value)
+    <li>{{ $history->userResponsible()->first_name }} created this resource at {{ $history->newValue() }}</li>
+  @else
+    <li>{{ $history->userResponsible()->first_name }} changed {{ $history->fieldName() }} from {{ $history->oldValue() }} to {{ $history->newValue() }}</li>
+  @endif
 @endforeach
 ```
 

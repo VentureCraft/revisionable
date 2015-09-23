@@ -64,6 +64,10 @@ class Revisionable extends Eloquent
             $model->postSave();
         });
 
+        static::created(function($model){
+            $model->postCreate();
+        });
+
         static::deleted(function ($model) {
             $model->preSave();
             $model->postDelete();
@@ -152,6 +156,39 @@ class Revisionable extends Eloquent
                 $revision = new Revision;
                 \DB::table($revision->getTable())->insert($revisions);
             }
+        }
+    }
+
+    /**
+    * Called after record successfully created
+    */
+    public function postCreate()
+    {
+
+        // Check if we should store creations in our revision history
+        // Set this value to true in your model if you want to
+        if(empty($this->revisionCreationsEnabled))
+        {
+            // We should not store creations.
+            return false;
+        }
+
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
+        {
+            $revisions[] = array(
+                'revisionable_type' => get_class($this),
+                'revisionable_id' => $this->getKey(),
+                'key' => 'created_at',
+                'old_value' => null,
+                'new_value' => $this->created_at,
+                'user_id' => $this->getUserId(),
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+            );
+
+            $revision = new Revision;
+            \DB::table($revision->getTable())->insert($revisions);
+
         }
     }
 
