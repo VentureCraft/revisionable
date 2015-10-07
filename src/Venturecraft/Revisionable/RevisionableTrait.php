@@ -369,7 +369,7 @@ trait RevisionableTrait
 
     /**
      * Identifiable Name
-     * When displaying revision history, when a foreigh key is updated
+     * When displaying revision history, when a foreign key is updated
      * instead of displaying the ID, you can choose to display a string
      * of your choice, just override this method in your model
      * By default, it will fall back to the models ID.
@@ -383,7 +383,7 @@ trait RevisionableTrait
 
     /**
      * Revision Unknown String
-     * When displaying revision history, when a foreigh key is updated
+     * When displaying revision history, when a foreign key is updated
      * instead of displaying the ID, you can choose to display a string
      * of your choice, just override this method in your model
      * By default, it will fall back to the models ID.
@@ -400,6 +400,7 @@ trait RevisionableTrait
      * When displaying revision history, if the revisions value
      * cant be figured out, this is used instead.
      * It can be overridden.
+     *
      * @return string an identifying name for the model
      */
     public function getRevisionUnknownString()
