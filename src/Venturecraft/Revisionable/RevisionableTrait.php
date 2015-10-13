@@ -20,6 +20,11 @@ trait RevisionableTrait
     /**
      * @var array
      */
+    private $syncData = array();
+
+    /**
+     * @var array
+     */
     private $updatedData = array();
 
     /**
@@ -267,7 +272,7 @@ trait RevisionableTrait
             $ids = array_keys($this->$relation->modelKeys());
 
             // And store them under the relationship name
-            $this->originalData = [$relation => $ids];
+            $this->syncData = [$relation => $ids];
         }
     }
 
@@ -283,9 +288,9 @@ trait RevisionableTrait
     {
         if (($this->isRevisionEnabled())
             && (!$this->isLimitReached() || $this->isRevisionCleanup())
-            && array_key_exists($key, $this->originalData)
+            && array_key_exists($key, $this->syncData)
         ) {
-            $revision = $this->prepareRevision($key, json_encode(array_get($this->originalData, $key)), json_encode($ids));
+            $revision = $this->prepareRevision($key, json_encode(array_get($this->syncData, $key)), json_encode($ids));
 
             $this->cleanupRevisions();
 
