@@ -19,9 +19,6 @@
         "illuminate/support": "~4.0|~5.0|~5.1"
     },
     "autoload": {
-        "classmap": [
-            "database"
-        ],
         "psr-0": {
             "Venturecraft\\Revisionable": "src/"
         }
