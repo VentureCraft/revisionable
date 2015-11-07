@@ -194,6 +194,7 @@ In cases where you want to have control over the format of the output of the val
 protected $revisionFormattedFields = array(
     'title'  => 'string:<strong>%s</strong>',
     'public' => 'boolean:No|Yes',
+    'modified' => 'datetime:m/d/Y g:i A',
     'deleted_at' => 'isEmpty:Active|Deleted'
 );
 ```
@@ -222,6 +223,13 @@ Booleans by default will display as a 0 or a 1, which is pretty bland and won't 
 
 ```
 boolean:No|Yes
+```
+
+### DateTime
+DateTime by default will display as Y-m-d H:i:s. Prefix the value with `datetime:` and then add your datetime format, e.g.,
+
+```
+datetime:m/d/Y g:i A
 ```
 
 ### Is Empty
