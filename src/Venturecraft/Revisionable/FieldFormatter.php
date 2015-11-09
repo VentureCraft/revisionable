@@ -98,4 +98,19 @@ class FieldFormatter
 
         return sprintf($format, $value);
     }
+    
+    /**
+     * Format the datetime
+     *
+     * @param string $value
+     * @param string $format
+     *
+     * @return formatted datetime
+     */
+    public static function datetime($value, $format = 'Y-m-d H:i:s')
+    {
+        $datetime = new \DateTime($value);
+
+        return $datetime->format($format);
+    }
 }

@@ -48,8 +48,8 @@ class Revision extends Eloquent
     /**
      * Field Name
      *
-     * Returns the field that was updated, in the case that it's a foreighn key
-     * denoted by a suffic of "_id", then "_id" is simply stripped
+     * Returns the field that was updated, in the case that it's a foreign key
+     * denoted by a suffix of "_id", then "_id" is simply stripped
      *
      * @return string field
      */
@@ -170,7 +170,7 @@ class Revision extends Eloquent
                     return $this->format($this->key, $item->identifiableName());
                 }
             } catch (\Exception $e) {
-                // Just a failsafe, in the case the data setup isn't as expected
+                // Just a fail-safe, in the case the data setup isn't as expected
                 // Nothing to do here.
                 Log::info('Revisionable: ' . $e);
             }
@@ -220,7 +220,7 @@ class Revision extends Eloquent
     }
 
     /*
-     * Egzamples:
+     * Examples:
     array(
         'public' => 'boolean:Yes|No',
         'minimum'  => 'string:Min: %s'
