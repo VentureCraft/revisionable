@@ -185,7 +185,7 @@ protected $dontKeepRevisionOf = array(
 ## Format output
 
 > You can continue (and are encouraged to) use `eloquent accessors` in your model to set the
-output of your values, see the [laravel docs for more information on accessors](http://laravel.com/docs/eloquent#accessors-and-mutators)
+output of your values, see the [laravel docs for more information on accessors](http://laravel.com/docs/eloquent-mutators#accessors-and-mutators)
 > The below documentation is therefor deprecated
 
 In cases where you want to have control over the format of the output of the values, for example a boolean field, you can set them in the `$revisionFormattedFields` array in your model. e.g.,
