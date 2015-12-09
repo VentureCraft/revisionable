@@ -14,8 +14,8 @@ class CreateRevisionsTable extends Migration
         Schema::create('revisions', function ($table) {
             $table->increments('id');
             $table->string('revisionable_type');
-            $table->integer('revisionable_id');
-            $table->integer('user_id')->nullable();
+            $table->string('revisionable_id');
+            $table->string('user_id')->nullable();
             $table->string('key');
             $table->text('old_value')->nullable();
             $table->text('new_value')->nullable();
