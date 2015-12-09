@@ -263,7 +263,7 @@ trait RevisionableTrait
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
-    private function getUserId()
+    public function getUserId()
     {
         try {
             if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
