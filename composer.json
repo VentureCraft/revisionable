@@ -1,5 +1,5 @@
 {
-    "name": "LogisticsPlus/Revisionable",
+    "name": "logisticsplus/revisionable",
     "license": "MIT",
     "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel, forked from https://github.com/VentureCraft/revisionable",
     "keywords": ["model", "laravel", "ardent", "revision", "history"],
