@@ -224,7 +224,7 @@ trait RevisionableTrait
     {
 
         try {
-            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry') && $class::check()) {
+            if ((class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry') || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')) && $class::check()) {
                 $user = $class::getUser();
 
                 return $user->id;
