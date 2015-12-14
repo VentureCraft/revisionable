@@ -29,27 +29,24 @@ Revisionable can also now be used [as a trait](#the-new-trait-based-implementati
 
 Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.md), the details are on [packagist, here.](https://packagist.org/packages/venturecraft/revisionable)
 
-Add the following to the `require` section of your projects composer.json file:
-
-```php
-"venturecraft/revisionable": "1.*",
-```
-
-Run composer update to download the package
+Run composer require to download the package:
 
 ```
-php composer.phar update
+php composer.phar require 'venturecraft/revisionable' '~1.0'
 ```
 
-Finally, you'll also need to run migration on the package
+Next, append the `RevisionableServiceProvider` to your list of providers in your app config:
 
 ```
-php artisan migrate --package=venturecraft/revisionable
+    Venturecraft\Revisionable\RevisionableServiceProvider::class,
 ```
 
-> If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
+Finally, publish the migration & run it:
 
-> `cp vendor/venturecraft/revisionable/src/migrations/2013_04_09_062329_create_revisions_table.php app/database/migrations/`
+```
+php artisan vendor:publish --provider='Venturecraft\Revisionable\RevisionableServiceProvider'
+php artisan migrate
+```
 
 ## Docs
 
@@ -150,8 +147,6 @@ You can choose to ignore deletes and restores by adding `deleted_at` to your `$d
 
 To better format the output for `deleted_at` entries, you can use the `isEmpty` formatter (see <a href="#format-output">Format output</a> for an example of this.)
 
-<a name="control"></a>
-
 ### Storing creations
 By default the creation of a new model is not stored as a revision.
 Only subsequent changes to a model is stored.
@@ -161,6 +156,7 @@ If you want to store the creation as a revision you can override this behavior b
 protected $revisionCreationsEnabled = true;
 ```
 
+<a name="control"></a>
 ## More control
 
 No doubt, there'll be cases where you don't want to store a revision history only for certain fields of the model, this is supported in two different ways. In your model you can either specifiy which fields you explicitly want to track and all other fields are ignored:
