@@ -23,6 +23,13 @@ class Revision extends Eloquent
     /**
      * @var array
      */
+    protected $casts = array(
+        'revisionable_id' => 'string';
+    );
+
+    /**
+     * @var array
+     */
     protected $revisionFormattedFields = array();
 
     /**
