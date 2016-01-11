@@ -266,7 +266,8 @@ trait RevisionableTrait
     public function getUserId()
     {
         try {
-            if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
+            if (class_exists($class = '\SleepingOwl\AdminAuth\Facades\AdminAuth')
+                || class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
                 || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
             ) {
                 return ($class::check()) ? $class::getUser()->id : null;
