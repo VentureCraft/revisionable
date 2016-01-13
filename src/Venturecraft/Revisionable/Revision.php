@@ -194,6 +194,7 @@ class Revision extends Eloquent
      */
     public function userResponsible()
     {
+        if (empty($this->user_id)) { return false; }
         if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
             || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
         ) {
@@ -201,6 +202,15 @@ class Revision extends Eloquent
         } else {
             $user_model = app('config')->get('auth.model');
 
+            if (empty($user_model)) {
+                $user_model = app('config')->get('auth.providers.users.model');
+                if (empty($user_model)) {
+                    return false;
+                }
+            }
+            if (!class_exists($user_model)) {
+                return false;
+            }
             return $user_model::find($this->user_id);
         }
     }
