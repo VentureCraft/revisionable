@@ -128,7 +128,7 @@ class Article extends Eloquent {
     protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
 }
 ```
-In order to maintain a limit on history, but instead of stopping tracking revisions if you want to remove old revisions, you can accommodate that feature by setting `$revisionCleanup`.
+In order to maintain a limit on history, but instead of stopping tracking revisions you want to remove old revisions, you can accommodate that feature by setting `$revisionCleanup`.
 
 ```php
 namespace MyApp\Models;
