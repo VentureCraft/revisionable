@@ -47,6 +47,12 @@ Finally, you'll also need to run migration on the package
 php artisan migrate --package=venturecraft/revisionable
 ```
 
+In order to run the migrations on Laravel 5 you need to us this:
+
+```
+php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
+```
+
 > If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
 
 > `cp vendor/venturecraft/revisionable/src/migrations/2013_04_09_062329_create_revisions_table.php app/database/migrations/`
