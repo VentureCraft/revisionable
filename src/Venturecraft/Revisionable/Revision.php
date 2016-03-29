@@ -1,6 +1,4 @@
-<?php
-
-namespace Venturecraft\Revisionable;
+<?php namespace Venturecraft\Revisionable;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Log;
@@ -30,6 +28,8 @@ class Revision extends Eloquent
      */
     public function __construct(array $attributes = array())
     {
+        $this->table = config('revisionable.revision.table');
+        $this->connection = config('revisionable.revision.connection');
         parent::__construct($attributes);
     }
 
@@ -99,7 +99,6 @@ class Revision extends Eloquent
         return $this->getValue('old');
     }
 
-
     /**
      * New Value.
      *
@@ -112,7 +111,6 @@ class Revision extends Eloquent
     {
         return $this->getValue('new');
     }
-
 
     /**
      * Responsible for actually doing the grunt work for getting the
@@ -160,7 +158,6 @@ class Revision extends Eloquent
                         return $this->format($this->key, $item->getRevisionUnknownString());
                     }
 
-
                     // see if there's an available mutator
                     $mutator = 'get' . studly_case($this->key) . 'Attribute';
                     if (method_exists($item, $mutator)) {
@@ -187,6 +184,10 @@ class Revision extends Eloquent
         return $this->format($this->key, $this->$which_value);
     }
 
+    public function revisionUser()
+    {
+        return $this->belongsTo(config('revisionable.user.model'));
+    }
     /**
      * User Responsible.
      *
@@ -194,25 +195,7 @@ class Revision extends Eloquent
      */
     public function userResponsible()
     {
-        if (empty($this->user_id)) { return false; }
-        if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
-            || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
-        ) {
-            return $class::findUserById($this->user_id);
-        } else {
-            $user_model = app('config')->get('auth.model');
-
-            if (empty($user_model)) {
-                $user_model = app('config')->get('auth.providers.users.model');
-                if (empty($user_model)) {
-                    return false;
-                }
-            }
-            if (!class_exists($user_model)) {
-                return false;
-            }
-            return $user_model::find($this->user_id);
-        }
+        return $this->revisionUser;
     }
 
     /**
@@ -232,8 +215,8 @@ class Revision extends Eloquent
     /*
      * Examples:
     array(
-        'public' => 'boolean:Yes|No',
-        'minimum'  => 'string:Min: %s'
+    'public' => 'boolean:Yes|No',
+    'minimum'  => 'string:Min: %s'
     )
      */
     /**
