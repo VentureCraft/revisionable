@@ -175,7 +175,7 @@ trait RevisionableTrait
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
-                $revisions[] = array(
+                $revisions[] = $this->transformRevision(array(
                     'revisionable_type' => get_class($this),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
@@ -184,7 +184,7 @@ trait RevisionableTrait
                     'user_id' => $this->getUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
-                );
+                ));
             }
 
             if (count($revisions) > 0) {
@@ -216,7 +216,7 @@ trait RevisionableTrait
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
-            $revisions[] = array(
+            $revisions[] = $this->transformRevision(array(
                 'revisionable_type' => get_class($this),
                 'revisionable_id' => $this->getKey(),
                 'key' => 'created_at',
@@ -225,7 +225,7 @@ trait RevisionableTrait
                 'user_id' => $this->getUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
-            );
+            ));
 
             $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
@@ -244,7 +244,7 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable('deleted_at')
         ) {
-            $revisions[] = array(
+            $revisions[] = $this->transformRevision(array(
                 'revisionable_type' => get_class($this),
                 'revisionable_id' => $this->getKey(),
                 'key' => 'deleted_at',
@@ -253,7 +253,7 @@ trait RevisionableTrait
                 'user_id' => $this->getUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
-            );
+            ));
             $revision = new \Venturecraft\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
@@ -433,5 +433,17 @@ trait RevisionableTrait
             $this->dontKeepRevisionOf = $donts;
             unset($donts);
         }
+    }
+
+    /**
+     * Transform revision data. This is designed to be overloaded in a child
+     * trait for application specific purposes.
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function transformRevision(array $data)
+    {
+        return $data;
     }
 }
