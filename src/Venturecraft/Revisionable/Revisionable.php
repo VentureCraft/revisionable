@@ -178,9 +178,9 @@ class Revisionable extends Eloquent
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
                 'revisionable_id' => $this->getKey(),
-                'key' => 'created_at',
+                'key' => self::CREATED_AT,
                 'old_value' => null,
-                'new_value' => $this->created_at,
+                'new_value' => $this->{self::CREATED_AT},
                 'user_id' => $this->getUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
@@ -199,13 +199,13 @@ class Revisionable extends Eloquent
     {
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
-            && $this->isRevisionable('deleted_at')) {
+            && $this->isRevisionable(self::DELETED_AT)) {
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
                 'revisionable_id' => $this->getKey(),
-                'key' => 'deleted_at',
+                'key' => self::DELETED_AT,
                 'old_value' => null,
-                'new_value' => $this->deleted_at,
+                'new_value' => $this->{self::DELETED_AT},
                 'user_id' => $this->getUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
