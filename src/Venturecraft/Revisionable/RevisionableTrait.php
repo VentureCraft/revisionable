@@ -132,11 +132,11 @@ trait RevisionableTrait
             // the below is ugly, for sure, but it's required so we can save the standard model
             // then use the keep / dontkeep values for later, in the isRevisionable method
             $this->dontKeep = isset($this->dontKeepRevisionOf) ?
-                $this->dontKeepRevisionOf + $this->dontKeep
+                array_merge($this->dontKeepRevisionOf, $this->dontKeep)
                 : $this->dontKeep;
 
             $this->doKeep = isset($this->keepRevisionOf) ?
-                $this->keepRevisionOf + $this->doKeep
+                array_merge($this->keepRevisionOf, $this->doKeep)
                 : $this->doKeep;
 
             unset($this->attributes['dontKeepRevisionOf']);
