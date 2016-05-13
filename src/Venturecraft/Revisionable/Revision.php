@@ -199,7 +199,7 @@ class Revision extends Eloquent
         ) {
             return $class::findUserById($this->user_id);
         } else {
-            $user_model = app('config')->get('auth.model');
+            $user_model = \Config::get('auth.providers.users.model');
 
             return $user_model::find($this->user_id);
         }
