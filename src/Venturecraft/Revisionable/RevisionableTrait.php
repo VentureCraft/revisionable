@@ -196,6 +196,7 @@ trait RevisionableTrait
                 }
                 $revision = new Revision;
                 \DB::table($revision->getTable())->insert($revisions);
+                \Event::fire('revisionable.saved', array('revisions' => $revisions));
             }
         }
     }
@@ -229,9 +230,8 @@ trait RevisionableTrait
 
             $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
-
+            \Event::fire('revisionable.created', array('revisions' => $revisions));
         }
-
 
     }
 
@@ -256,6 +256,7 @@ trait RevisionableTrait
             );
             $revision = new \Venturecraft\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
+            \Event::fire('revisionable.deleted', array('revisions' => $revisions));
         }
     }
 
