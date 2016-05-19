@@ -192,9 +192,9 @@ public function boot(DispatcherContract $events)
 {
     parent::boot($events);
 
-    $events->listen('revisionable.*', function($revisions) {
-        // Do something with the revisions. 
-        dd($revisions);
+    $events->listen('revisionable.*', function($model, $revisions) {
+        // Do something with the revisions or the changed model. 
+        dd($model, $revisions);
     });
 }
 
