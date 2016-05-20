@@ -128,7 +128,7 @@ class Article extends Eloquent {
     protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
 }
 ```
-In order to maintain a limit on history, but instead of stopping tracking revisions you want to remove old revisions, you can accommodate that feature by setting `$revisionCleanup`.
+In order to maintain a limit on history, but instead of stopping tracking revisions if you want to remove old revisions, you can accommodate that feature by setting `$revisionCleanup`.
 
 ```php
 namespace MyApp\Models;
@@ -180,6 +180,25 @@ protected $dontKeepRevisionOf = array(
 ```
 
 > The `$keepRevisionOf` setting takes precendence over `$dontKeepRevisionOf`
+
+### Events
+
+Every time a model revision is created an event is fired. You can listen for `revisionable.created`,  
+`revisionable.saved` or `revisionable.deleted`.
+
+```php
+// app/Providers/EventServiceProviders.php
+public function boot(DispatcherContract $events)
+{
+    parent::boot($events);
+
+    $events->listen('revisionable.*', function($model, $revisions) {
+        // Do something with the revisions or the changed model. 
+        dd($model, $revisions);
+    });
+}
+
+```
 
 <a name="formatoutput"></a>
 ## Format output
