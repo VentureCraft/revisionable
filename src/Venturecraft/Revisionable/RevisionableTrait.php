@@ -75,7 +75,7 @@ trait RevisionableTrait
             $model->postSave();
         });
 
-        static::created(function($model){
+        static::created(function ($model) {
             $model->postCreate();
         });
 
@@ -90,7 +90,17 @@ trait RevisionableTrait
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+        return $this->morphMany(config('revisionable.revision.model'), 'revisionable');
+    }
+
+    /**
+     * @param int $limit
+     * @return mixed
+     */
+
+    public function getRevisionHistory($limit = 10)
+    {
+        return $this->revisionHistory->take($limit);
     }
 
     /**
@@ -102,15 +112,16 @@ trait RevisionableTrait
      */
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
-        return \Venturecraft\Revisionable\Revision::where('revisionable_type', get_called_class())
+        $class = config('revisionable.revision.model');
+        return $class::where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
     }
 
     /**
-    * Invoked before a model is saved. Return false to abort the operation.
-    *
-    * @return bool
-    */
+     * Invoked before a model is saved. Return false to abort the operation.
+     *
+     * @return bool
+     */
     public function preSave()
     {
         if (!isset($this->revisionEnabled) || $this->revisionEnabled) {
@@ -132,12 +143,12 @@ trait RevisionableTrait
             // the below is ugly, for sure, but it's required so we can save the standard model
             // then use the keep / dontkeep values for later, in the isRevisionable method
             $this->dontKeep = isset($this->dontKeepRevisionOf) ?
-                $this->dontKeepRevisionOf + $this->dontKeep
-                : $this->dontKeep;
+            $this->dontKeepRevisionOf + $this->dontKeep
+            : $this->dontKeep;
 
             $this->doKeep = isset($this->keepRevisionOf) ?
-                $this->keepRevisionOf + $this->doKeep
-                : $this->doKeep;
+            $this->keepRevisionOf + $this->doKeep
+            : $this->doKeep;
 
             unset($this->attributes['dontKeepRevisionOf']);
             unset($this->attributes['keepRevisionOf']);
@@ -146,7 +157,6 @@ trait RevisionableTrait
             $this->updating = $this->exists;
         }
     }
-
 
     /**
      * Called after a model is successfully saved.
@@ -160,10 +170,10 @@ trait RevisionableTrait
         } else {
             $LimitReached = false;
         }
-        if (isset($this->revisionCleanup)){
-            $RevisionCleanup=$this->revisionCleanup;
-        }else{
-            $RevisionCleanup=false;
+        if (isset($this->revisionCleanup)) {
+            $RevisionCleanup = $this->revisionCleanup;
+        } else {
+            $RevisionCleanup = false;
         }
 
         // check if the model already exists
@@ -188,9 +198,9 @@ trait RevisionableTrait
             }
 
             if (count($revisions) > 0) {
-                if($LimitReached && $RevisionCleanup){
-                    $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
-                    foreach($toDelete as $delete){
+                if ($LimitReached && $RevisionCleanup) {
+                    $toDelete = $this->revisionHistory()->orderBy('id', 'asc')->limit(count($revisions))->get();
+                    foreach ($toDelete as $delete) {
                         $delete->delete();
                     }
                 }
@@ -202,21 +212,19 @@ trait RevisionableTrait
     }
 
     /**
-    * Called after record successfully created
-    */
+     * Called after record successfully created
+     */
     public function postCreate()
     {
 
         // Check if we should store creations in our revision history
         // Set this value to true in your model if you want to
-        if(empty($this->revisionCreationsEnabled))
-        {
+        if (empty($this->revisionCreationsEnabled)) {
             // We should not store creations.
             return false;
         }
 
-        if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
-        {
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled)) {
             $revisions[] = array(
                 'revisionable_type' => get_class($this),
                 'revisionable_id' => $this->getKey(),
@@ -254,7 +262,8 @@ trait RevisionableTrait
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = new \Venturecraft\Revisionable\Revision;
+            $class = config('revisionable.revision.model');
+            $revision = new $class;
             \DB::table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
@@ -267,9 +276,7 @@ trait RevisionableTrait
     public function getUserId()
     {
         try {
-            if (class_exists($class = '\SleepingOwl\AdminAuth\Facades\AdminAuth')
-                || class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
-                || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
+            if (class_exists($class = config('revisionable.user.model'))
             ) {
                 return ($class::check()) ? $class::getUser()->id : null;
             } elseif (\Auth::check()) {
