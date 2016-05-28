@@ -41,15 +41,18 @@ Run composer update to download the package
 php composer.phar update
 ```
 
-Finally, you'll also need to run migration on the package
+After updating composer, add the service provider to the `providers` array in `config/app.php`
+
+```php
+Venturecraft\Revisionable\RevisionableServiceProvider::class,
+```
+
+Finally, publish the migrations and then migrate.
 
 ```
-php artisan migrate --package=venturecraft/revisionable
+php artisan vendor:publish --provider="Venturecraft\Revisionable\RevisionableServiceProvider"
+php artisan migrate
 ```
-
-> If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
-
-> `cp vendor/venturecraft/revisionable/src/migrations/2013_04_09_062329_create_revisions_table.php app/database/migrations/`
 
 ## Docs
 
