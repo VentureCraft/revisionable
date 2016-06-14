@@ -147,6 +147,7 @@ class Revisionable extends Eloquent
                     'old_value'             => array_get($this->originalData, $key),
                     'new_value'             => $this->updatedData[$key],
                     'user_id'               => $this->getUserId(),
+                    'ip'                    => $this->getClientIp(),
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
                 );
@@ -182,6 +183,7 @@ class Revisionable extends Eloquent
                 'old_value' => null,
                 'new_value' => $this->created_at,
                 'user_id' => $this->getUserId(),
+                'ip' => $this->getClientIp(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
@@ -207,12 +209,18 @@ class Revisionable extends Eloquent
                 'old_value' => null,
                 'new_value' => $this->deleted_at,
                 'user_id' => $this->getUserId(),
+                'ip' => $this->getClientIp(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
             $revision = new \Venturecraft\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
+    }
+
+    private function getClientIp()
+    {
+        return request()->getClientIp();
     }
 
     /**
