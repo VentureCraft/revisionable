@@ -146,7 +146,7 @@ class Revisionable extends Eloquent
                     'key'                   => $key,
                     'old_value'             => array_get($this->originalData, $key),
                     'new_value'             => $this->updatedData[$key],
-                    'user_id'               => $this->getUserId(),
+                    'user_id'               => $this->getSystemUserId(),
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
                 );
@@ -181,7 +181,7 @@ class Revisionable extends Eloquent
                 'key' => 'created_at',
                 'old_value' => null,
                 'new_value' => $this->created_at,
-                'user_id' => $this->getUserId(),
+                'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
@@ -206,7 +206,7 @@ class Revisionable extends Eloquent
                 'key' => 'deleted_at',
                 'old_value' => null,
                 'new_value' => $this->deleted_at,
-                'user_id' => $this->getUserId(),
+                'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
@@ -219,7 +219,7 @@ class Revisionable extends Eloquent
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
-    private function getUserId()
+    private function getSystemUserId()
     {
         try {
             if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
