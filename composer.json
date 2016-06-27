@@ -10,6 +10,7 @@
             "email": "developer@roomroster.com"
         }
     ],
+    "minimum-stability": "stable",
     "require": {
         "php": ">=5.3.0",
         "illuminate/support": ">=5.1"
@@ -18,7 +19,7 @@
         "classmap": [
             "src/migrations"
         ],
-        "psr-0": {
+        "psr-4": {
             "Venturecraft\\Revisionable": "src/"
         }
     },
