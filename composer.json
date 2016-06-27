@@ -20,7 +20,7 @@
             "src/migrations"
         ],
         "psr-4": {
-            "Venturecraft\\Revisionable": "src/"
+            "Venturecraft\\Revisionable\\": "src/"
         }
     },
     "repositories": [
