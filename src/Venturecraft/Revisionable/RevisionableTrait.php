@@ -245,7 +245,7 @@ trait RevisionableTrait
             && $this->isRevisionable('deleted_at')
         ) {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => 'deleted_at',
                 'old_value' => null,
