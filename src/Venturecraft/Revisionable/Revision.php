@@ -133,8 +133,8 @@ class Revision extends Eloquent
             $main_model = new $main_model;
 
             try {
-                if (strpos($this->key, '_id')) {
-                    $related_model = str_replace('_id', '', $this->key);
+                if ($this->isRelated()) {
+                    $related_model = $this->getRelatedModel();
 
                     // Now we can find out the namespace of of related model
                     if (!method_exists($main_model, $related_model)) {
@@ -185,6 +185,38 @@ class Revision extends Eloquent
         }
 
         return $this->format($this->key, $this->$which_value);
+    }
+
+    /**
+     * Return true if the key is for a related model.
+     *
+     * @return bool
+     */
+    private function isRelated()
+    {
+        $isRelated = false;
+        $idSuffix = '_id';
+        $pos = strrpos($this->key, $idSuffix);
+
+        if ($pos !== false
+            && strlen($this->key) - strlen($idSuffix) === $pos
+        ) {
+            $isRelated = true;
+        }
+
+        return $isRelated;
+    }
+
+    /**
+     * Return the name of the related model.
+     *
+     * @return string
+     */
+    private function getRelatedModel()
+    {
+        $idSuffix = '_id';
+
+        return substr($this->key, 0, strlen($this->key) - strlen($idSuffix));
     }
 
     /**
