@@ -176,7 +176,7 @@ trait RevisionableTrait
 
             foreach ($changes_to_record as $key => $change) {
                 $revisions[] = array(
-                    'revisionable_type' => get_class($this),
+                    'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
                     'old_value' => array_get($this->originalData, $key),
@@ -218,7 +218,7 @@ trait RevisionableTrait
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => self::CREATED_AT,
                 'old_value' => null,
@@ -245,7 +245,7 @@ trait RevisionableTrait
             && $this->isRevisionable($this->getDeletedAtColumn())
         ) {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
