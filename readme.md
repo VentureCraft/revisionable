@@ -1,11 +1,10 @@
 <img src="http://venturecraft.com.au/wp-content/uploads/2015/09/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
 
-<a href="https://packagist.org/packages/venturecraft/revisionable">
-    <img src="http://img.shields.io/github/tag/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
-</a>
-<a href="https://packagist.org/packages/venturecraft/revisionable">
-    <img src="http://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
-</a>
+[![Laravel 4.x](https://img.shields.io/badge/Laravel-4.x-brightgreen.svg?style=flat-square)](http://laravel.com)
+[![Laravel 5.2](https://img.shields.io/badge/Laravel-5.x-brightgreen.svg?style=flat-square)](http://laravel.com)
+[![Latest Version](https://img.shields.io/github/release/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
+[![Downloads](https://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
+[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
 
 Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable from your model, you can instantly have just that, and be able to display a history similar to this:
 
@@ -41,8 +40,13 @@ Run composer update to download the package
 php composer.phar update
 ```
 
-Finally, you'll also need to run migration on the package
+Finally, you'll also need to run migration on the package (Laravel 5.x)
 
+```
+php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
+```
+
+For Laravel 4.x users:
 ```
 php artisan migrate --package=venturecraft/revisionable
 ```
@@ -128,7 +132,7 @@ class Article extends Eloquent {
     protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
 }
 ```
-In order to maintain a limit on history, but instead of stopping tracking revisions you want to remove old revisions, you can accommodate that feature by setting `$revisionCleanup`.
+In order to maintain a limit on history, but instead of stopping tracking revisions if you want to remove old revisions, you can accommodate that feature by setting `$revisionCleanup`.
 
 ```php
 namespace MyApp\Models;
@@ -180,6 +184,25 @@ protected $dontKeepRevisionOf = array(
 ```
 
 > The `$keepRevisionOf` setting takes precendence over `$dontKeepRevisionOf`
+
+### Events
+
+Every time a model revision is created an event is fired. You can listen for `revisionable.created`,  
+`revisionable.saved` or `revisionable.deleted`.
+
+```php
+// app/Providers/EventServiceProviders.php
+public function boot(DispatcherContract $events)
+{
+    parent::boot($events);
+
+    $events->listen('revisionable.*', function($model, $revisions) {
+        // Do something with the revisions or the changed model. 
+        dd($model, $revisions);
+    });
+}
+
+```
 
 <a name="formatoutput"></a>
 ## Format output
@@ -340,7 +363,7 @@ $object->disableRevisionField(array('title', 'content')); // Disables title and 
 ## Contributing
 
 Contributions are encouraged and welcome; to keep things organised, all bugs and requests should be
-opened in the github issues tab for the main project, at [venturecraft/revisionable/issues](https://github.com/venturecraft/revisionable/issues)
+opened in the GitHub issues tab for the main project, at [venturecraft/revisionable/issues](https://github.com/venturecraft/revisionable/issues)
 
 All pull requests should be made to the develop branch, so they can be tested before being merged into the master branch.
 
@@ -350,6 +373,6 @@ All pull requests should be made to the develop branch, so they can be tested be
 If you're having troubles with using this package, odds on someone else has already had the same problem. Two places you can look for common answers to your problems are:
 
 * [StackOverflow revisionable tag](http://stackoverflow.com/questions/tagged/revisionable?sort=newest&pageSize=50)
-* [Github Issues](https://github.com/VentureCraft/revisionable/issues?page=1&state=closed)
+* [GitHub Issues](https://github.com/VentureCraft/revisionable/issues?page=1&state=closed)
 
 > If you do prefer posting your questions to the public on StackOverflow, please use the 'revisionable' tag.
