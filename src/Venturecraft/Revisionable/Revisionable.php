@@ -154,7 +154,7 @@ class Revisionable extends Eloquent
 
             if (count($revisions) > 0) {
                 $revision = new Revision;
-                \DB::table($revision->getTable())->insert($revisions);
+                \DB::connection(\Config::get('revisionable.db_connection') ?? null)->table($revision->getTable())->insert($revisions);
             }
         }
     }
@@ -187,7 +187,7 @@ class Revisionable extends Eloquent
             );
 
             $revision = new Revision;
-            \DB::table($revision->getTable())->insert($revisions);
+            \DB::connection(\Config::get('revisionable.db_connection') ?? null)->table($revision->getTable())->insert($revisions);
 
         }
     }
@@ -211,7 +211,7 @@ class Revisionable extends Eloquent
                 'updated_at' => new \DateTime(),
             );
             $revision = new \Venturecraft\Revisionable\Revision;
-            \DB::table($revision->getTable())->insert($revisions);
+            \DB::connection(\Config::get('revisionable.db_connection') ?? null)->table($revision->getTable())->insert($revisions);
         }
     }
 

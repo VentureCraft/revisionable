@@ -195,7 +195,7 @@ trait RevisionableTrait
                     }
                 }
                 $revision = new Revision;
-                \DB::table($revision->getTable())->insert($revisions);
+                \DB::connection(\Config::get('revisionable.db_connection') ?? null)->table($revision->getTable())->insert($revisions);
                 \Event::fire('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
         }
@@ -229,7 +229,7 @@ trait RevisionableTrait
             );
 
             $revision = new Revision;
-            \DB::table($revision->getTable())->insert($revisions);
+            \DB::connection(\Config::get('revisionable.db_connection') ?? null)->table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
 
@@ -255,7 +255,7 @@ trait RevisionableTrait
                 'updated_at' => new \DateTime(),
             );
             $revision = new \Venturecraft\Revisionable\Revision;
-            \DB::table($revision->getTable())->insert($revisions);
+            \DB::connection(\Config::get('revisionable.db_connection') ?? null)->table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
