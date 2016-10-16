@@ -133,8 +133,8 @@ class Revision extends Eloquent
             $main_model = new $main_model;
 
             try {
-                if (strpos($this->key, '_id')) {
-                    $related_model = str_replace('_id', '', $this->key);
+                if ($this->isRelated()) {
+                    $related_model = $this->getRelatedModel();
 
                     // Now we can find out the namespace of of related model
                     if (!method_exists($main_model, $related_model)) {
@@ -188,12 +188,45 @@ class Revision extends Eloquent
     }
 
     /**
+     * Return true if the key is for a related model.
+     *
+     * @return bool
+     */
+    private function isRelated()
+    {
+        $isRelated = false;
+        $idSuffix = '_id';
+        $pos = strrpos($this->key, $idSuffix);
+
+        if ($pos !== false
+            && strlen($this->key) - strlen($idSuffix) === $pos
+        ) {
+            $isRelated = true;
+        }
+
+        return $isRelated;
+    }
+
+    /**
+     * Return the name of the related model.
+     *
+     * @return string
+     */
+    private function getRelatedModel()
+    {
+        $idSuffix = '_id';
+
+        return substr($this->key, 0, strlen($this->key) - strlen($idSuffix));
+    }
+
+    /**
      * User Responsible.
      *
      * @return User user responsible for the change
      */
     public function userResponsible()
     {
+        if (empty($this->user_id)) { return false; }
         if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
             || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
         ) {
@@ -201,6 +234,15 @@ class Revision extends Eloquent
         } else {
             $user_model = app('config')->get('auth.model');
 
+            if (empty($user_model)) {
+                $user_model = app('config')->get('auth.providers.users.model');
+                if (empty($user_model)) {
+                    return false;
+                }
+            }
+            if (!class_exists($user_model)) {
+                return false;
+            }
             return $user_model::find($this->user_id);
         }
     }

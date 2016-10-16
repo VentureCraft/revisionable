@@ -107,11 +107,11 @@ class Revisionable extends Eloquent
             // the below is ugly, for sure, but it's required so we can save the standard model
             // then use the keep / dontkeep values for later, in the isRevisionable method
             $this->dontKeep = isset($this->dontKeepRevisionOf) ?
-                $this->dontKeepRevisionOf + $this->dontKeep
+                array_merge($this->dontKeepRevisionOf, $this->dontKeep)
                 : $this->dontKeep;
 
             $this->doKeep = isset($this->keepRevisionOf) ?
-                $this->keepRevisionOf + $this->doKeep
+                array_merge($this->keepRevisionOf, $this->doKeep)
                 : $this->doKeep;
 
             unset($this->attributes['dontKeepRevisionOf']);
@@ -141,12 +141,12 @@ class Revisionable extends Eloquent
 
             foreach ($changes_to_record as $key => $change) {
                 $revisions[] = array(
-                    'revisionable_type'     => get_class($this),
+                    'revisionable_type'     => $this->getMorphClass(),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
                     'old_value'             => array_get($this->originalData, $key),
                     'new_value'             => $this->updatedData[$key],
-                    'user_id'               => $this->getUserId(),
+                    'user_id'               => $this->getSystemUserId(),
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
                 );
@@ -176,12 +176,12 @@ class Revisionable extends Eloquent
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
-                'key' => 'created_at',
+                'key' => self::CREATED_AT,
                 'old_value' => null,
-                'new_value' => $this->created_at,
-                'user_id' => $this->getUserId(),
+                'new_value' => $this->{self::CREATED_AT},
+                'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
@@ -199,14 +199,14 @@ class Revisionable extends Eloquent
     {
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
-            && $this->isRevisionable('deleted_at')) {
+            && $this->isRevisionable($this->getDeletedAtColumn())) {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
-                'key' => 'deleted_at',
+                'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
-                'new_value' => $this->deleted_at,
-                'user_id' => $this->getUserId(),
+                'new_value' => $this->{$this->getDeletedAtColumn()},
+                'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
@@ -219,7 +219,7 @@ class Revisionable extends Eloquent
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
-    private function getUserId()
+    private function getSystemUserId()
     {
         try {
             if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
