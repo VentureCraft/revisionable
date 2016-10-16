@@ -20,6 +20,8 @@ class Revision extends Eloquent
      */
     public $table = 'revisions';
 
+    protected $dates = ['accepted_at'];
+
     /**
      * @var array
      */
@@ -287,5 +289,15 @@ class Revision extends Eloquent
         } else {
             return $value;
         }
+    }
+
+    public function scopeOnlyPending($q)
+    {
+        $q->whereNull('accepted_at');
+    }
+
+    public function scopeOnlyAccepted($q)
+    {
+        $q->whereNotNull('accepted_at');
     }
 }

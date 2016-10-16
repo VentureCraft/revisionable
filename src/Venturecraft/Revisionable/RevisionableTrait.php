@@ -94,6 +94,17 @@ trait RevisionableTrait
     }
 
     /**
+     * Restrict the result to include only records which has pending revision
+     * history which are not accepted yet.
+     */
+    public function scopeHasPendingRevisionHistory($query)
+    {
+        $query->whereHas('revisionHistory', function($q){
+            $q->whereNull('accepted_at');
+        });
+    }
+
+    /**
      * Generates a list of the last $limit revisions made to any objects of the class it is being called from.
      *
      * @param int $limit
@@ -144,6 +155,10 @@ trait RevisionableTrait
 
             $this->dirtyData = $this->getDirty();
             $this->updating = $this->exists;
+
+            if($this->autoAccept == false){
+                $this->attributes = $this->original;
+            }
         }
     }
 
@@ -184,12 +199,19 @@ trait RevisionableTrait
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
+                    'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
                 );
             }
 
             if (count($revisions) > 0) {
                 if($LimitReached && $RevisionCleanup){
-                    $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
+                    $columns = collect($revisions)->pluck('key');
+                    $toDelete = $this->revisionHistory()
+                        ->whereIn('key', $columns)
+                        ->orderBy('id','asc')
+                        ->limit(count($revisions))
+                        ->get();
+                    
                     foreach($toDelete as $delete){
                         $delete->delete();
                     }
