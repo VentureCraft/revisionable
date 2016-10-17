@@ -156,7 +156,7 @@ trait RevisionableTrait
             $this->dirtyData = $this->getDirty();
             $this->updating = $this->exists;
 
-            if($this->autoAccept == false){
+            if($this->updating && $this->autoAccept == false){
                 $this->attributes = $this->original;
             }
         }
