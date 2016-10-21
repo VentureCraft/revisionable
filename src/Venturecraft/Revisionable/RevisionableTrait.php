@@ -134,11 +134,6 @@ trait RevisionableTrait
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
-                if($this->updating && $this->autoAccept == false && in_array($key, $this->keepRevisionOf)){
-                    if(isset($this->originalData[$key]) and ($this->originalData[$key] != null OR $this->originalData[$key] != ''))
-                        $this->attributes[$key] = $this->originalData[$key];
-                }
-
                 if (gettype($val) == 'object' && !method_exists($val, '__toString')) {
                     unset($this->originalData[$key]);
                     unset($this->updatedData[$key]);
@@ -202,6 +197,13 @@ trait RevisionableTrait
                     'updated_at' => new \DateTime(),
                     'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
                 );
+                if($this->updating && $this->autoAccept == false && in_array($key, $this->keepRevisionOf)){
+                    if(isset($this->originalData[$key]) and ($this->originalData[$key] != null OR $this->originalData[$key] != '')){
+                        \Log::debug('Changing value for key '.$key);
+                        $this->attributes[$key] = $this->originalData[$key];
+                    }
+                }
+
             }
 
             if (count($revisions) > 0) {
