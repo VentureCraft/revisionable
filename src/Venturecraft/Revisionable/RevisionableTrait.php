@@ -135,7 +135,7 @@ trait RevisionableTrait
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
                 if($this->updating && $this->autoAccept == false && in_array($key, $this->keepRevisionOf)){
-                    if(isset($this->originalData[$key]))
+                    if(isset($this->originalData[$key]) and ($this->originalData[$key] != null OR $this->originalData[$key] != ''))
                         $this->attributes[$key] = $this->originalData[$key];
                 }
 
