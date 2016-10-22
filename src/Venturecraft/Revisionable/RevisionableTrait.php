@@ -128,6 +128,7 @@ trait RevisionableTrait
             // if there's no revisionEnabled. Or if there is, if it's true
 
             $this->originalData = $this->original;
+
             $this->updatedData = $this->attributes;
             $this->updating = $this->exists;
 
@@ -155,6 +156,17 @@ trait RevisionableTrait
             unset($this->attributes['keepRevisionOf']);
 
             $this->dirtyData = $this->getDirty();
+
+            $changes_to_record = $this->changedRevisionableFields(); 
+            foreach ($changes_to_record as $key => $value) {
+                if($this->updating && $this->autoAccept == false && in_array($key, $this->keepRevisionOf)){
+                    if(isset($this->originalData[$key])){
+                        \Log::debug('Changing value for key '.$key);
+                        $this->attributes[$key] = $this->originalData[$key];
+                    }
+                }
+            }
+
         }
     }
 
@@ -197,13 +209,6 @@ trait RevisionableTrait
                     'updated_at' => new \DateTime(),
                     'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
                 );
-                if($this->updating && $this->autoAccept == false && in_array($key, $this->keepRevisionOf)){
-                    if(isset($this->originalData[$key]) and ($this->originalData[$key] != null OR $this->originalData[$key] != '')){
-                        \Log::debug('Changing value for key '.$key);
-                        $this->attributes[$key] = $this->originalData[$key];
-                    }
-                }
-
             }
 
             if (count($revisions) > 0) {
