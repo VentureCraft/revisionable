@@ -13,6 +13,8 @@
  */
 trait RevisionableTrait
 {
+    use MakeRevisionTrait;
+
     /**
      * @var array
      */
@@ -175,16 +177,11 @@ trait RevisionableTrait
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
-                $revisions[] = array(
-                    'revisionable_type' => $this->getMorphClass(),
-                    'revisionable_id' => $this->getKey(),
+                $revisions[] = $this->makeRevision([
                     'key' => $key,
                     'old_value' => array_get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
-                    'user_id' => $this->getSystemUserId(),
-                    'created_at' => new \DateTime(),
-                    'updated_at' => new \DateTime(),
-                );
+                ]);
             }
 
             if (count($revisions) > 0) {
@@ -217,17 +214,10 @@ trait RevisionableTrait
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
-            $revisions[] = array(
-                'revisionable_type' => $this->getMorphClass(),
-                'revisionable_id' => $this->getKey(),
+            $revisions[] = $this->makeRevision([
                 'key' => self::CREATED_AT,
-                'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
-                'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
-            );
-
+            ]);
             $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.created', array('model' => $this, 'revisions' => $revisions));
@@ -244,16 +234,10 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
         ) {
-            $revisions[] = array(
-                'revisionable_type' => $this->getMorphClass(),
-                'revisionable_id' => $this->getKey(),
+            $revisions[] = $this->makeRevision([
                 'key' => $this->getDeletedAtColumn(),
-                'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
-                'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
-            );
+            ]);
             $revision = new \Venturecraft\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));

@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  */
 class Revisionable extends Eloquent
 {
+    use MakeRevisionTrait;
+
     /**
      * @var
      */
@@ -140,16 +142,11 @@ class Revisionable extends Eloquent
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
-                $revisions[] = array(
-                    'revisionable_type'     => $this->getMorphClass(),
-                    'revisionable_id'       => $this->getKey(),
-                    'key'                   => $key,
-                    'old_value'             => array_get($this->originalData, $key),
-                    'new_value'             => $this->updatedData[$key],
-                    'user_id'               => $this->getSystemUserId(),
-                    'created_at'            => new \DateTime(),
-                    'updated_at'            => new \DateTime(),
-                );
+                $revisions[] = $this->makeRevision([
+                    'key' => $key,
+                    'old_value' => array_get($this->originalData, $key),
+                    'new_value' => $this->updatedData[$key],
+                ]);
             }
 
             if (count($revisions) > 0) {
@@ -175,17 +172,11 @@ class Revisionable extends Eloquent
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
-            $revisions[] = array(
-                'revisionable_type' => $this->getMorphClass(),
-                'revisionable_id' => $this->getKey(),
+            $revisions[] = $this->makeRevision([
                 'key' => self::CREATED_AT,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
-                'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
-            );
-
+            ]);
             $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
 
@@ -200,16 +191,11 @@ class Revisionable extends Eloquent
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())) {
-            $revisions[] = array(
-                'revisionable_type' => $this->getMorphClass(),
-                'revisionable_id' => $this->getKey(),
+            $revisions[] = $this->makeRevision([
                 'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
-                'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
-            );
+            ]);
             $revision = new \Venturecraft\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
