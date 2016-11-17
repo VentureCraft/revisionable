@@ -182,6 +182,7 @@ trait RevisionableTrait
                     'old_value' => array_get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getSystemUserId(),
+                    'ip' => $_SERVER["REMOTE_ADDR"],
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
                 );
@@ -224,6 +225,7 @@ trait RevisionableTrait
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
                 'user_id' => $this->getSystemUserId(),
+                'ip' => $_SERVER["REMOTE_ADDR"],
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
@@ -251,6 +253,7 @@ trait RevisionableTrait
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
                 'user_id' => $this->getSystemUserId(),
+                'ip' => $_SERVER["REMOTE_ADDR"],
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
