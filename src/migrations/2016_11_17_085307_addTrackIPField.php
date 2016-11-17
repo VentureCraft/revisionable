@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddResponsibleInStudyReport extends Migration
+class AddTrackIPField extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class AddResponsibleInStudyReport extends Migration
      */
     public function up()
     {
-        echo "Modify (report_field) add (ref)..." . PHP_EOL;
+        echo "Modify (revisions) add (ip)..." . PHP_EOL;
 
-        Schema::table('report_field', function($table)
+        Schema::table('revisions', function($table)
         {
-           $table->string('ref')->nullable();
+           $table->string('ip', 64)->nullable();
         });
     }
 
@@ -28,13 +28,13 @@ class AddResponsibleInStudyReport extends Migration
      */
     public function down()
     {
-        echo "Modify (report_field) drop (ref)..." . PHP_EOL;
+        echo "Modify (revisions) drop (ip)..." . PHP_EOL;
 
-        if (Schema::hasColumn('report_field', 'ref'))
+        if (Schema::hasColumn('revisions', 'ip'))
         {
-            Schema::table('report_field', function($table)
+            Schema::table('revisions', function($table)
             {
-                $table->dropColumn('ref');
+                $table->dropColumn('ip');
             });
         }
     }
