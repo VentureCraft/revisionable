@@ -40,7 +40,7 @@ Run composer update to download the package
 php composer.phar update
 ```
 
-Open config/app.php and register the required service provider
+Open config/app.php and register the required service provider  (Laravel 5.x)
 
 ```
 'providers' => [
@@ -48,10 +48,9 @@ Open config/app.php and register the required service provider
 ]
 ```
 
-Publish the configuration and migrations
+Publish the configuration and migrations (Laravel 5.x)
 
 ```
-# Laravel 5.x
 php artisan vendor:publish --provider="Venturecraft\Revisionable\RevisionableServiceProvider"
 ```
 
