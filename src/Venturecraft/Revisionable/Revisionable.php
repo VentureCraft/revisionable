@@ -79,7 +79,7 @@ class Revisionable extends Eloquent
      */
     public static function newModel()
     {
-        $model = \Config::get('revisionable.model');
+        $model = \Config::get('revisionable.model', 'Venturecraft\Revisionable\Revision');
         return new $model;
     }
 
