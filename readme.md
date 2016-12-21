@@ -40,10 +40,25 @@ Run composer update to download the package
 php composer.phar update
 ```
 
+Open config/app.php and register the required service provider
+
+```
+'providers' => [
+	Venturecraft\Revisionable\RevisionableServiceProvider::class,
+]
+```
+
+Publish the configuration and migrations
+
+```
+# Laravel 5.x
+php artisan vendor:publish --provider="Venturecraft\Revisionable\RevisionableServiceProvider"
+```
+
 Finally, you'll also need to run migration on the package (Laravel 5.x)
 
 ```
-php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
+php artisan migrate
 ```
 
 For Laravel 4.x users:
