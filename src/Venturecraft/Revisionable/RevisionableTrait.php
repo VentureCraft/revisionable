@@ -295,7 +295,7 @@ trait RevisionableTrait
             // check that the field is revisionable, and double check
             // that it's actually new data in case dirty is, well, clean
             if ($this->isRevisionable($key) && !is_array($value)) {
-                if (!isset($this->originalData[$key]) || $this->originalData[$key] != $this->updatedData[$key]) {
+                if (!array_key_exists($key, $this->originalData) || $this->originalData[$key] != $this->updatedData[$key]) {
                     $changes_to_record[$key] = $value;
                 }
             } else {
