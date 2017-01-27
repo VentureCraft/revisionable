@@ -75,7 +75,7 @@ class Revision extends Eloquent
      */
     private function formatFieldName($key)
     {
-        $related_model = $this->revisionable_type;
+        $related_model = $this->getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFieldNames = $related_model->getRevisionFormattedFieldNames();
 
@@ -278,7 +278,7 @@ class Revision extends Eloquent
      */
     public function format($key, $value)
     {
-        $related_model = $this->revisionable_type;
+        $related_model = $this->getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFields = $related_model->getRevisionFormattedFields();
 
