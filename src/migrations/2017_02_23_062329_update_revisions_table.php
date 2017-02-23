@@ -11,7 +11,7 @@ class CreateRevisionsTable extends Migration
      */
     public function up()
     {
-        Schema::table('revisions', function (Blueprint $table) {
+        Schema::table('revisions', function ($table) {
             $table->string('revision_id');
         });
     }
@@ -23,7 +23,7 @@ class CreateRevisionsTable extends Migration
      */
     public function down()
     {
-        Schema::table('revisions', function (Blueprint $table) {
+        Schema::table('revisions', function ($table) {
             $table->dropColumn('revision_id');
         });
     }
