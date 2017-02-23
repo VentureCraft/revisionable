@@ -173,11 +173,13 @@ trait RevisionableTrait
             $changes_to_record = $this->changedRevisionableFields();
 
             $revisions = array();
-
+            $uniqid = uniqid();
+            
             foreach ($changes_to_record as $key => $change) {
                 $revisions[] = array(
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
+                    'revision_id' => $uniqid,
                     'key' => $key,
                     'old_value' => array_get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
@@ -217,9 +219,11 @@ trait RevisionableTrait
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
+            $uniqid = uniqid();
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
+                'revision_id' => $uniqid,
                 'key' => self::CREATED_AT,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
@@ -244,9 +248,11 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
         ) {
+            $uniqid = uniqid();
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
+                'revision_id' => $uniqid,
                 'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
