@@ -177,9 +177,11 @@ class Revisionable extends Eloquent
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
+            $uniqid = uniqid();
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
+                'revision_id'     => $uniqid,
                 'key' => self::CREATED_AT,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
@@ -202,9 +204,12 @@ class Revisionable extends Eloquent
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())) {
+
+            $uniqid = uniqid();
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
+                'revision_id'     => $uniqid,
                 'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
