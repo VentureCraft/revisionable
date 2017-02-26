@@ -94,6 +94,27 @@ trait RevisionableTrait
     }
 
     /**
+     * @return mixed
+     */
+    public function revisionHistoryMapped()
+    {
+        $out = [];
+        $data = $this->revisionHistory()->get()->sortByDesc(function ($item) {
+            return $item->created_at;
+        });
+        foreach ($data as $key => $item) {
+            $out[$item->revision_id]['item'] = $item;
+            $out[$item->revision_id]['revision_data'][] = [
+                'key' => $item->key,
+                'old_value' => $item->oldValue(),
+                'new_value' => $item->newValue()
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
      * Generates a list of the last $limit revisions made to any objects of the class it is being called from.
      *
      * @param int $limit
