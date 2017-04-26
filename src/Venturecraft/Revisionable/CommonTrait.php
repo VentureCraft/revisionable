@@ -133,6 +133,8 @@ trait CommonTrait
      **/
     public function getSystemUserId()
     {
+        $sessionUserId = app('request')->input('session_user_id', null);
+
         try {
             if (class_exists($class = '\SleepingOwl\AdminAuth\Facades\AdminAuth')
                 || class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
@@ -141,6 +143,8 @@ trait CommonTrait
                 return ($class::check()) ? $class::getUser()->id : null;
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
+            } elseif ($sessionUserId) {
+                return $sessionUserId;
             }
         } catch (\Exception $e) {
             return null;
