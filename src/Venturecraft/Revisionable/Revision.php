@@ -140,7 +140,7 @@ class Revision extends Eloquent
                     if (!method_exists($main_model, $related_model)) {
                         $related_model = camel_case($related_model); // for cases like published_status_id
                         if (!method_exists($main_model, $related_model)) {
-                            throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                            throw new \Exception('Relation ' . $related_model . ' does not exist for ' . get_class($main_model));
                         }
                     }
                     $related_class = $main_model->$related_model()->getRelated();
