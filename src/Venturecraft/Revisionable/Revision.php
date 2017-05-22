@@ -160,14 +160,16 @@ class Revision extends Eloquent
                         return $this->format($this->key, $item->getRevisionUnknownString());
                     }
 
+                    // Check if model use RevisionableTrait
+                    if(method_exists($item, 'identifiableName')) {
+                        // see if there's an available mutator
+                        $mutator = 'get' . studly_case($this->key) . 'Attribute';
+                        if (method_exists($item, $mutator)) {
+                            return $this->format($item->$mutator($this->key), $item->identifiableName());
+                        }
 
-                    // see if there's an available mutator
-                    $mutator = 'get' . studly_case($this->key) . 'Attribute';
-                    if (method_exists($item, $mutator)) {
-                        return $this->format($item->$mutator($this->key), $item->identifiableName());
+                        return $this->format($this->key, $item->identifiableName());
                     }
-
-                    return $this->format($this->key, $item->identifiableName());
                 }
             } catch (\Exception $e) {
                 // Just a fail-safe, in the case the data setup isn't as expected
