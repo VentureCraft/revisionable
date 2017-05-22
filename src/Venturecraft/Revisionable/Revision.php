@@ -172,7 +172,6 @@ class Revision extends Eloquent
             } catch (\Exception $e) {
                 // Just a fail-safe, in the case the data setup isn't as expected
                 // Nothing to do here.
-                Log::info('Revisionable: ' . $e);
             }
 
             // if there was an issue
