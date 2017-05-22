@@ -6,7 +6,7 @@
 [![Downloads](https://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
 
-Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable from your model, you can instantly have just that, and be able to display a history similar to this:
+Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply adding the `RevisionableTrait` Trait to your model, you can instantly have just that, and be able to display a history similar to this:
 
 * Chris changed title from 'Something' to 'Something else'
 * Chris changed category from 'News' to 'Breaking news'
@@ -85,8 +85,7 @@ php artisan migrate --package=venturecraft/revisionable
 ### The new, Trait based implementation (recommended)
 > Traits require PHP >= 5.4
 
-For any model that you want to keep a revision history for, include the revisionable namespace and use the `RevisionableTrait` in your model, e.g.,
-If you are using another bootable trait the be sure to override the boot method in your model;
+For any model that you want to keep a revision history for, include the `VentureCraft\Revisionable` namespace and use the `RevisionableTrait` in your model, e.g.,
 
 ```php
 namespace App;
@@ -98,13 +97,13 @@ class Article extends \Illuminate\Database\Eloquent\Model {
 }
 ```
 
-> Being a trait, revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent, such as [Ardent](https://github.com/laravelbook/ardent).
+> Being a trait, Revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent, such as [Ardent](https://github.com/laravelbook/ardent).
 
 ### Legacy class based implementation
 
 > The new trait based approach is backwards compatible with existing installations of Revisionable. You can still use the below installation instructions, which essentially is extending a wrapper for the trait.
 
-For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
+For any model that you want to keep a revision history for, include the `VentureCraft\Revisionable` namespace and use the `RevisionableTrait` in your model, e.g.,
 
 ```php
 use Venturecraft\Revisionable\Revisionable;
@@ -118,7 +117,7 @@ class Article extends Revisionable { }
 
 ### Implementation notes
 
-If needed, you can disable the revisioning by setting `$revisionEnabled` to false in your model. This can be handy if you want to temporarily disable revisioning, or if you want to create your own base model that extends revisionable, which all of your models extend, but you want to turn revisionable off for certain models.
+If needed, you can disable the revisioning by setting `$revisionEnabled` to false in your Model. This can be handy if you want to temporarily disable revisioning, or if you want to create your own base Model that extends Revisionable, which all of your models extend, but you want to turn Revisionable off for certain models.
 
 ```php
 namespace App;
@@ -156,9 +155,8 @@ class Article extends \Illuminate\Database\Eloquent\Model {
 }
 ```
 
-### Storing soft deletes
-
-By default, if your model supports soft deletes, revisionable will store this and any restores as updates on the model.
+### Storing Soft Deletes
+By default, if your model supports soft deletes, Revisionable will store this and any restores as updates on the model.
 
 You can choose to ignore deletes and restores by adding `deleted_at` to your `$dontKeepRevisionOf` array.
 
@@ -166,7 +164,7 @@ To better format the output for `deleted_at` entries, you can use the `isEmpty` 
 
 <a name="control"></a>
 
-### Storing creations
+### Storing Creations
 By default the creation of a new model is not stored as a revision.
 Only subsequent changes to a model is stored.
 
@@ -175,7 +173,7 @@ If you want to store the creation as a revision you can override this behavior b
 protected $revisionCreationsEnabled = true;
 ```
 
-## More control
+## More Control
 
 No doubt, there'll be cases where you don't want to store a revision history only for certain fields of the model, this is supported in two different ways. In your model you can either specifiy which fields you explicitly want to track and all other fields are ignored:
 
@@ -197,10 +195,11 @@ Every time a model revision is created an event is fired. You can listen for `re
 `revisionable.saved` or `revisionable.deleted`.
 
 ```php
-// app/Providers/EventServiceProviders.php
-public function boot(DispatcherContract $events)
+// app/Providers/EventServiceProvider.php
+
+public function boot()
 {
-    parent::boot($events);
+    parent::boot();
 
     $events->listen('revisionable.*', function($model, $revisions) {
         // Do something with the revisions or the changed model. 
@@ -213,8 +212,8 @@ public function boot(DispatcherContract $events)
 <a name="formatoutput"></a>
 ## Format output
 
-> You can continue (and are encouraged to) use `eloquent accessors` in your model to set the
-output of your values, see the [Laravel docs for more information on accessors](https://laravel.com/docs/eloquent-mutators#accessors-and-mutators)
+> You can continue (and are encouraged to) use `Eloquent accessors` in your model to set the
+output of your values, see the [Laravel Documentation for more information on accessors](https://laravel.com/docs/eloquent-mutators#accessors-and-mutators)
 > The below documentation is therefor deprecated
 
 In cases where you want to have control over the format of the output of the values, for example a boolean field, you can set them in the `$revisionFormattedFields` array in your model. e.g.,
