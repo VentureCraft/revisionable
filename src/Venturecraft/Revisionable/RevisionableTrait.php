@@ -124,7 +124,7 @@ trait RevisionableTrait
             foreach ($this->updatedData as $key => $val) {
                 if (isset($this->casts[$key]) && in_array($this->casts[$key], ['object', 'array'])) {
                     // Reformat JSON to remove whitespaces so it doesn't false flag it as changed
-                    $this->originalData[$key] = json_encode(json_decode($val));
+                    $this->originalData[$key] = json_encode(json_decode($this->originalData[$key]));
                 } else if (gettype($val) == 'object' && !method_exists($val, '__toString')) {
                     unset($this->originalData[$key]);
                     unset($this->updatedData[$key]);
