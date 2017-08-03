@@ -122,7 +122,7 @@ trait RevisionableTrait
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
-                if (isset($this->casts[$key]) && in_array($this->casts[$key], ['object', 'array'])) {
+                if (isset($this->casts[$key]) && in_array($this->casts[$key], ['object', 'array']) && isset($this->originalData[$key])) {
                     // Reformat JSON to remove whitespaces so it doesn't false flag it as changed
                     $this->originalData[$key] = json_encode(json_decode($this->originalData[$key]));
                 } else if (gettype($val) == 'object' && !method_exists($val, '__toString')) {
