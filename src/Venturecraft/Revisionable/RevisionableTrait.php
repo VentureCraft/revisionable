@@ -181,6 +181,7 @@ trait RevisionableTrait
                     'key' => $key,
                     'old_value' => array_get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
+                    'auth_guard' => $this->getCurrentAuthGuard(),
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
@@ -223,6 +224,7 @@ trait RevisionableTrait
                 'key' => self::CREATED_AT,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
+                'auth_guard' => $this->getCurrentAuthGuard(),
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
@@ -250,6 +252,7 @@ trait RevisionableTrait
                 'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
+                'auth_guard' => $this->getCurrentAuthGuard(),
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
@@ -272,8 +275,34 @@ trait RevisionableTrait
                 || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
             ) {
                 return ($class::check()) ? $class::getUser()->id : null;
-            } elseif (\Auth::check()) {
-                return \Auth::user()->getAuthIdentifier();
+            } else {
+
+                $guards = array_keys(config('auth.guards'));
+                foreach ($guards as $guard) {
+                    if(\Auth::guard($guard)->check()){
+                        return \Auth::guard($guard)->user()->getAuthIdentifier();
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the current used guard (supports multi-auth)
+     * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
+     **/
+    public function getCurrentAuthGuard()
+    {
+        try {
+            $guards = array_keys(app('config')->get('auth.guards'));
+            foreach ($guards as $guard) {
+                if(\Auth::guard($guard)->check()){
+                    return $guard;
+                }
             }
         } catch (\Exception $e) {
             return null;
