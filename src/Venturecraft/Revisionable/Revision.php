@@ -160,16 +160,14 @@ class Revision extends Eloquent
                         return $this->format($this->key, $item->getRevisionUnknownString());
                     }
 
-                    // Check if model use RevisionableTrait
-                    if(method_exists($item, 'identifiableName')) {
-                        // see if there's an available mutator
-                        $mutator = 'get' . studly_case($this->key) . 'Attribute';
-                        if (method_exists($item, $mutator)) {
-                            return $this->format($item->$mutator($this->key), $item->identifiableName());
-                        }
 
-                        return $this->format($this->key, $item->identifiableName());
+                    // see if there's an available mutator
+                    $mutator = 'get' . studly_case($this->key) . 'Attribute';
+                    if (method_exists($item, $mutator)) {
+                        return $this->format($item->$mutator($this->key), $item->identifiableName());
                     }
+
+                    return $this->format($this->key, $item->identifiableName());
                 }
             } catch (\Exception $e) {
                 // Just a fail-safe, in the case the data setup isn't as expected
@@ -234,7 +232,10 @@ class Revision extends Eloquent
         ) {
             return $class::findUserById($this->user_id);
         } else {
-            $user_model = app('config')->get('auth.model');
+
+            $user_guard_provider = app('config')->get('auth.guards.' . $this->auth_guard . '.provider');
+
+            $user_model = app('config')->get('auth.providers.' . $user_guard_provider . '.model');
 
             if (empty($user_model)) {
                 $user_model = app('config')->get('auth.providers.users.model');
