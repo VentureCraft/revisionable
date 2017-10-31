@@ -3,6 +3,7 @@
 namespace Venturecraft\Revisionable;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -75,7 +76,7 @@ class Revision extends Eloquent
      */
     private function formatFieldName($key)
     {
-        $related_model = $this->revisionable_type;
+        $related_model = $this->getRelatedModelClassName();
         $related_model = new $related_model;
         $revisionFormattedFieldNames = $related_model->getRevisionFormattedFieldNames();
 
@@ -127,7 +128,7 @@ class Revision extends Eloquent
         $which_value = $which . '_value';
 
         // First find the main model that was updated
-        $main_model = $this->revisionable_type;
+        $main_model = $this->getRelatedModelClassName();
         // Load it, WITH the related model
         if (class_exists($main_model)) {
             $main_model = new $main_model;
@@ -221,6 +222,22 @@ class Revision extends Eloquent
     }
 
     /**
+     * Return the class name of the related model.
+     *
+     * @return string
+     */
+    private function getRelatedModelClassName()
+    {
+        if (method_exists(Relation::class, 'getMorphedModel')) {
+            return ($class = Relation::getMorphedModel($this->revisionable_type))
+                ? $class
+                : $this->revisionable_type;
+        }
+
+        return $this->revisionable_type;
+    }
+
+    /**
      * User Responsible.
      *
      * @return User user responsible for the change
@@ -255,7 +272,7 @@ class Revision extends Eloquent
      */
     public function historyOf()
     {
-        if (class_exists($class = $this->revisionable_type)) {
+        if (class_exists($class = $this->getRelatedModelClassName())) {
             return $class::find($this->revisionable_id);
         }
 
@@ -279,7 +296,7 @@ class Revision extends Eloquent
      */
     public function format($key, $value)
     {
-        $related_model = $this->revisionable_type;
+        $related_model = $this->getRelatedModelClassName();
         $related_model = new $related_model;
         $revisionFormattedFields = $related_model->getRevisionFormattedFields();
 
