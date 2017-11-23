@@ -18,6 +18,9 @@
         "php": ">=5.3.0",
         "illuminate/support": "~4.0|~5.0|~5.1"
     },
+    "suggest": {
+        "https://github.com/fico7489/laravel-revisionable-upgrade": "Use venturecraft package for a lot more useful stuff."
+    },
     "autoload": {
         "classmap": [
             "src/migrations"
