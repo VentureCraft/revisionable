@@ -19,7 +19,7 @@
         "illuminate/support": "~4.0|~5.0|~5.1"
     },
     "suggest": {
-        "https://github.com/fico7489/laravel-revisionable-upgrade": "Use venturecraft package for a lot more stuff."
+        "https://github.com/fico7489/laravel-revisionable-upgrade": "Use venturecraft package for a lot more usefull stuff."
     },
     "autoload": {
         "classmap": [
