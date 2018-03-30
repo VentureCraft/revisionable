@@ -256,6 +256,8 @@ trait RevisionableTrait
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
+                'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
+
             );
 
             $revision = new Revision;
