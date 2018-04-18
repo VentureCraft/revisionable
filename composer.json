@@ -25,5 +25,13 @@
         "psr-0": {
             "Venturecraft\\Revisionable": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Venturecraft\\Revisionable\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.0"
     }
 }
