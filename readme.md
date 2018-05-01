@@ -40,10 +40,10 @@ Run composer update to download the package
 php composer.phar update
 ```
 
-Finally, you'll also need to run migration on the package (Laravel 5.x)
+Finally, you'll also need to run migration on the package (Laravel 5.5^)
 
 ```
-php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
+php artisan migrate
 ```
 
 For Laravel 4.x users:
