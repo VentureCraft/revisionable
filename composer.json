@@ -19,10 +19,7 @@
         "illuminate/support": "~4.0|~5.0|~5.1"
     },
     "autoload": {
-        "classmap": [
-            "src/migrations"
-        ],
-        "psr-0": {
+        "psr-4": {
             "Venturecraft\\Revisionable": "src/"
         }
     }
