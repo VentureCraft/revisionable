@@ -22,5 +22,12 @@
         "psr-4": {
             "Venturecraft\\Revisionable": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Venturecraft\\Revisionable\\ServiceProvider"
+            ]
+        }
     }
 }
