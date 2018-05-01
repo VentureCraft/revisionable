@@ -18,6 +18,10 @@ class ServiceProvider extends BaseServiceProvider{
 	 */
 	public function boot(){
 		$this->loadMigrationsFrom(__DIR__ . '/../migrations');
+		$this->publishes([__DIR__ . '/../config/main.php' => config_path(SELF::SHORT_NAME . '.php')]);
+		$this->mergeConfigFrom(
+			__DIR__ . '/../config/main.php', SELF::SHORT_NAME
+		);
 	}
 
 	/**
