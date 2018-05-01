@@ -160,7 +160,7 @@ trait RevisionableTrait
 
             $changes_to_record = $this->changedRevisionableFields(); 
             foreach ($changes_to_record as $key => $value) {
-                if($this->updating && $this->autoAccept == false && in_array($key, $this->keepRevisionOf)){
+	            if($this->updating && $this->autoAccept == false && !empty($this->keepRevisionOf) && in_array($key, $this->keepRevisionOf)){
                     if(isset($this->originalData[$key])){
                         \Log::debug('Changing value for key '.$key);
                         $this->attributes[$key] = $this->originalData[$key];
