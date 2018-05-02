@@ -22,6 +22,9 @@ class ServiceProvider extends BaseServiceProvider{
 		$this->mergeConfigFrom(
 			__DIR__ . '/../config/main.php', SELF::SHORT_NAME
 		);
+
+		$this->loadViewsFrom(__DIR__ . '/../resources/views', self::SHORT_NAME);
+		$this->publishes([__DIR__ . '/../resources/views' => resource_path('views/vendor/' . self::SHORT_NAME)], 'views');
 	}
 
 	/**
