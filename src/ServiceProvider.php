@@ -1,6 +1,9 @@
 <?php
+
 namespace Venturecraft\Revisionable;
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator as BaseValidator;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 /**
@@ -25,6 +28,12 @@ class ServiceProvider extends BaseServiceProvider{
 
 		$this->loadViewsFrom(__DIR__ . '/../resources/views', self::SHORT_NAME);
 		$this->publishes([__DIR__ . '/../resources/views' => resource_path('views/vendor/' . self::SHORT_NAME)], 'views');
+
+		$this->loadRoutesFrom(__DIR__ . '/../routes/main.php');
+
+		$this->loadTranslationsFrom(__DIR__ . '/../resources/lang', self::SHORT_NAME);
+		$this->publishes([__DIR__ . '/../resources/lang' => resource_path('lang/vendor/' . self::SHORT_NAME)], 'lang');
+
 	}
 
 	/**
