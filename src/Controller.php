@@ -12,7 +12,7 @@ class Controller extends BaseController{
 		$key   = array_pop($parts);
 		$model = implode('\\', $parts);
 
-		$model = $model::find($key);
+		$model = $model::findOrFail($key);
 
 		return view(ServiceProvider::SHORT_NAME . '::history')->withModel($model);
 	}
