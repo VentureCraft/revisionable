@@ -85,6 +85,11 @@ trait RevisionableTrait
         });
     }
 
+    public function getRevisionableRouteParamAttribute(){
+	    return strtolower(str_replace('\\', '-',static::class) .'-'. $this->getKey());
+    }
+
+
     /**
      * @return mixed
      */
