@@ -2,28 +2,43 @@
     "name": "venturecraft/revisionable",
     "license": "MIT",
     "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel",
-    "keywords": ["model", "laravel", "ardent", "revision", "history"],
-    "homepage": "http://github.com/venturecraft/revisionable",
+    "keywords": ["model", "laravel", "ardent", "revision", "history", "audit", "eloquent"],
+    "homepage": "https://github.com/venturecraft/revisionable",
     "authors": [
         {
             "name": "Chris Duell",
-            "email": "me@chrisduell.com"
-        }
+            "email": "me@chrisduell.com",
+            "role": "Original Developer"
+        },
+        {
+            "name": "Austin Stierler",
+            "email": "austin.stierler@gmail.com",
+            "role": "Developer/Maintainer"
+        },
+      {
+        "name": "Tarek Adam",
+        "email": "tarek.adam@gmail.com",
+        "role": "Contributor"
+      }
     ],
     "support": {
         "issues": "https://github.com/VentureCraft/revisionable/issues",
         "source": "https://github.com/VentureCraft/revisionable"
     },
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.4.0",
         "illuminate/support": "~4.0|~5.0|~5.1"
     },
     "autoload": {
-        "classmap": [
-            "src/migrations"
-        ],
-        "psr-0": {
-            "Venturecraft\\Revisionable": "src/"
+        "psr-4": {
+            "Venturecraft\\Revisionable\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Venturecraft\\Revisionable\\ServiceProvider"
+            ]
         }
     }
 }

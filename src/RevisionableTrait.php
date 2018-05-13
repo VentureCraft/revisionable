@@ -75,7 +75,7 @@ trait RevisionableTrait
             $model->postSave();
         });
 
-        static::created(function($model){
+        static::created(function ($model) {
             $model->postCreate();
         });
 
@@ -85,12 +85,28 @@ trait RevisionableTrait
         });
     }
 
+    public function getRevisionableRouteParamAttribute(){
+	    return strtolower(str_replace('\\', '-',static::class) .'-'. $this->getKey());
+    }
+
+
     /**
      * @return mixed
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+        return $this->morphMany(get_class(Revisionable::newModel()), 'revisionable');
+    }
+
+    /**
+     * Restrict the result to include only records which has pending revision
+     * history which are not accepted yet.
+     */
+    public function scopeHasPendingRevisionHistory($query)
+    {
+        $query->whereHas('revisionHistory', function($q){
+            $q->whereNull('accepted_at');
+        });
     }
 
     /**
@@ -102,7 +118,8 @@ trait RevisionableTrait
      */
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
-        return \Venturecraft\Revisionable\Revision::where('revisionable_type', get_called_class())
+        $model = Revisionable::newModel();
+        return $model->where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
     }
 
@@ -117,7 +134,9 @@ trait RevisionableTrait
             // if there's no revisionEnabled. Or if there is, if it's true
 
             $this->originalData = $this->original;
+
             $this->updatedData = $this->attributes;
+            $this->updating = $this->exists;
 
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
@@ -143,7 +162,17 @@ trait RevisionableTrait
             unset($this->attributes['keepRevisionOf']);
 
             $this->dirtyData = $this->getDirty();
-            $this->updating = $this->exists;
+
+            $changes_to_record = $this->changedRevisionableFields(); 
+            foreach ($changes_to_record as $key => $value) {
+	            if($this->updating && !empty($this->autoAccept) && $this->autoAccept == false && !empty($this->keepRevisionOf) && in_array($key, $this->keepRevisionOf)){
+                    if(isset($this->originalData[$key])){
+                        \Log::debug('Changing value for key '.$key);
+                        $this->attributes[$key] = $this->originalData[$key];
+                    }
+                }
+            }
+
         }
     }
 
@@ -184,17 +213,24 @@ trait RevisionableTrait
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
+                    'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
                 );
             }
 
             if (count($revisions) > 0) {
                 if($LimitReached && $RevisionCleanup){
-                    $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
+                    $columns = collect($revisions)->pluck('key');
+                    $toDelete = $this->revisionHistory()
+                        ->whereIn('key', $columns)
+                        ->orderBy('id','asc')
+                        ->limit(count($revisions))
+                        ->get();
+                    
                     foreach($toDelete as $delete){
                         $delete->delete();
                     }
                 }
-                $revision = new Revision;
+                $revision = Revisionable::newModel();
                 \DB::table($revision->getTable())->insert($revisions);
                 \Event::fire('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
@@ -226,9 +262,11 @@ trait RevisionableTrait
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
+                'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
+
             );
 
-            $revision = new Revision;
+            $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
@@ -254,7 +292,7 @@ trait RevisionableTrait
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = new \Venturecraft\Revisionable\Revision;
+            $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
@@ -295,7 +333,7 @@ trait RevisionableTrait
             // check that the field is revisionable, and double check
             // that it's actually new data in case dirty is, well, clean
             if ($this->isRevisionable($key) && !is_array($value)) {
-                if (!isset($this->originalData[$key]) || $this->originalData[$key] != $this->updatedData[$key]) {
+                if (!array_key_exists($key, $this->originalData) || $this->originalData[$key] != $this->updatedData[$key]) {
                     $changes_to_record[$key] = $value;
                 }
             } else {

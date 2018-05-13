@@ -20,6 +20,8 @@ class Revision extends Eloquent
      */
     public $table = 'revisions';
 
+    protected $dates = ['accepted_at'];
+
     /**
      * @var array
      */
@@ -140,7 +142,7 @@ class Revision extends Eloquent
                     if (!method_exists($main_model, $related_model)) {
                         $related_model = camel_case($related_model); // for cases like published_status_id
                         if (!method_exists($main_model, $related_model)) {
-                            throw new \Exception('Relation ' . $related_model . ' does not exist for ' . $main_model);
+                            throw new \Exception('Relation ' . $related_model . ' does not exist for ' . get_class($main_model));
                         }
                     }
                     $related_class = $main_model->$related_model()->getRelated();
@@ -174,7 +176,6 @@ class Revision extends Eloquent
             } catch (\Exception $e) {
                 // Just a fail-safe, in the case the data setup isn't as expected
                 // Nothing to do here.
-                Log::info('Revisionable: ' . $e);
             }
 
             // if there was an issue
@@ -234,10 +235,10 @@ class Revision extends Eloquent
         ) {
             return $class::findUserById($this->user_id);
         } else {
-            $user_model = app('config')->get('auth.model');
+            $user_model = config('auth.model');
 
             if (empty($user_model)) {
-                $user_model = app('config')->get('auth.providers.users.model');
+                $user_model = config('auth.providers.users.model');
                 if (empty($user_model)) {
                     return false;
                 }
@@ -289,5 +290,15 @@ class Revision extends Eloquent
         } else {
             return $value;
         }
+    }
+
+    public function scopeOnlyPending($q)
+    {
+        $q->whereNull('accepted_at');
+    }
+
+    public function scopeOnlyAccepted($q)
+    {
+        $q->whereNotNull('accepted_at');
     }
 }
