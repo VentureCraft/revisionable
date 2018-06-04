@@ -75,7 +75,7 @@ class Revision extends Eloquent
      */
     private function formatFieldName($key)
     {
-        $related_model = $this->revisionable_type;
+        $related_model = Eloquent::getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFieldNames = $related_model->getRevisionFormattedFieldNames();
 
@@ -127,7 +127,7 @@ class Revision extends Eloquent
         $which_value = $which . '_value';
 
         // First find the main model that was updated
-        $main_model = $this->revisionable_type;
+        $main_model = Eloquent::getActualClassNameForMorph($this->revisionable_type);
         // Load it, WITH the related model
         if (class_exists($main_model)) {
             $main_model = new $main_model;
@@ -256,8 +256,9 @@ class Revision extends Eloquent
      */
     public function historyOf()
     {
-        if (class_exists($class = $this->revisionable_type)) {
-            return $class::find($this->revisionable_id);
+        $related_model = Eloquent::getActualClassNameForMorph($this->revisionable_type);
+        if (class_exists($related_model)) {
+            return $related_model::find($this->revisionable_id);
         }
 
         return false;
@@ -280,7 +281,7 @@ class Revision extends Eloquent
      */
     public function format($key, $value)
     {
-        $related_model = $this->revisionable_type;
+        $related_model = Eloquent::getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFields = $related_model->getRevisionFormattedFields();
 
