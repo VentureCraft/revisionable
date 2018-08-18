@@ -270,16 +270,9 @@ trait RevisionableTrait
     public function getSystemUserId()
     {
         try {
-            if (class_exists($class = '\SleepingOwl\AdminAuth\Facades\AdminAuth')
-                || class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
-                || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
-            ) {
-                return ($class::check()) ? $class::getUser()->id : null;
-            } elseif (\Auth::check()) {
-                return \Auth::user()->getAuthIdentifier();
-            }
+            return \Auth::id();
         } catch (\Exception $e) {
-            return null;
+
         }
 
         return null;
