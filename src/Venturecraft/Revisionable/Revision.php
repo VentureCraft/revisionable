@@ -18,7 +18,8 @@ class Revision extends Eloquent
     /**
      * @var string
      */
-    public $table = 'revisions';
+    public $table;
+    protected $connection;
 
     /**
      * @var array
@@ -30,6 +31,9 @@ class Revision extends Eloquent
      */
     public function __construct(array $attributes = array())
     {
+        $this->table = config('revisionable.revisions_table_name');
+        $this->connection = config('revisionable.revisions_db_connection');
+
         parent::__construct($attributes);
     }
 
