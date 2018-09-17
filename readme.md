@@ -46,6 +46,12 @@ Finally, you'll also need to run migration on the package (Laravel 5.x)
 php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
 ```
 
+Register service provider in your app.php:
+
+```
+Venturecraft\Revisionable\RevisionableServiceProvider::class
+```
+
 If you want to change the default table name and/or database connection you can publish package config file (Laravel 5.x)
 
 ```
