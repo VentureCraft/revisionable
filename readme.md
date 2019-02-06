@@ -71,7 +71,7 @@ php artisan migrate --package=venturecraft/revisionable
 ### The new, trait based implementation
 
 For any model that you want to keep a revision history for, include the revisionable namespace and use the `RevisionableTrait` in your model, e.g.,
-If you are using another bootable trait the be sure to override the boot method in your model;
+If you are using another bootable trait then be sure to override the boot method in your model;
 
 ```php
 namespace MyApp\Models;
