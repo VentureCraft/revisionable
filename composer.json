@@ -1,35 +1,30 @@
 {
-    "name": "venturecraft/revisionable",
-    "license": "MIT",
+    "name": "robbielove/revisionable",
     "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel",
-    "keywords": ["model", "laravel", "ardent", "revision", "history"],
-    "homepage": "http://github.com/venturecraft/revisionable",
+    "keywords": ["model", "laravel", "revision", "history"],
     "authors": [
         {
-            "name": "Chris Duell",
-            "email": "me@chrisduell.com"
+            "name": "Robbie Love",
+            "homepage": "http://robbiecloud.com",
+            "role": "Developer"
         }
     ],
-    "abandoned": true,
-    "support": {
-        "issues": "https://github.com/VentureCraft/revisionable/issues",
-        "source": "https://github.com/VentureCraft/revisionable"
-    },
+    "homepage": "http://github.com/robbielove/revisionable",
+    "license": "Private",
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "~4.0|~5.0|~5.1"
+        "laravel/framework": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|~5.9.0",
     },
     "autoload": {
         "classmap": [
             "src/migrations"
         ],
         "psr-0": {
-            "Venturecraft\\Revisionable": "src/"
+            "Robbielove\\Revisionable": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Venturecraft\\Revisionable\\Tests\\": "tests/"
+            "Robbielove\\Revisionable\\Tests\\": "tests/"
         }
     },
     "require-dev": {
