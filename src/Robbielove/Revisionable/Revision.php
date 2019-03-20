@@ -1,6 +1,6 @@
 <?php
 
-namespace Venturecraft\Revisionable;
+namespace Robbielove\Revisionable;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Log;
@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
  * Base model to allow for revision history on
  * any model that extends this model
  *
- * (c) Venture Craft <http://www.venturecraft.com.au>
  */
 class Revision extends Eloquent
 {

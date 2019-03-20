@@ -1,17 +1,16 @@
-<?php namespace Venturecraft\Revisionable;
+<?php namespace Robbielove\Revisionable;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /*
- * This file is part of the Revisionable package by Venture Craft
+ * This file is part of the Revisionable package
  *
- * (c) Venture Craft <http://www.venturecraft.com.au>
  *
  */
 
 /**
  * Class Revisionable
- * @package Venturecraft\Revisionable
+ * @package Robbielove\Revisionable
  */
 class Revisionable extends Eloquent
 {
@@ -79,7 +78,7 @@ class Revisionable extends Eloquent
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+        return $this->morphMany('\Robbielove\Revisionable\Revision', 'revisionable');
     }
 
     /**
@@ -210,7 +209,7 @@ class Revisionable extends Eloquent
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = new \Venturecraft\Revisionable\Revision;
+            $revision = new \Robbielove\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
     }

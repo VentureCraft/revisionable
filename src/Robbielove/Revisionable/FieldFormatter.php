@@ -1,18 +1,17 @@
 <?php
 
-namespace Venturecraft\Revisionable;
+namespace Robbielove\Revisionable;
 
 /**
  * FieldFormatter.
  *
  * Allows formatting of fields
  *
- * (c) Venture Craft <http://www.venturecraft.com.au>
  */
 
 /**
  * Class FieldFormatter
- * @package Venturecraft\Revisionable
+ * @package Robbielove\Revisionable
  */
 class FieldFormatter
 {

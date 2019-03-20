@@ -1,28 +1,16 @@
-<img src="http://venturecraft.com.au/wp-content/uploads/2015/09/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
-
-[![Laravel 4.x](https://img.shields.io/badge/Laravel-4.x-brightgreen.svg?style=flat-square)](http://laravel.com)
-[![Laravel 5.2](https://img.shields.io/badge/Laravel-5.x-brightgreen.svg?style=flat-square)](http://laravel.com)
-[![Latest Version](https://img.shields.io/github/release/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
-[![Downloads](https://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
-[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
-
 Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable from your model, you can instantly have just that, and be able to display a history similar to this:
 
-* Chris changed title from 'Something' to 'Something else'
-* Chris changed category from 'News' to 'Breaking news'
-* Matt changed category from 'Breaking news' to 'News'
+* Robbie changed title from 'Something' to 'Something else'
+* Robbie changed category from 'News' to 'Breaking news'
+* Liam changed category from 'Breaking news' to 'News'
 
 So not only can you see a history of what happened, but who did what, so there's accountability.
 
 Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
 
-## Working with 3rd party Auth / Eloquent extensions
+## Trait implementation
 
-Revisionable has support for Auth powered by
-* [**Sentry by Cartalyst**](https://cartalyst.com/manual/sentry).
-* [**Sentinel by Cartalyst**](https://cartalyst.com/manual/sentinel).
-
-Revisionable can also now be used [as a trait](#the-new-trait-based-implementation), so your models can continue to extend Eloquent, or any other class that extends Eloquent (like [Ardent](https://github.com/laravelbook/ardent)).
+Revisionable should be used [as a trait](#the-new-trait-based-implementation), so your models can continue to extend Eloquent, or any other class that extends Eloquent
 
 ## Installation
 
@@ -31,24 +19,19 @@ Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.m
 Add the following to the `require` section of your projects composer.json file:
 
 ```php
-"venturecraft/revisionable": "1.*",
+"robbielove/revisionable": "@dev",
 ```
 
 Run composer update to download the package
 
 ```
-php composer.phar update
+php composer update
 ```
 
-Finally, you'll also need to run migration on the package (Laravel 5.x)
+Finally, you'll also need to run migration on the package
 
 ```
 php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
-```
-
-For Laravel 4.x users:
-```
-php artisan migrate --package=venturecraft/revisionable
 ```
 
 > If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
@@ -65,10 +48,9 @@ php artisan migrate --package=venturecraft/revisionable
 * [Contributing](#contributing)
 * [Having troubles?](#faq)
 
-<a name="intro"></a>
 ## Implementation
 
-### The new, trait based implementation
+### Trait based implementation
 
 For any model that you want to keep a revision history for, include the revisionable namespace and use the `RevisionableTrait` in your model, e.g.,
 If you are using another bootable trait the be sure to override the boot method in your model;
@@ -77,7 +59,7 @@ If you are using another bootable trait the be sure to override the boot method 
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use \Venturecraft\Revisionable\RevisionableTrait;
+    use \Robbielove\Revisionable\RevisionableTrait;
 
     public static function boot()
     {
@@ -86,25 +68,7 @@ class Article extends Eloquent {
 }
 ```
 
-> Being a trait, revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent, like [Ardent](https://github.com/laravelbook/ardent) for example.
-
-> Traits require PHP >= 5.4
-
-### Legacy class based implementation
-
-> The new trait based approach is backwards compatible with existing installations of Revisionable. You can still use the below installation instructions, which essentially is extending a wrapper for the trait.
-
-For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
-
-```php
-use Venturecraft\Revisionable\Revisionable;
-
-namespace MyApp\Models;
-
-class Article extends Revisionable { }
-```
-
-Note that it also works with namespaced models.
+> Being a trait, revisionable can now be used with the standard Eloquent model, or any class that extends Eloquent.
 
 ### Implementation notes
 
@@ -114,7 +78,7 @@ If needed, you can disable the revisioning by setting `$revisionEnabled` to fals
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use Venturecraft\Revisionable\RevisionableTrait;
+    use Robbielove\Revisionable\RevisionableTrait;
 
     protected $revisionEnabled = false;
 }
@@ -126,7 +90,7 @@ You can also disable revisioning after X many revisions have been made by settin
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use Venturecraft\Revisionable\RevisionableTrait;
+    use Robbielove\Revisionable\RevisionableTrait;
 
     protected $revisionEnabled = true;
     protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
@@ -138,7 +102,7 @@ In order to maintain a limit on history, but instead of stopping tracking revisi
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use Venturecraft\Revisionable\RevisionableTrait;
+    use Robbielove\Revisionable\RevisionableTrait;
 
     protected $revisionEnabled = true;
     protected $revisionCleanup = true; //Remove old revisions (works only when used with $historyLimit)
@@ -153,8 +117,6 @@ By default, if your model supports soft deletes, revisionable will store this an
 You can choose to ignore deletes and restores by adding `deleted_at` to your `$dontKeepRevisionOf` array.
 
 To better format the output for `deleted_at` entries, you can use the `isEmpty` formatter (see <a href="#format-output">Format output</a> for an example of this.)
-
-<a name="control"></a>
 
 ### Storing creations
 By default the creation of a new model is not stored as a revision.
@@ -204,7 +166,6 @@ public function boot(DispatcherContract $events)
 
 ```
 
-<a name="formatoutput"></a>
 ## Format output
 
 > You can continue (and are encouraged to) use `eloquent accessors` in your model to set the
@@ -268,7 +229,6 @@ This can also accept `%s` if you'd like to output the value, something like the 
 isEmpty:Nothing|%s
 ```
 
-<a name="loadhistory"></a>
 ## Load revision history
 
 To load the revision history for a given model, simply call the `revisionHistory` method on that model, e.g.,
@@ -278,7 +238,6 @@ $article = Article::find($id);
 $history = $article->revisionHistory;
 ```
 
-<a name="display"></a>
 ## Displaying history
 
 For the most part, the revision history will hold enough information to directly output a change history, however in the cases where a foreign key is updated we need to be able to do some mapping and display something nicer than `plan_id changed from 3 to 1`.
@@ -323,7 +282,7 @@ This is used when the value (old or new) is the id of a foreign key relationship
 By default, it simply returns the ID of the model that was updated. It is up to you to override this method in your own models to return something meaningful. e.g.,
 
 ```php
-use Venturecraft\Revisionable\Revisionable;
+use Robbielove\Revisionable\Revisionable;
 
 class Article extends Revisionable
 {
@@ -359,20 +318,18 @@ or:
 $object->disableRevisionField(array('title', 'content')); // Disables title and content
 ```
 
-<a name="contributing"></a>
 ## Contributing
 
 Contributions are encouraged and welcome; to keep things organised, all bugs and requests should be
-opened in the GitHub issues tab for the main project, at [venturecraft/revisionable/issues](https://github.com/venturecraft/revisionable/issues)
+opened in the GitHub issues tab for the main project, at [robbielove/revisionable/issues](https://github.com/robbielove/revisionable/issues)
 
 All pull requests should be made to the develop branch, so they can be tested before being merged into the master branch.
 
-<a name="faq"></a>
 ## Having troubles?
 
 If you're having troubles with using this package, odds on someone else has already had the same problem. Two places you can look for common answers to your problems are:
 
 * [StackOverflow revisionable tag](http://stackoverflow.com/questions/tagged/revisionable?sort=newest&pageSize=50)
-* [GitHub Issues](https://github.com/VentureCraft/revisionable/issues?page=1&state=closed)
+* [GitHub Issues](https://github.com/robbielove/revisionable/issues?page=1&state=closed)
 
 > If you do prefer posting your questions to the public on StackOverflow, please use the 'revisionable' tag.

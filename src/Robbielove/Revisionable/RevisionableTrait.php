@@ -1,15 +1,14 @@
-<?php namespace Venturecraft\Revisionable;
+<?php namespace Robbielove\Revisionable;
 
 /*
- * This file is part of the Revisionable package by Venture Craft
+ * This file is part of the Revisionable package
  *
- * (c) Venture Craft <http://www.venturecraft.com.au>
  *
  */
 
 /**
  * Class RevisionableTrait
- * @package Venturecraft\Revisionable
+ * @package Robbielove\Revisionable
  */
 trait RevisionableTrait
 {
@@ -90,7 +89,7 @@ trait RevisionableTrait
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+        return $this->morphMany('\Robbielove\Revisionable\Revision', 'revisionable');
     }
 
     /**
@@ -102,7 +101,7 @@ trait RevisionableTrait
      */
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
-        return \Venturecraft\Revisionable\Revision::where('revisionable_type', get_called_class())
+        return \Robbielove\Revisionable\Revision::where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
     }
 
@@ -254,7 +253,7 @@ trait RevisionableTrait
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = new \Venturecraft\Revisionable\Revision;
+            $revision = new \Robbielove\Revisionable\Revision;
             \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
