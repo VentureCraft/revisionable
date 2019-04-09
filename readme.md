@@ -1,3 +1,11 @@
+## This package is no longer maintained
+
+Please consider using alternatives:
+- https://github.com/owen-it/laravel-auditing
+- https://github.com/jarektkaczyk/revisionable
+- https://github.com/fico7489/laravel-revisionable-upgrade
+- https://github.com/ProAI/eloquent-versioning
+
 <img src="http://venturecraft.com.au/wp-content/uploads/2015/09/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
 
 [![Laravel 4.x](https://img.shields.io/badge/Laravel-4.x-brightgreen.svg?style=flat-square)](http://laravel.com)
