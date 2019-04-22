@@ -7,13 +7,7 @@
     "authors": [
         {
             "name": "Chris Duell",
-            "email": "me@chrisduell.com",
-            "role": "Original Developer"
-        },
-        {
-            "name": "Austin Stierler",
-            "email": "austin.stierler@gmail.com",
-            "role": "Developer/Maintainer"
+            "email": "me@chrisduell.com"
         }
     ],
     "support": {
@@ -31,5 +25,13 @@
         "psr-0": {
             "Venturecraft\\Revisionable": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Venturecraft\\Revisionable\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.0"
     }
 }
