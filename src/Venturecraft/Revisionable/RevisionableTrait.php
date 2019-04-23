@@ -1,4 +1,4 @@
-<?php namespace SeedGabo\Revisionable;
+<?php namespace Venturecraft\Revisionable;
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -9,7 +9,7 @@
 
 /**
  * Class RevisionableTrait
- * @package SeedGabo\Revisionable
+ * @package Venturecraft\Revisionable
  */
 trait RevisionableTrait
 {
