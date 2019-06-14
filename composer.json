@@ -10,7 +10,6 @@
             "email": "me@chrisduell.com"
         }
     ],
-    "abandoned": true,
     "support": {
         "issues": "https://github.com/VentureCraft/revisionable/issues",
         "source": "https://github.com/VentureCraft/revisionable"
