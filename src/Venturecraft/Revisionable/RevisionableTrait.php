@@ -174,14 +174,30 @@ trait RevisionableTrait
             $changes_to_record = $this->changedRevisionableFields();
 
             $revisions = array();
-
+            
+            $getJsonData = function ($value) {
+                $jsonData = json_decode($value);
+                if (is_array($jsonData) || is_object($jsonData)) return (array)$jsonData;
+                if (is_array($value) || is_object($value)) return (array)$value;
+                else return $value;
+            };
+            
             foreach ($changes_to_record as $key => $change) {
+                $originalData = $getJsonData(array_get($this->originalData, $key));
+                $updatedData  = $getJsonData($this->updatedData[$key]);
+                
+                // check if it's an array
+                if (is_array($originalData) && is_array($updatedData)) {
+                    // remove nulls and duplicates
+                    $updatedData = array_filter(array_diff_assoc($updatedData, $originalData));
+                }
+
                 $revisions[] = array(
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
-                    'old_value' => array_get($this->originalData, $key),
-                    'new_value' => $this->updatedData[$key],
+                    'old_value' => $originalData,
+                    'new_value' => $updatedData,
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
