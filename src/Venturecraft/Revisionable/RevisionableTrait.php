@@ -190,6 +190,7 @@ trait RevisionableTrait
                 if (is_array($originalData) && is_array($updatedData)) {
                     // remove nulls and duplicates
                     $updatedData = array_filter(array_diff_assoc($updatedData, $originalData));
+                    $originalData = array_filter(array_diff_assoc($originalData, $updatedData));
                 }
 
                 $revisions[] = array(
