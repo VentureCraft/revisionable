@@ -17,7 +17,7 @@
     "require": {
         "php": ">=5.4.0",
         "illuminate/support": "~4.0|~5.0|~5.1|^6.0",
-        "laravel/framework": "~5.4"
+        "laravel/framework": "~5.4|^6.0"
     },
     "autoload": {
         "classmap": [
