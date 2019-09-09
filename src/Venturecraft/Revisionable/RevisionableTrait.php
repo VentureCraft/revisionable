@@ -1,5 +1,7 @@
 <?php namespace Venturecraft\Revisionable;
 
+use Illuminate\Support\Arr;
+
 /*
  * This file is part of the Revisionable package by Venture Craft
  *
@@ -188,7 +190,7 @@ trait RevisionableTrait
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
-                    'old_value' => array_get($this->originalData, $key),
+                    'old_value' => Arr::get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
