@@ -1,4 +1,6 @@
-<img src="https://cdn1.wwe.com/static/ossimg/revisionableghbanner.png" style="width: 100%" alt="Revisionable for Laravel" />
+<p align="center">
+<img width="400" height="200" src="https://raw.githubusercontent.com/VentureCraft/revisionable/master/art/logo.png" alt="Revisionable logo" />
+</p>
 
 [![Laravel 4.x](https://img.shields.io/badge/Laravel-4.x-yellow.svg?style=flat-square)](https://laravel.com/)
 [![Laravel 5.2](https://img.shields.io/badge/Laravel-5.x-brightgreen.svg?style=flat-square)](https://laravel.com/)
@@ -191,7 +193,7 @@ protected $dontKeepRevisionOf = ['category_id'];
 
 ### Events
 
-Every time a model revision is created an event is fired. You can listen for `revisionable.created`,  
+Every time a model revision is created an event is fired. You can listen for `revisionable.created`,
 `revisionable.saved` or `revisionable.deleted`.
 
 ```php
@@ -202,7 +204,7 @@ public function boot()
     parent::boot();
 
     $events->listen('revisionable.*', function($model, $revisions) {
-        // Do something with the revisions or the changed model. 
+        // Do something with the revisions or the changed model.
         dd($model, $revisions);
     });
 }
@@ -381,3 +383,8 @@ If you're having troubles with using this package, odds on someone else has alre
 * [GitHub Issues](https://github.com/VentureCraft/revisionable/issues)
 
 > If you do prefer posting your questions to the public on StackOverflow, please use the 'revisionable' tag.
+
+
+## Credits
+
+- Logo by [Caneco](https://twitter.com/caneco)
