@@ -244,7 +244,7 @@ class Revision extends Eloquent
             if (!class_exists($user_model)) {
                 return false;
             }
-            return $user_model::find($this->user_id);
+            return $user_model::withoutGlobalScopes()->find($this->user_id);
         }
     }
 
