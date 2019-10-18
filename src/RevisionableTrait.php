@@ -7,6 +7,8 @@
  *
  */
 
+use Illuminate\Support\Arr;
+
 /**
  * Class RevisionableTrait
  * @package Venturecraft\Revisionable
@@ -163,7 +165,7 @@ trait RevisionableTrait
 
             $this->dirtyData = $this->getDirty();
 
-            $changes_to_record = $this->changedRevisionableFields(); 
+            $changes_to_record = $this->changedRevisionableFields();
             foreach ($changes_to_record as $key => $value) {
 	            if($this->updating && !empty($this->autoAccept) && $this->autoAccept == false && !empty($this->keepRevisionOf) && in_array($key, $this->keepRevisionOf)){
                     if(isset($this->originalData[$key])){
@@ -208,7 +210,7 @@ trait RevisionableTrait
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
-                    'old_value' => array_get($this->originalData, $key),
+                    'old_value' => Arr::get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
@@ -225,14 +227,14 @@ trait RevisionableTrait
                         ->orderBy('id','asc')
                         ->limit(count($revisions))
                         ->get();
-                    
+
                     foreach($toDelete as $delete){
                         $delete->delete();
                     }
                 }
                 $revision = Revisionable::newModel();
                 \DB::table($revision->getTable())->insert($revisions);
-                \Event::fire('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
+                \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
         }
     }
