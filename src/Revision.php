@@ -2,8 +2,9 @@
 
 namespace Venturecraft\Revisionable;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 
 /**
  * Revision.
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Log;
  *
  * (c) Venture Craft <http://www.venturecraft.com.au>
  */
-class Revision extends Eloquent
+class Revision extends Model
 {
     /**
      * @var string
@@ -165,7 +166,7 @@ class Revision extends Eloquent
                     // Check if model use RevisionableTrait
                     if(method_exists($item, 'identifiableName')) {
                         // see if there's an available mutator
-                        $mutator = 'get' . studly_case($this->key) . 'Attribute';
+                        $mutator = 'get' . Str::studly($this->key) . 'Attribute';
                         if (method_exists($item, $mutator)) {
                             return $this->format($item->$mutator($this->key), $item->identifiableName());
                         }
@@ -181,7 +182,7 @@ class Revision extends Eloquent
             // if there was an issue
             // or, if it's a normal value
 
-            $mutator = 'get' . studly_case($this->key) . 'Attribute';
+            $mutator = 'get' . Str::studly($this->key) . 'Attribute';
             if (method_exists($main_model, $mutator)) {
                 return $this->format($this->key, $main_model->$mutator($this->$which_value));
             }
