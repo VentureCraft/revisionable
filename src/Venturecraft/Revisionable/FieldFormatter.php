@@ -117,4 +117,29 @@ class FieldFormatter
 
         return $datetime->format($format);
     }
+
+    /**
+     * Format options
+     *
+     * @param string $value
+     * @param string $format
+     * @return string
+     */
+    public static function options($value, $format)
+    {
+        $options = explode('|', $format);
+
+        $result = [];
+
+        foreach ($options as $option) {
+            $transform = explode('.', $option);
+            $result[$transform[0]] = $transform[1];
+        }
+
+        if (isset($result[$value])) {
+            return $result[$value];
+        }
+
+        return 'undefined';
+    }
 }
