@@ -172,7 +172,7 @@ If you want to store the Force Delete as a revision you can override this behavi
 protected $revisionForceDeleteEnabled = true;
 ```
 
-In which case, the `created_at` field will be stored as a key with the `oldValue()` value equal to the model creation date and the `newValue()` value equal to null.
+In which case, the `created_at` field will be stored as a key with the `oldValue()` value equal to the model creation date and the `newValue()` value equal to `null`.
 
 **Attention!** Turn on this setting carefully! Since the model saved in the revision, now does not exist, so you will not be able to get its object or its relations. 
 
