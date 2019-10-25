@@ -164,6 +164,14 @@ To better format the output for `deleted_at` entries, you can use the `isEmpty` 
 
 <a name="control"></a>
 
+### Storing Force Delete
+By default the Force Delete of a model is not stored as a revision.
+
+If you want to store the Force Delete as a revision you can override this behavior by setting `revisionForceDeleteEnabled ` to `true` by adding the following to your model:
+```php
+protected $revisionForceDeleteEnabled = true;
+```
+
 ### Storing Creations
 By default the creation of a new model is not stored as a revision.
 Only subsequent changes to a model is stored.
