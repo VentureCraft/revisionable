@@ -89,7 +89,7 @@ class Revisionable extends Eloquent
      */
     public function revisionHistory()
     {
-        return $this->morphMany(get_class(static::newModel()), 'revisionable');
+        return $this->morphMany(Revision::class, 'revisionable');
     }
 
     /**

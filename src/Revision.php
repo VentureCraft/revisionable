@@ -99,7 +99,7 @@ class Revision extends Model
      */
     public function oldValue()
     {
-        return $this->getValue('old');
+         $this->getValue('old');
     }
 
 

@@ -97,7 +97,7 @@ trait RevisionableTrait
      */
     public function revisionHistory()
     {
-        return $this->morphMany(get_class(Revisionable::newModel()), 'revisionable');
+        return $this->morphMany(Revision::class, 'revisionable');
     }
 
     /**

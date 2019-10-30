@@ -2,6 +2,7 @@
 
 namespace Venturecraft\Revisionable;
 
+use FuquIo\LaravelDisks\Support\DownloadableResolver;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator as BaseValidator;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -33,6 +34,8 @@ class ServiceProvider extends BaseServiceProvider{
 
 		$this->loadTranslationsFrom(__DIR__ . '/../resources/lang', self::SHORT_NAME);
 		$this->publishes([__DIR__ . '/../resources/lang' => resource_path('lang/vendor/' . self::SHORT_NAME)], 'lang');
+
+        Route::bind('revisionable', RevisionableResolver::class);
 
 	}
 
