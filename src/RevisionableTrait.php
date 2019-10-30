@@ -120,7 +120,7 @@ trait RevisionableTrait
      */
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
-        $model = Revisionable::newModel();
+        $model = new Revision;
         return $model->where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
     }
@@ -215,7 +215,7 @@ trait RevisionableTrait
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
-                    'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
+                    'accepted_at' => new \DateTime()
                 );
             }
 
@@ -232,7 +232,7 @@ trait RevisionableTrait
                         $delete->delete();
                     }
                 }
-                $revision = Revisionable::newModel();
+                $revision = new Revision;
                 \DB::table($revision->getTable())->insert($revisions);
                 \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
@@ -264,11 +264,11 @@ trait RevisionableTrait
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
-                'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
+                'accepted_at' => new \DateTime()
 
             );
 
-            $revision = Revisionable::newModel();
+            $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
@@ -294,7 +294,7 @@ trait RevisionableTrait
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = Revisionable::newModel();
+            $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }

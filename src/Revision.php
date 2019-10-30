@@ -2,6 +2,7 @@
 
 namespace Venturecraft\Revisionable;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -23,6 +24,7 @@ class Revision extends Model
 
     protected $dates = ['accepted_at'];
 
+
     /**
      * @var array
      */
@@ -34,6 +36,10 @@ class Revision extends Model
     public function __construct(array $attributes = array())
     {
         parent::__construct($attributes);
+
+        if(empty($this->attributes['accepted_at'])){
+            $this->attributes['accepted_at'] = Carbon::now();
+        }
     }
 
     /**

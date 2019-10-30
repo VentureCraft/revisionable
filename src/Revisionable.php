@@ -75,14 +75,16 @@ class Revisionable extends Eloquent
         });
     }
     /**
+     * @deprecated
+     *
      * Instance the revision model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public static function newModel()
-    {
-        $model = config(ServiceProvider::SHORT_NAME .'.model');
-        return new $model;
-    }
+//    public static function newModel()
+//    {
+//        $model = config(ServiceProvider::SHORT_NAME .'.model');
+//        return new $model;
+//    }
 
     /**
      * @return mixed
@@ -163,7 +165,7 @@ class Revisionable extends Eloquent
             }
 
             if (count($revisions) > 0) {
-                $revision = static::newModel();
+                $revision = new Revision;
                 \DB::table($revision->getTable())->insert($revisions);
             }
         }
@@ -196,7 +198,7 @@ class Revisionable extends Eloquent
                 'updated_at' => new \DateTime(),
             );
 
-            $revision = static::newModel();
+            $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
     }
@@ -219,7 +221,7 @@ class Revisionable extends Eloquent
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = static::newModel();
+            $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
     }
