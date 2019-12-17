@@ -1,4 +1,6 @@
-<?php namespace Robbielove\Revisionable;
+<?php
+
+namespace Robbielove\Revisionable;
 
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model as Eloquent;
