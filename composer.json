@@ -34,7 +34,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Venturecraft\\Revisionable\\RevisionableServiceProvider"
+                "Robbielove\\Revisionable\\RevisionableServiceProvider"
             ]
         }
     }
