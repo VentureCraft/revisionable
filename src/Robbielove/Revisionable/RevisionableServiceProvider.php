@@ -1,6 +1,6 @@
 <?php
 
-namespace Venturecraft\Revisionable;
+namespace Robbielove\Revisionable;
 
 use Illuminate\Support\ServiceProvider;
 
