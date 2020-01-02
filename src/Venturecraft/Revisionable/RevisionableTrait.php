@@ -309,35 +309,14 @@ trait RevisionableTrait
         $additional = [];
         //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
         //get them into an array.
-        $fields = $this->getAdditionalFieldNames();
-        foreach($fields as $field)
-        {
-            if(Arr::has($this->originalData, $field))
-            {
+        $fields = config('revisionable.additional_fields', []);
+        foreach($fields as $field) {
+            if(Arr::has($this->originalData, $field)) {
                 $additional[$field]  =  Arr::get($this->originalData, $field);
             }
         }
 
         return $additional;
-    }
-
-
-    /**
-     * Get any fields that should be included in the revision model that have been selected in
-     * config/revisionable.php
-     *
-     * @return array fields
-     */
-    public function getAdditionalFieldNames()
-    {
-        if(config('revisionable.additional_fields_in_model', null) != null) {
-
-            $fields = config('revisionable.additional_fields_in_model', null);
-            $fields = explode('|', $fields);
-            return $fields;
-        }
-
-        return [];
     }
 
     /**
