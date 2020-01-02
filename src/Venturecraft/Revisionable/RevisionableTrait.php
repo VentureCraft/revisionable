@@ -186,7 +186,7 @@ trait RevisionableTrait
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
-                $revisions[] = array(
+                $original = array(
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
@@ -196,6 +196,8 @@ trait RevisionableTrait
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
                 );
+
+                $revisions[] = array_merge($original, $this->getAdditionalFields());
             }
 
             if (count($revisions) > 0) {
@@ -239,6 +241,10 @@ trait RevisionableTrait
                 'updated_at' => new \DateTime(),
             );
 
+            //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
+            //get them into an array.
+            $revisions = array_merge($revisions[0], $this->getAdditionalFields());
+
             $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
@@ -265,6 +271,10 @@ trait RevisionableTrait
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
+
+            //Since there is only one revision because it's deleted, let's just merge into revision[0]
+            $revisions = array_merge($revisions[0], $this->getAdditionalFields());
+
             $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
@@ -291,6 +301,43 @@ trait RevisionableTrait
         }
 
         return null;
+    }
+
+
+    public function getAdditionalFields()
+    {
+        $additional = [];
+        //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
+        //get them into an array.
+        $fields = $this->getAdditionalFieldNames();
+        foreach($fields as $field)
+        {
+            if(Arr::has($this->originalData, $field))
+            {
+                $additional[$field]  =  Arr::get($this->originalData, $field);
+            }
+        }
+
+        return $additional;
+    }
+
+
+    /**
+     * Get any fields that should be included in the revision model that have been selected in
+     * config/revisionable.php
+     *
+     * @return array fields
+     */
+    public function getAdditionalFieldNames()
+    {
+        if(config('revisionable.additional_fields_in_model', null) != null) {
+
+            $fields = config('revisionable.additional_fields_in_model', null);
+            $fields = explode('|', $fields);
+            return $fields;
+        }
+
+        return [];
     }
 
     /**
