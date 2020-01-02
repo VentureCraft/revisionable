@@ -189,6 +189,21 @@ protected $dontKeepRevisionOf = ['category_id'];
 
 > The `$keepRevisionOf` setting takes precedence over `$dontKeepRevisionOf`
 
+### Storing additional fields in revisions
+
+In some cases, you'll want additional metadata from the models in each revision. An example of this might be if you 
+have to keep track of accounts as well as users. Simply create a migration to add the fields you'd like to your revision model,
+add them to your config/revisionable.php separated by pipes like so:
+
+```php 
+'additional_fields_in_model' => "account_id|permissions_id|other_id", 
+```
+
+If the column exists in the model, it will be included in the revision. 
+
+Make sure that if you can't guarantee the column in every model, you make that column ```nullable()``` in your migrations.  
+
+
 ### Events
 
 Every time a model revision is created an event is fired. You can listen for `revisionable.created`,  
