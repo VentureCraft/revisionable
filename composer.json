@@ -12,8 +12,8 @@
     "homepage": "http://github.com/robbielove/revisionable",
     "license": "Private",
     "require": {
-        "illuminate/support": "^6.0",
-        "laravel/framework": "^6.0"
+        "illuminate/support": "^6.0|^7.0",
+        "laravel/framework": "^6.0|^7.0"
     },
     "autoload": {
         "classmap": [
