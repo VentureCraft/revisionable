@@ -1,5 +1,7 @@
 <?php namespace Venturecraft\Revisionable;
 
+use Illuminate\Support\Arr;
+
 /*
  * This file is part of the Revisionable package by Venture Craft
  *
@@ -123,7 +125,15 @@ trait RevisionableTrait
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
-                if (gettype($val) == 'object' && !method_exists($val, '__toString')) {
+                if (isset($this->casts[$key]) && in_array($this->casts[$key], ['object', 'array']) && isset($this->originalData[$key])) {
+                    // Sorts the keys of a JSON object due Normalization performed by MySQL
+                    // So it doesn't set false flag if it is changed only order of key or whitespace after comma
+
+                    $updatedData = $this->sortJsonKeys(json_decode($this->updatedData[$key], true));
+
+                    $this->updatedData[$key] = json_encode($updatedData);
+                    $this->originalData[$key] = json_encode(json_decode($this->originalData[$key], true));
+                } else if (gettype($val) == 'object' && !method_exists($val, '__toString')) {
                     unset($this->originalData[$key]);
                     unset($this->updatedData[$key]);
                     array_push($this->dontKeep, $key);
@@ -452,5 +462,35 @@ trait RevisionableTrait
             $this->dontKeepRevisionOf = $donts;
             unset($donts);
         }
+    }
+
+    /**
+     * Sorts the keys of a JSON object
+     *
+     * Normalization performed by MySQL and
+     * discards extra whitespace between keys, values, or elements
+     * in the original JSON document.
+     * To make lookups more efficient, it sorts the keys of a JSON object.
+     *
+     * @param mixed $attribute
+     *
+     * @return mixed
+     */
+    private function sortJsonKeys($attribute)
+    {
+        if(empty($attribute)) return $attribute;
+
+        foreach ($attribute as $key=>$value) {
+            if(is_array($value) || is_object($value)){
+                $value = $this->sortJsonKeys($value);
+            } else {
+                continue;
+            }
+
+            ksort($value);
+            $attribute[$key] = $value;
+        }
+
+        return $attribute;
     }
 }

@@ -253,6 +253,14 @@ Booleans by default will display as a 0 or a 1, which is pretty bland and won't 
 boolean:No|Yes
 ```
 
+### Options
+Analogous to "boolean", only any text or numeric values can act as a source value (often flags are stored in the database). The format allows you to specify different outputs depending on the value.
+Look at this as an associative array in which the key is separated from the value by a dot. Array elements are separated by a vertical line.
+
+```
+options: search.On the search|network.In networks
+```
+
 ### DateTime
 DateTime by default will display as Y-m-d H:i:s. Prefix the value with `datetime:` and then add your datetime format, e.g.,
 
