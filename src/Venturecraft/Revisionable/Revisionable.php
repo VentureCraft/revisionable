@@ -234,6 +234,8 @@ class Revisionable extends Eloquent
             if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
                     || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')) {
                 return ($class::check()) ? $class::getUser()->id : null;
+            } elseif (function_exists('backpack_auth') && backpack_auth()->check()) {
+                return backpack_user()->id;
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
             }
