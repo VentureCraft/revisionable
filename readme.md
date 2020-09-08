@@ -1,7 +1,5 @@
 <img src="https://cdn1.wwe.com/static/ossimg/revisionableghbanner.png" style="width: 100%" alt="Revisionable for Laravel" />
 
-[![Laravel 4.x](https://img.shields.io/badge/Laravel-4.x-yellow.svg?style=flat-square)](https://laravel.com/)
-[![Laravel 5.2](https://img.shields.io/badge/Laravel-5.x-brightgreen.svg?style=flat-square)](https://laravel.com/)
 [![Latest Version](https://img.shields.io/github/release/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
 [![Downloads](https://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
