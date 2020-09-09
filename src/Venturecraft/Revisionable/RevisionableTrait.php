@@ -125,7 +125,8 @@ trait RevisionableTrait
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
-                if (gettype($val) == 'object' && isset($this->casts[$key]) && in_array($this->casts[$key], ['object', 'array']) && isset($this->originalData[$key])) {
+				$castCheck = ['object', 'array'];
+                if (isset($this->casts[$key]) && in_array(gettype($val), $castCheck) && in_array($this->casts[$key], $castCheck) && isset($this->originalData[$key])) {
                     // Sorts the keys of a JSON object due Normalization performed by MySQL
                     // So it doesn't set false flag if it is changed only order of key or whitespace after comma
 
