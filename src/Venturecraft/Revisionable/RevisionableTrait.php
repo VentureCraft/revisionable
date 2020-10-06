@@ -128,13 +128,15 @@ trait RevisionableTrait
             foreach ($this->updatedData as $key => $val) {
                 $castCheck = ['object', 'array'];
                 if (isset($this->casts[$key]) && in_array(gettype($val), $castCheck) && in_array($this->casts[$key], $castCheck) && isset($this->originalData[$key])) {
-                    // Sorts the keys of a JSON object due Normalization performed by MySQL
-                    // So it doesn't set false flag if it is changed only order of key or whitespace after comma
-
+                    // Due to MySQL resorting JSON keys for efficiency, we'll ignore the change if
+                    // only the order of keys was modified
+                    
+                    $originalData = $this->sortJsonKeys(json_decode($this->originalData[$key], true));
                     $updatedData = $this->sortJsonKeys(json_decode($this->updatedData[$key], true));
-
-                    $this->updatedData[$key] = json_encode($updatedData);
-                    $this->originalData[$key] = json_encode(json_decode($this->originalData[$key], true));
+                    
+                    if ($originalData === $updatedData) {
+                        $this->syncOriginalAttribute($key);
+                    }
                 } else if (gettype($val) == 'object' && !method_exists($val, '__toString')) {
                     unset($this->originalData[$key]);
                     unset($this->updatedData[$key]);
@@ -522,16 +524,13 @@ trait RevisionableTrait
     {
         if(empty($attribute)) return $attribute;
 
-        foreach ($attribute as $key=>$value) {
+        foreach ($attribute as &$value) {
             if(is_array($value) || is_object($value)){
                 $value = $this->sortJsonKeys($value);
-            } else {
-                continue;
             }
-
-            ksort($value);
-            $attribute[$key] = $value;
         }
+
+        ksort($attribute);
 
         return $attribute;
     }
