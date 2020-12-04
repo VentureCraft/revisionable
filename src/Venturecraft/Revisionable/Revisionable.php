@@ -164,8 +164,10 @@ class Revisionable extends Eloquent
             }
 
             if (count($revisions) > 0) {
-                $revision = static::newModel();
-                \DB::table($revision->getTable())->insert($revisions);
+                foreach ($revisions as $revisionData) {
+                    $revision = Revisionable::newModel();
+                    $revision->fill($revisionData)->save();
+                }
             }
         }
     }
@@ -197,8 +199,10 @@ class Revisionable extends Eloquent
                 'updated_at' => new \DateTime(),
             );
 
-            $revision = static::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            foreach ($revisions as $revisionData) {
+                $revision = Revisionable::newModel();
+                $revision->fill($revisionData)->save();
+            }
         }
     }
 
@@ -220,8 +224,11 @@ class Revisionable extends Eloquent
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
-            $revision = static::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            
+            foreach ($revisions as $revisionData) {
+                $revision = Revisionable::newModel();
+                $revision->fill($revisionData)->save();
+            }
         }
     }
 
@@ -250,8 +257,10 @@ class Revisionable extends Eloquent
                 'updated_at' => new \DateTime(),
             );
 
-            $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            foreach ($revisions as $revisionData) {
+                $revision = Revisionable::newModel();
+                $revision->fill($revisionData)->save();
+            }
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
