@@ -214,7 +214,7 @@ class Revision extends Eloquent
      *
      * @return string
      */
-    private function getRelatedModel()
+    protected function getRelatedModel()
     {
         $idSuffix = '_id';
 
