@@ -310,7 +310,7 @@ trait RevisionableTrait
 
             $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
-            \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
+            \Event::dispatch('revisionable.forceDeleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
 
