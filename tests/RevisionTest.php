@@ -79,4 +79,93 @@ class RevisionTest extends \Orchestra\Testbench\TestCase
         // we should have two revisions to my name
         $this->assertCount(2, $user->revisionHistory);
     }
+
+    /**
+     * Make sure additional fields are saved with revision
+     */
+    public function testRevisionStoredAdditionalFields()
+    {
+        $this->loadMigrationsFrom([
+            '--database' => 'testing',
+            '--path' => realpath(__DIR__.'/migrations'),
+        ]);
+
+        $this->app['config']->set('revisionable.additional_fields', ['additional_field']);
+
+        $user = User::create([
+            'name' => 'James Judd',
+            'email' => 'james.judd@revisionable.test',
+            'additional_field' => 678,
+            'password' => \Hash::make('456'),
+        ]);
+
+
+        // change to my nickname
+        $user->update([
+            'name' => 'Judd'
+        ]);
+
+        // we should have two revisions to my name
+        $this->assertCount(1, $user->revisionHistory);
+
+        $this->assertEquals(678, $user->revisionHistory->first()->additional_field);
+    }
+
+    /**
+     * Make sure additional fields without values don't break
+     */
+    public function testRevisionSkipsAdditionalFieldsWhenNotAvailable()
+    {
+        $this->loadMigrationsFrom([
+            '--database' => 'testing',
+            '--path' => realpath(__DIR__.'/migrations'),
+        ]);
+
+        $this->app['config']->set('revisionable.additional_fields', ['additional_field']);
+
+        $user = User::create([
+            'name' => 'James Judd',
+            'email' => 'james.judd@revisionable.test',
+            'password' => \Hash::make('456'),
+        ]);
+
+
+        // change to my nickname
+        $user->update([
+            'name' => 'Judd'
+        ]);
+
+        // we should have two revisions to my name
+        $this->assertCount(1, $user->revisionHistory);
+
+        $this->assertNull($user->revisionHistory->first()->additional_field);
+    }
+
+    /**
+     * Make sure additional fields which don't exist on the model still save revision
+     */
+    public function testRevisionSkipsAdditionalFieldsWhenMisconfigured()
+    {
+        $this->loadMigrationsFrom([
+            '--database' => 'testing',
+            '--path' => realpath(__DIR__.'/migrations'),
+        ]);
+
+        $this->app['config']->set('revisionable.additional_fields', ['unknown_field']);
+
+        $user = User::create([
+            'name' => 'James Judd',
+            'email' => 'james.judd@revisionable.test',
+            'password' => \Hash::make('456'),
+        ]);
+
+
+        // change to my nickname
+        $user->update([
+            'name' => 'Judd'
+        ]);
+
+        // we should have two revisions to my name
+        $this->assertCount(1, $user->revisionHistory);
+    }
 }

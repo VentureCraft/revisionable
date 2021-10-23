@@ -73,6 +73,7 @@ class Revisionable extends Eloquent
         static::deleted(function ($model) {
             $model->preSave();
             $model->postDelete();
+            $model->postForceDelete();
         });
     }
     /**
@@ -81,7 +82,11 @@ class Revisionable extends Eloquent
      */
     public static function newModel()
     {
-        $model = \Config::get('revisionable.model', '\Robbielove\Revisionable\Revision');
+        $model = app('config')->get('revisionable.model');
+
+        if (! $model) {
+            $model = '\Robbielove\Revisionable\Revision';
+        }
         return new $model;
     }
 
@@ -229,6 +234,37 @@ class Revisionable extends Eloquent
     }
 
     /**
+     * If forcedeletes are enabled, set the value created_at of model to null
+     *
+     * @return void|bool
+     */
+    public function postForceDelete()
+    {
+        if (empty($this->revisionForceDeleteEnabled)) {
+            return false;
+        }
+
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
+            && (($this->isSoftDelete() && $this->isForceDeleting()) || !$this->isSoftDelete())) {
+
+            $revisions[] = array(
+                'revisionable_type' => $this->getMorphClass(),
+                'revisionable_id' => $this->getKey(),
+                'key' => self::CREATED_AT,
+                'old_value' => $this->{self::CREATED_AT},
+                'new_value' => null,
+                'user_id' => $this->getSystemUserId(),
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+            );
+
+            $revision = Revisionable::newModel();
+            \DB::table($revision->getTable())->insert($revisions);
+            \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
+        }
+    }
+
+    /**
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
@@ -238,6 +274,8 @@ class Revisionable extends Eloquent
             if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
                     || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')) {
                 return ($class::check()) ? $class::getUser()->id : null;
+            } elseif (function_exists('backpack_auth') && backpack_auth()->check()) {
+                return backpack_user()->id;
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
             }

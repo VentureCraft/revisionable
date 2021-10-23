@@ -86,6 +86,7 @@ trait RevisionableTrait
         static::deleted(function ($model) {
             $model->preSave();
             $model->postDelete();
+            $model->postForceDelete();
         });
     }
 
@@ -127,7 +128,8 @@ trait RevisionableTrait
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
             foreach ($this->updatedData as $key => $val) {
-                if (isset($this->casts[$key]) && in_array($this->casts[$key], ['object', 'array']) && isset($this->originalData[$key])) {
+                $castCheck = ['object', 'array'];
+                if (isset($this->casts[$key]) && in_array(gettype($val), $castCheck) && in_array($this->casts[$key], $castCheck) && isset($this->originalData[$key])) {
                     // Sorts the keys of a JSON object due Normalization performed by MySQL
                     // So it doesn't set false flag if it is changed only order of key or whitespace after comma
 
@@ -188,7 +190,7 @@ trait RevisionableTrait
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
-                $revisions[] = array(
+                $original = array(
                     'uid' => Str::uuid(),
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
@@ -199,6 +201,8 @@ trait RevisionableTrait
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
                 );
+
+                $revisions[] = array_merge($original, $this->getAdditionalFields());
             }
 
             if (count($revisions) > 0) {
@@ -243,6 +247,10 @@ trait RevisionableTrait
                 'updated_at' => new \DateTime(),
             );
 
+            //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
+            //get them into an array.
+            $revisions = array_merge($revisions[0], $this->getAdditionalFields());
+
             $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
@@ -270,6 +278,41 @@ trait RevisionableTrait
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
             );
+
+            //Since there is only one revision because it's deleted, let's just merge into revision[0]
+            $revisions = array_merge($revisions[0], $this->getAdditionalFields());
+
+            $revision = Revisionable::newModel();
+            \DB::table($revision->getTable())->insert($revisions);
+            \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
+        }
+    }
+
+    /**
+     * If forcedeletes are enabled, set the value created_at of model to null
+     *
+     * @return void|bool
+     */
+    public function postForceDelete()
+    {
+        if (empty($this->revisionForceDeleteEnabled)) {
+            return false;
+        }
+
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
+            && (($this->isSoftDelete() && $this->isForceDeleting()) || !$this->isSoftDelete())) {
+
+            $revisions[] = array(
+                'revisionable_type' => $this->getMorphClass(),
+                'revisionable_id' => $this->getKey(),
+                'key' => self::CREATED_AT,
+                'old_value' => $this->{self::CREATED_AT},
+                'new_value' => null,
+                'user_id' => $this->getSystemUserId(),
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+            );
+
             $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
@@ -288,6 +331,8 @@ trait RevisionableTrait
                 || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
             ) {
                 return ($class::check()) ? $class::getUser()->id : null;
+            } elseif (function_exists('backpack_auth') && backpack_auth()->check()) {
+                return backpack_user()->id;
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
             }
@@ -296,6 +341,22 @@ trait RevisionableTrait
         }
 
         return null;
+    }
+
+
+    public function getAdditionalFields()
+    {
+        $additional = [];
+        //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
+        //get them into an array.
+        $fields = config('revisionable.additional_fields', []);
+        foreach($fields as $field) {
+            if(Arr::has($this->originalData, $field)) {
+                $additional[$field]  =  Arr::get($this->originalData, $field);
+            }
+        }
+
+        return $additional;
     }
 
     /**
