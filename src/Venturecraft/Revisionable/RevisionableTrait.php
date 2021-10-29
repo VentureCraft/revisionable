@@ -327,6 +327,9 @@ trait RevisionableTrait
             ) {
                 return ($class::check()) ? $class::getUser()->id : null;
             } elseif (function_exists('backpack_auth') && backpack_auth()->check()) {
+                if (backpack_user()->uuid) {
+                    return backpack_user()->uuid;
+                }
                 return backpack_user()->id;
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
