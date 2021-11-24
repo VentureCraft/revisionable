@@ -127,13 +127,15 @@ class FieldFormatter
      */
     public static function options($value, $format)
     {
-        $options = explode('|', $format);
+        $options= array_map(function($val) {
+            return str_replace('\\|', '|', $val);
+        }, preg_split('~(?<!\\\)' . preg_quote('|', '~') . '~', $format));
 
         $result = [];
 
         foreach ($options as $option) {
-            $transform = explode('.', $option);
-            $result[$transform[0]] = $transform[1];
+            $transform = preg_split('~(?<!\\\)' . preg_quote('.', '~') . '~', $option);
+            $result[$transform[0]] = str_replace('\\.', '.', $transform[1]);
         }
 
         if (isset($result[$value])) {
