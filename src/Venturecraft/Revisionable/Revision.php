@@ -28,6 +28,11 @@ class Revision extends Eloquent
     protected $revisionFormattedFields = array();
 
     /**
+     * @var array
+     */
+    protected $guarded = [];
+
+    /**
      * @param array $attributes
      */
     public function __construct(array $attributes = array())
@@ -185,7 +190,7 @@ class Revision extends Eloquent
         }
     }
 
-    protected function prepareForDatabase($revisionData)
+    public function prepareForDatabase($revisionData)
     {
         $this->fill($revisionData);
 

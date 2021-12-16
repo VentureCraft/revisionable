@@ -211,7 +211,10 @@ trait RevisionableTrait
                     }
                 }
 
-                $this->saveRevisionEntries($revisions);
+                foreach ($revisions as $revision) {
+                    $this->saveRevisionEntries($revision);
+                }
+
                 \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
         }
@@ -281,13 +284,11 @@ trait RevisionableTrait
         }
     }
 
-    protected function saveRevisionEntries($revisions)
+    protected function saveRevisionEntries($revisionData)
     {
-        foreach($revisions as $revisionData) {
-            $revision = Revisionable::newModel();
-            $revision->prepareForDatabase($revisionData);
-            $revision->save();
-        }
+        $revision = Revisionable::newModel();
+        $revision->prepareForDatabase($revisionData);
+        $revision->save();
     }
 
     /**
@@ -315,7 +316,7 @@ trait RevisionableTrait
                 'updated_at'        => new \DateTime(),
             );
 
-            $this->saveRevisionEntries($revisions);
+            $this->saveRevisionEntries($revisions[0]);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
