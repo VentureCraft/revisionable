@@ -198,8 +198,6 @@ trait RevisionableTrait
                     'user_id'           => $this->getSystemUserId(),
                     'created_at'        => new \DateTime(),
                     'updated_at'        => new \DateTime(),
-                    'description'       => $this->getRevisionableDescription(),
-                    'name'              => $this->getRevisionableName(),
                 );
 
                 $revisions[] = array_merge($original, $this->getAdditionalFields());
@@ -244,8 +242,6 @@ trait RevisionableTrait
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
-                'description'       => $this->getRevisionableDescription(),
-                'name'              => $this->getRevisionableName(),
             );
 
             //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
@@ -275,8 +271,6 @@ trait RevisionableTrait
                 'user_id'           => $this->getSystemUserId(),
                 'created_at'        => new \DateTime(),
                 'updated_at'        => new \DateTime(),
-                'description'       => $this->getRevisionableDescription(),
-                'name'              => $this->getRevisionableName(),
             );
 
             //Since there is only one revision because it's deleted, let's just merge into revision[0]
