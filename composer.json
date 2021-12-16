@@ -1,5 +1,5 @@
 {
-    "name": "venturecraft/revisionable",
+    "name": "nexuspointltd/revisionable",
     "license": "MIT",
     "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel",
     "keywords": ["model", "laravel", "ardent", "revision", "audit", "history"],
