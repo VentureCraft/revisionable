@@ -212,7 +212,7 @@ trait RevisionableTrait
                 }
 
                 foreach ($revisions as $revision) {
-                    $this->saveRevisionEntries($revision);
+                    $this->saveRevisionEntry($revision);
                 }
 
                 \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
@@ -250,7 +250,7 @@ trait RevisionableTrait
             //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
             //get them into an array.
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
-            $this->saveRevisionEntries($revisions);
+            $this->saveRevisionEntry($revisions);
             \Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
 
@@ -278,13 +278,13 @@ trait RevisionableTrait
 
             //Since there is only one revision because it's deleted, let's just merge into revision[0]
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
-            $this->saveRevisionEntries($revisions);
+            $this->saveRevisionEntry($revisions);
 
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
 
-    protected function saveRevisionEntries($revisionData)
+    protected function saveRevisionEntry($revisionData)
     {
         $revision = Revisionable::newModel();
         $revision->prepareForDatabase($revisionData);
@@ -316,7 +316,7 @@ trait RevisionableTrait
                 'updated_at'        => new \DateTime(),
             );
 
-            $this->saveRevisionEntries($revisions[0]);
+            $this->saveRevisionEntry($revisions[0]);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
