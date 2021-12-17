@@ -1,6 +1,7 @@
 <?php namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -190,13 +191,13 @@ trait RevisionableTrait
             foreach ($changes_to_record as $key => $change) {
                 $original = array(
                     'revisionable_type' => $this->getMorphClass(),
-                    'revisionable_id' => $this->getKey(),
-                    'key' => $key,
-                    'old_value' => Arr::get($this->originalData, $key),
-                    'new_value' => $this->updatedData[$key],
-                    'user_id' => $this->getSystemUserId(),
-                    'created_at' => new \DateTime(),
-                    'updated_at' => new \DateTime(),
+                    'revisionable_id'   => $this->getKey(),
+                    'key'               => $key,
+                    'old_value'         => Arr::get($this->originalData, $key),
+                    'new_value'         => $this->updatedData[$key],
+                    'user_id'           => $this->getSystemUserId(),
+                    'created_at'        => new \DateTime(),
+                    'updated_at'        => new \DateTime(),
                 );
 
                 $revisions[] = array_merge($original, $this->getAdditionalFields());
@@ -209,8 +210,11 @@ trait RevisionableTrait
                         $delete->delete();
                     }
                 }
-                $revision = Revisionable::newModel();
-                \DB::table($revision->getTable())->insert($revisions);
+
+                foreach ($revisions as $revision) {
+                    $this->saveRevisionEntry($revision);
+                }
+
                 \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
         }
@@ -246,9 +250,7 @@ trait RevisionableTrait
             //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
             //get them into an array.
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
-
-            $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            $this->saveRevisionEntry($revisions);
             \Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
 
@@ -265,22 +267,28 @@ trait RevisionableTrait
         ) {
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
-                'revisionable_id' => $this->getKey(),
-                'key' => $this->getDeletedAtColumn(),
-                'old_value' => null,
-                'new_value' => $this->{$this->getDeletedAtColumn()},
-                'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                'revisionable_id'   => $this->getKey(),
+                'key'               => $this->getDeletedAtColumn(),
+                'old_value'         => null,
+                'new_value'         => $this->{$this->getDeletedAtColumn()},
+                'user_id'           => $this->getSystemUserId(),
+                'created_at'        => new \DateTime(),
+                'updated_at'        => new \DateTime(),
             );
 
             //Since there is only one revision because it's deleted, let's just merge into revision[0]
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
+            $this->saveRevisionEntry($revisions);
 
-            $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
+    }
+
+    protected function saveRevisionEntry($revisionData)
+    {
+        $revision = Revisionable::newModel();
+        $revision->prepareForDatabase($revisionData);
+        $revision->save();
     }
 
     /**
@@ -299,37 +307,28 @@ trait RevisionableTrait
 
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
-                'revisionable_id' => $this->getKey(),
-                'key' => self::CREATED_AT,
-                'old_value' => $this->{self::CREATED_AT},
-                'new_value' => null,
-                'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                'revisionable_id'   => $this->getKey(),
+                'key'               => self::CREATED_AT,
+                'old_value'         => $this->{self::CREATED_AT},
+                'new_value'         => null,
+                'user_id'           => $this->getSystemUserId(),
+                'created_at'        => new \DateTime(),
+                'updated_at'        => new \DateTime(),
             );
 
-            $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            $this->saveRevisionEntry($revisions[0]);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
 
     /**
      * Attempt to find the user id of the currently logged in user
-     * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
     public function getSystemUserId()
     {
         try {
-            if (class_exists($class = '\SleepingOwl\AdminAuth\Facades\AdminAuth')
-                || class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
-                || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
-            ) {
-                return ($class::check()) ? $class::getUser()->id : null;
-            } elseif (function_exists('backpack_auth') && backpack_auth()->check()) {
-                return backpack_user()->id;
-            } elseif (\Auth::check()) {
-                return \Auth::user()->getAuthIdentifier();
+            if (\Auth::check()) {
+                return \Auth::user()->id;
             }
         } catch (\Exception $e) {
             return null;
