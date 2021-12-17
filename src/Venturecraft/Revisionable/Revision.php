@@ -212,10 +212,10 @@ class Revision extends Eloquent
     public function getRevisionableDescription()
     {
         if ($this->old_value) {
-            return "Changed {$this->key} from {$this->getValue('old')} to {$this->getValue('new')}";
+            return "Changed {$this->fieldName()} from {$this->getValue('old')} to {$this->getValue('new')}";
         }
 
-        return "Initialised {$this->key} with {$this->getValue('new')}";
+        return "Initialised {$this->fieldName()} with {$this->getValue('new')}";
     }
 
     /**
