@@ -202,8 +202,14 @@ class Revision extends Eloquent
 
     public function getRevisionableName()
     {
-        if (Auth::check()) {
-            return Auth::user()->name;
+        $user = $this->userResponsible();
+
+        if (! $user && Auth::check()) {
+            $user = Auth::user();
+        }
+
+        if ($user) {
+            return $user->name;
         }
 
         return 'SYSTEM';
