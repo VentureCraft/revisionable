@@ -289,6 +289,15 @@ class Revision extends Eloquent
                 }
             }
 
+            // Even if relation is not found, null/empty should still be handled via the main model.
+            if (is_null($this->$which_value) || $this->$which_value == '') {
+                if (method_exists($main_model, 'getRevisionNullString')) {
+                    return $main_model->getRevisionNullString();
+                } else {
+                    return 'Nothing';
+                }
+            }
+
             // if there was an issue
             // or, if it's a normal value
 
