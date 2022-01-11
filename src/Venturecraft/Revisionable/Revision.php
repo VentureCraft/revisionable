@@ -194,8 +194,9 @@ class Revision extends Eloquent
     {
         $this->fill($revisionData);
 
-        $this->name = $this->getRevisionableName();
-        $this->description = $this->getRevisionableDescription();
+        // Comment out as the related fields are not being eager loaded, so this is causing additional lookups against the writer DB
+//        $this->name = $this->getRevisionableName();
+//        $this->description = $this->getRevisionableDescription();
 
         $this->save();
     }
