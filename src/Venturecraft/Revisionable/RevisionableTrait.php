@@ -89,12 +89,26 @@ trait RevisionableTrait
         });
     }
 
-    /**
-     * @return mixed
-     */
     public function revisionHistory()
     {
-        return $this->morphMany(get_class(Revisionable::newModel()), 'revisionable');
+        return $this
+            ->hasMany(
+                Revisionable::newModel(),
+                'revisionable_id',
+                'revision_id_override'
+            )
+            ->where('revisionable_type', get_class($this));
+    }
+
+    public function getRevisionIdOverrideAttribute()
+    {
+        if ($this->id) {
+            return (string)$this->id;
+        }
+
+        if ($this->guid) {
+            return (string)$this->guid;
+        }
     }
 
     /**
