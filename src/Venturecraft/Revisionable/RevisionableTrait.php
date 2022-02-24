@@ -1,6 +1,8 @@
 <?php namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -186,7 +188,7 @@ trait RevisionableTrait
             $changes_to_record = $this->changedRevisionableFields();
 
             $revisions = array();
-            $group_id = Str::random(64);
+            $group_id = (string) Str::uuid();
             foreach ($changes_to_record as $key => $change) {
                 $original = array(
                     'revisionable_type' => $this->getMorphClass(),
@@ -231,7 +233,7 @@ trait RevisionableTrait
             return false;
         }
 
-        $group_id = Str::random(64);
+        $group_id = (string) Str::uuid();
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
             $revisions[] = array(
@@ -262,7 +264,7 @@ trait RevisionableTrait
      */
     public function postDelete()
     {
-        $group_id = Str::random(64);
+        $group_id = (string) Str::uuid();
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
@@ -299,7 +301,7 @@ trait RevisionableTrait
             return false;
         }
         
-        $group_id = Str::random(64);
+        $group_id = (string) Str::uuid();
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && (($this->isSoftDelete() && $this->isForceDeleting()) || !$this->isSoftDelete())) {
 
