@@ -17,7 +17,7 @@ class CreateRevisionsTable extends Migration
             $table->unsignedBigInteger('revisionable_id');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('key');
-            $table->string('revision_group_id')->nullable()
+            $table->string('group_id')->nullable()
             $table->text('old_value')->nullable();
             $table->text('new_value')->nullable();
             $table->timestamps();
