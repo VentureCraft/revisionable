@@ -186,12 +186,13 @@ trait RevisionableTrait
             $changes_to_record = $this->changedRevisionableFields();
 
             $revisions = array();
-
+            $group_id = Str::random(64);
             foreach ($changes_to_record as $key => $change) {
                 $original = array(
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
+                    'revision_group_id' => $group_id,
                     'old_value' => Arr::get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getSystemUserId(),
@@ -230,12 +231,14 @@ trait RevisionableTrait
             return false;
         }
 
+        $group_id = Str::random(64);
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => self::CREATED_AT,
+                'revision_group_id' => $group_id,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
                 'user_id' => $this->getSystemUserId(),
@@ -259,6 +262,7 @@ trait RevisionableTrait
      */
     public function postDelete()
     {
+        $group_id = Str::random(64);
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
@@ -267,6 +271,7 @@ trait RevisionableTrait
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => $this->getDeletedAtColumn(),
+                'revision_group_id' => $group_id,
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
                 'user_id' => $this->getSystemUserId(),
@@ -293,7 +298,8 @@ trait RevisionableTrait
         if (empty($this->revisionForceDeleteEnabled)) {
             return false;
         }
-
+        
+        $group_id = Str::random(64);
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && (($this->isSoftDelete() && $this->isForceDeleting()) || !$this->isSoftDelete())) {
 
@@ -301,6 +307,7 @@ trait RevisionableTrait
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => self::CREATED_AT,
+                'revision_group_id' => $group_id,
                 'old_value' => $this->{self::CREATED_AT},
                 'new_value' => null,
                 'user_id' => $this->getSystemUserId(),
