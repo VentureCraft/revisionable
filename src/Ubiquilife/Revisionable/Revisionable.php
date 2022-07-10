@@ -1,6 +1,6 @@
 <?php
 
-namespace Robbielove\Revisionable;
+namespace Ubiquilife\Revisionable;
 
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
  * Class Revisionable
- * @package Robbielove\Revisionable
+ * @package Ubiquilife\Revisionable
  */
 class Revisionable extends Eloquent
 {
@@ -85,7 +85,7 @@ class Revisionable extends Eloquent
         $model = app('config')->get('revisionable.model');
 
         if (! $model) {
-            $model = '\Robbielove\Revisionable\Revision';
+            $model = '\Ubiquilife\Revisionable\Revision';
         }
         return new $model;
     }

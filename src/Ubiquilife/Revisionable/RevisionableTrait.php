@@ -1,6 +1,6 @@
 <?php
 
-namespace Robbielove\Revisionable;
+namespace Ubiquilife\Revisionable;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 /**
  * Class RevisionableTrait
- * @package Robbielove\Revisionable
+ * @package Ubiquilife\Revisionable
  */
 trait RevisionableTrait
 {

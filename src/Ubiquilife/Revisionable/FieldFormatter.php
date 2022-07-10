@@ -1,6 +1,6 @@
 <?php
 
-namespace Robbielove\Revisionable;
+namespace Ubiquilife\Revisionable;
 
 /**
  * FieldFormatter.
@@ -11,7 +11,7 @@ namespace Robbielove\Revisionable;
 
 /**
  * Class FieldFormatter
- * @package Robbielove\Revisionable
+ * @package Ubiquilife\Revisionable
  */
 class FieldFormatter
 {

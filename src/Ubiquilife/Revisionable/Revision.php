@@ -1,6 +1,6 @@
 <?php
 
-namespace Robbielove\Revisionable;
+namespace Ubiquilife\Revisionable;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model as Eloquent;

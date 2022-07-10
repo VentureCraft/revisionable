@@ -1,15 +1,15 @@
 {
-    "name": "robbielove/revisionable",
+    "name": "ubiquilife/revisionable",
     "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel",
     "keywords": ["model", "laravel", "revision", "history"],
     "authors": [
         {
-            "name": "Robbie Love",
-            "homepage": "http://robbiecloud.com",
+            "name": "Ubiquilife",
+            "homepage": "https://ubiqui.life",
             "role": "Developer"
         }
     ],
-    "homepage": "http://github.com/robbielove/revisionable",
+    "homepage": "http://github.com/ubiquilife/revisionable",
     "license": "Private",
     "require": {
         "illuminate/support": "^6.0|^7.0|^8.0",
@@ -20,12 +20,12 @@
             "src/migrations"
         ],
         "psr-0": {
-            "Robbielove\\Revisionable": "src/"
+            "Ubiquilife\\Revisionable": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Robbielove\\Revisionable\\Tests\\": "tests/"
+            "Ubiquilife\\Revisionable\\Tests\\": "tests/"
         }
     },
     "require-dev": {
@@ -34,7 +34,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Robbielove\\Revisionable\\RevisionableServiceProvider"
+                "Ubiquilife\\Revisionable\\RevisionableServiceProvider"
             ]
         }
     }
