@@ -283,7 +283,7 @@ Analogous to "boolean", only any text or numeric values can act as a source valu
 Look at this as an associative array in which the key is separated from the value by a dot. Array elements are separated by a vertical line.
 
 ```
-options: search.On the search|network.In networks
+options:search.On the search|network.In networks
 ```
 
 ### DateTime
