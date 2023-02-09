@@ -33,7 +33,7 @@
         }
     },
     "require-dev": {
-        "orchestra/testbench": "~3.0"
+        "orchestra/testbench": "~3.0|^8.0"
     },
     "extra": {
         "laravel": {

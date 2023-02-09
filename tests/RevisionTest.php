@@ -9,7 +9,7 @@ class RevisionTest extends \Orchestra\Testbench\TestCase
     /**
      * Setup the test environment.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadLaravelMigrations(['--database' => 'testing']);
@@ -31,8 +31,8 @@ class RevisionTest extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', array(
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', array(
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
