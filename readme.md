@@ -344,7 +344,7 @@ If you have enabled revisions of creations as well you can display it like this:
 
 ### userResponsible()
 
-Returns the User that was responsible for making the revision. A user model is returned, or null if there was no user recorded.
+Returns the User that was responsible for making the revision. A user model is returned, or false if there was no user recorded.
 
 The user model that is loaded depends on what you have set in your `config/auth.php` file for the `model` variable.
 
