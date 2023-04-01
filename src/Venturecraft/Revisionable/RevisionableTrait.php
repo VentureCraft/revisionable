@@ -1,6 +1,9 @@
-<?php namespace Venturecraft\Revisionable;
+<?php
+
+namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Arr;
+use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -15,6 +18,8 @@ use Illuminate\Support\Arr;
  */
 trait RevisionableTrait
 {
+    use PivotEventTrait;
+
     /**
      * @var array
      */
@@ -85,6 +90,15 @@ trait RevisionableTrait
             $model->preSave();
             $model->postDelete();
             $model->postForceDelete();
+        });
+
+        // ManyToMany listeners
+        static::pivotAttached(function ($model, $relationName, $pivotClass, $pivotIds, $pivotIdsAttributes) {
+            $model->postPivotSimpleEvent('attached', $pivotClass, $pivotIds[0], $pivotIdsAttributes);
+        });
+
+        static::pivotDetached(function ($model, $relationName, $pivotClass, $pivotIds, $pivotIdsAttributes) {
+            $model->postPivotSimpleEvent('detached', $pivotClass, $pivotIds[0], $pivotIdsAttributes);
         });
     }
 
@@ -315,6 +329,46 @@ trait RevisionableTrait
     }
 
     /**
+     * Called after many to many record successfully attached
+     *
+     * @param string $event
+     * @param string $pivotModel
+     * @param integer $pivotId
+     * @param array $pivotAttributes
+     * @return void
+     */
+    public function postPivotSimpleEvent(string $event, string $pivotModel, int $pivotId, array $pivotAttributes): void
+    {
+        // Revision for pivots
+        $revisions[] = [
+            'revisionable_type' => $pivotModel,
+            'revisionable_id' => $pivotId,
+            'key' => "{$event}-to",
+            'old_value' => get_class($this),
+            'new_value' => $this->id,
+            'user_id' => $this->getSystemUserId(),
+            'created_at' => new \DateTime(),
+            'updated_at' => new \DateTime(),
+        ];
+
+        // Revision for yourself
+        $revisions[] = [
+            'revisionable_type' => get_class($this),
+            'revisionable_id' => $this->id,
+            'key' => "{$event}-from",
+            'old_value' => $pivotModel,
+            'new_value' => $pivotId,
+            'user_id' => $this->getSystemUserId(),
+            'created_at' => new \DateTime(),
+            'updated_at' => new \DateTime(),
+        ];
+
+        $revision = Revisionable::newModel();
+        \DB::table($revision->getTable())->insert($revisions);
+        \Event::dispatch("revisionable.pivot.{$event}", ['model' => $this, 'revisions' => $revisions]);
+    }
+
+    /**
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
@@ -337,7 +391,6 @@ trait RevisionableTrait
 
         return null;
     }
-
 
     public function getAdditionalFields()
     {
