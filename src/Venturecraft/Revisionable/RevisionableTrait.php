@@ -331,7 +331,7 @@ trait RevisionableTrait
     }
 
     /**
-     * Called after many to many record successfully attached
+     * Called after many to many record successfully attached or detached
      *
      * @param string $event
      * @param string $pivotModel
@@ -341,6 +341,7 @@ trait RevisionableTrait
      */
     public function postPivotSimpleEvent(string $event, string $pivotModel, int $pivotId, array $pivotAttributes): void
     {
+        // Many to many revisions are disabled by default
         if (!isset($this->manyToManyRevisionEnabled) || !$this->manyToManyRevisionEnabled) {
             return;
         }
