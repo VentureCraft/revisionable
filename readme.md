@@ -183,6 +183,15 @@ If you want to store the creation as a revision you can override this behavior b
 protected $revisionCreationsEnabled = true;
 ```
 
+### Traccking many to many relationship
+By default the many to many relationship is not stored as a revision.
+You can track BelongsToMany and MorphToMany attach and detach events.
+
+If you want to store these events as a revision you can override this behavior by setting `manyToManyRevisionEnabled` to `true` by adding the following to your model:
+```php
+protected $manyToManyRevisionEnabled = true;
+```
+
 ## More Control
 
 No doubt, there'll be cases where you don't want to store a revision history only for certain fields of the model, this is supported in two different ways. In your model you can either specifiy which fields you explicitly want to track and all other fields are ignored:
