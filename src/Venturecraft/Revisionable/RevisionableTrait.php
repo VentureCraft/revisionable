@@ -341,6 +341,10 @@ trait RevisionableTrait
      */
     public function postPivotSimpleEvent(string $event, string $pivotModel, int $pivotId, array $pivotAttributes): void
     {
+        if (!isset($this->manyToManyRevisionEnabled) || !$this->manyToManyRevisionEnabled) {
+            return;
+        }
+
         // Revision for pivots
         $revisions[] = [
             'revisionable_type' => $pivotModel,
