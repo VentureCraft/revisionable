@@ -1,6 +1,9 @@
-<?php namespace Venturecraft\Revisionable;
+<?php
+
+namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Arr;
+use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -15,6 +18,8 @@ use Illuminate\Support\Arr;
  */
 trait RevisionableTrait
 {
+    use PivotEventTrait;
+
     /**
      * @var array
      */
@@ -85,6 +90,17 @@ trait RevisionableTrait
             $model->preSave();
             $model->postDelete();
             $model->postForceDelete();
+        });
+
+        // ManyToMany listeners
+        static::pivotAttached(function ($model, $relationName, $pivotIds, $pivotIdsAttributes) {
+            $pivotClass = get_class($model->$relationName()->getRelated());
+            $model->postPivotSimpleEvent('attached', $pivotClass, $pivotIds[0], $pivotIdsAttributes);
+        });
+
+        static::pivotDetached(function ($model, $relationName, $pivotIds, $pivotIdsAttributes) {
+            $pivotClass = get_class($model->$relationName()->getRelated());
+            $model->postPivotSimpleEvent('detached', $pivotClass, $pivotIds[0], $pivotIdsAttributes);
         });
     }
 
@@ -173,10 +189,11 @@ trait RevisionableTrait
         } else {
             $LimitReached = false;
         }
+
         if (isset($this->revisionCleanup)){
-            $RevisionCleanup=$this->revisionCleanup;
-        }else{
-            $RevisionCleanup=false;
+            $RevisionCleanup = $this->revisionCleanup;
+        } else {
+            $RevisionCleanup = false;
         }
 
         // check if the model already exists
@@ -203,12 +220,13 @@ trait RevisionableTrait
             }
 
             if (count($revisions) > 0) {
-                if($LimitReached && $RevisionCleanup){
+                if ($LimitReached && $RevisionCleanup) {
                     $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
-                    foreach($toDelete as $delete){
+                    foreach($toDelete as $delete) {
                         $delete->delete();
                     }
                 }
+
                 $revision = Revisionable::newModel();
                 \DB::table($revision->getTable())->insert($revisions);
                 \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
@@ -224,14 +242,12 @@ trait RevisionableTrait
 
         // Check if we should store creations in our revision history
         // Set this value to true in your model if you want to
-        if(empty($this->revisionCreationsEnabled))
-        {
+        if (empty($this->revisionCreationsEnabled)) {
             // We should not store creations.
             return false;
         }
 
-        if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
-        {
+        if ((!isset($this->revisionEnabled) || $this->revisionEnabled)) {
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
@@ -315,6 +331,51 @@ trait RevisionableTrait
     }
 
     /**
+     * Called after many to many record successfully attached or detached
+     *
+     * @param string $event
+     * @param string $pivotModel
+     * @param integer $pivotId
+     * @param array $pivotAttributes
+     * @return void
+     */
+    public function postPivotSimpleEvent(string $event, string $pivotModel, int $pivotId, array $pivotAttributes): void
+    {
+        // Many to many revisions are disabled by default
+        if (!isset($this->manyToManyRevisionEnabled) || !$this->manyToManyRevisionEnabled) {
+            return;
+        }
+
+        // Revision for pivots
+        $revisions[] = [
+            'revisionable_type' => $pivotModel,
+            'revisionable_id' => $pivotId,
+            'key' => "{$event}-to",
+            'old_value' => get_class($this),
+            'new_value' => $this->id,
+            'user_id' => $this->getSystemUserId(),
+            'created_at' => new \DateTime(),
+            'updated_at' => new \DateTime(),
+        ];
+
+        // Revision for yourself
+        $revisions[] = [
+            'revisionable_type' => get_class($this),
+            'revisionable_id' => $this->id,
+            'key' => "{$event}-from",
+            'old_value' => $pivotModel,
+            'new_value' => $pivotId,
+            'user_id' => $this->getSystemUserId(),
+            'created_at' => new \DateTime(),
+            'updated_at' => new \DateTime(),
+        ];
+
+        $revision = Revisionable::newModel();
+        \DB::table($revision->getTable())->insert($revisions);
+        \Event::dispatch("revisionable.pivot.{$event}", ['model' => $this, 'revisions' => $revisions]);
+    }
+
+    /**
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
@@ -338,7 +399,6 @@ trait RevisionableTrait
         return null;
     }
 
-
     public function getAdditionalFields()
     {
         $additional = [];
@@ -346,7 +406,7 @@ trait RevisionableTrait
         //get them into an array.
         $fields = config('revisionable.additional_fields', []);
         foreach($fields as $field) {
-            if(Arr::has($this->originalData, $field)) {
+            if (Arr::has($this->originalData, $field)) {
                 $additional[$field]  =  Arr::get($this->originalData, $field);
             }
         }
@@ -398,6 +458,7 @@ trait RevisionableTrait
         if (isset($this->doKeep) && in_array($key, $this->doKeep)) {
             return true;
         }
+
         if (isset($this->dontKeep) && in_array($key, $this->dontKeep)) {
             return false;
         }
@@ -496,6 +557,7 @@ trait RevisionableTrait
         if (!isset($this->dontKeepRevisionOf)) {
             $this->dontKeepRevisionOf = array();
         }
+
         if (is_array($field)) {
             foreach ($field as $one_field) {
                 $this->disableRevisionField($one_field);
@@ -522,10 +584,12 @@ trait RevisionableTrait
      */
     private function sortJsonKeys($attribute)
     {
-        if(empty($attribute)) return $attribute;
+        if (empty($attribute)) {
+            return $attribute;
+        }
 
         foreach ($attribute as $key=>$value) {
-            if(is_array($value) || is_object($value)){
+            if (is_array($value) || is_object($value)) {
                 $value = $this->sortJsonKeys($value);
             } else {
                 continue;
