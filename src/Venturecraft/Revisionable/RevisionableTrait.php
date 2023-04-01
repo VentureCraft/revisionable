@@ -93,11 +93,13 @@ trait RevisionableTrait
         });
 
         // ManyToMany listeners
-        static::pivotAttached(function ($model, $relationName, $pivotClass, $pivotIds, $pivotIdsAttributes) {
+        static::pivotAttached(function ($model, $relationName, $pivotIds, $pivotIdsAttributes) {
+            $pivotClass = get_class($model->$relationName()->getRelated());
             $model->postPivotSimpleEvent('attached', $pivotClass, $pivotIds[0], $pivotIdsAttributes);
         });
 
-        static::pivotDetached(function ($model, $relationName, $pivotClass, $pivotIds, $pivotIdsAttributes) {
+        static::pivotDetached(function ($model, $relationName, $pivotIds, $pivotIdsAttributes) {
+            $pivotClass = get_class($model->$relationName()->getRelated());
             $model->postPivotSimpleEvent('detached', $pivotClass, $pivotIds[0], $pivotIdsAttributes);
         });
     }
