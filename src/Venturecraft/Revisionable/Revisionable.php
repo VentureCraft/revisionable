@@ -162,6 +162,7 @@ class Revisionable extends Eloquent
                     'key'                   => $key,
                     'old_value'             => Arr::get($this->originalData, $key),
                     'new_value'             => $this->updatedData[$key],
+                    'user_type'             => $this->getSystemUserType(),
                     'user_id'               => $this->getSystemUserId(),
                     'created_at'            => new \DateTime(),
                     'updated_at'            => new \DateTime(),
@@ -197,6 +198,7 @@ class Revisionable extends Eloquent
                 'key' => self::CREATED_AT,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
+                'user_type' => $this->getSystemUserType(),
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
@@ -221,6 +223,7 @@ class Revisionable extends Eloquent
                 'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
+                'user_type' => $this->getSystemUserType(),
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
@@ -250,6 +253,7 @@ class Revisionable extends Eloquent
                 'key' => self::CREATED_AT,
                 'old_value' => $this->{self::CREATED_AT},
                 'new_value' => null,
+                'user_type' => $this->getSystemUserType(),
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
@@ -275,6 +279,30 @@ class Revisionable extends Eloquent
                 return backpack_user()->id;
             } elseif (\Auth::check()) {
                 return \Auth::user()->getAuthIdentifier();
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Attempt to find the user class of the currently logged in user
+     * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
+     **/
+    public function getSystemUserType()
+    {
+        try {
+            if (class_exists($class = '\SleepingOwl\AdminAuth\Facades\AdminAuth')
+                || class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
+                || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
+            ) {
+                return ($class::check()) ? get_class($class::getUser()) : null;
+            } elseif (function_exists('backpack_auth') && backpack_auth()->check()) {
+                return get_class(backpack_user());
+            } elseif (\Auth::check()) {
+                return get_class(\Auth::user());
             }
         } catch (\Exception $e) {
             return null;
