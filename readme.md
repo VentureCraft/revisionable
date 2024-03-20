@@ -12,7 +12,7 @@ Wouldn't it be nice to have a revision history for any model in your project, wi
 
 So not only can you see a history of what happened, but who did what, so there's accountability.
 
-Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
+Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](https://chrisduell.com/keeping-revisions-of-your-laravel-model-data)
 
 ## Working with 3rd party Auth / Eloquent extensions
 
