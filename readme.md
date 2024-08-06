@@ -162,6 +162,18 @@ To better format the output for `deleted_at` entries, you can use the `isEmpty` 
 
 <a name="control"></a>
 
+### Storing Force Delete
+By default the Force Delete of a model is not stored as a revision.
+
+If you want to store the Force Delete as a revision you can override this behavior by setting `revisionForceDeleteEnabled ` to `true` by adding the following to your model:
+```php
+protected $revisionForceDeleteEnabled = true;
+```
+
+In which case, the `created_at` field will be stored as a key with the `oldValue()` value equal to the model creation date and the `newValue()` value equal to `null`.
+
+**Attention!** Turn on this setting carefully! Since the model saved in the revision, now does not exist, so you will not be able to get its object or its relations. 
+
 ### Storing Creations
 By default the creation of a new model is not stored as a revision.
 Only subsequent changes to a model is stored.
@@ -271,7 +283,7 @@ Analogous to "boolean", only any text or numeric values can act as a source valu
 Look at this as an associative array in which the key is separated from the value by a dot. Array elements are separated by a vertical line.
 
 ```
-options: search.On the search|network.In networks
+options:search.On the search|network.In networks
 ```
 
 ### DateTime
@@ -332,7 +344,7 @@ If you have enabled revisions of creations as well you can display it like this:
 
 ### userResponsible()
 
-Returns the User that was responsible for making the revision. A user model is returned, or null if there was no user recorded.
+Returns the User that was responsible for making the revision. A user model is returned, or false if there was no user recorded.
 
 The user model that is loaded depends on what you have set in your `config/auth.php` file for the `model` variable.
 
