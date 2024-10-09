@@ -89,11 +89,20 @@ trait RevisionableTrait
     }
 
     /**
+     * Instance the revision model
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public static function newModel()
+    {
+        return Revisionable::newModel();
+    }
+
+    /**
      * @return mixed
      */
     public function revisionHistory()
     {
-        return $this->morphMany(get_class(Revisionable::newModel()), 'revisionable');
+        return $this->morphMany(get_class(static::newModel()), 'revisionable');
     }
 
     /**
@@ -105,7 +114,7 @@ trait RevisionableTrait
      */
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
-        $model = Revisionable::newModel();
+        $model = static::newModel();
         return $model->where('revisionable_type', get_called_class())
             ->orderBy('updated_at', $order)->limit($limit)->get();
     }
@@ -209,8 +218,8 @@ trait RevisionableTrait
                         $delete->delete();
                     }
                 }
-                $revision = Revisionable::newModel();
-                \DB::table($revision->getTable())->insert($revisions);
+                $revision = static::newModel();
+                \DB::connection($revision->getConnectionName())->table($revision->getTable())->insert($revisions);
                 \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
         }
@@ -247,8 +256,8 @@ trait RevisionableTrait
             //get them into an array.
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
 
-            $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            $revision = static::newModel();
+            \DB::connection($revision->getConnectionName())->table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
 
@@ -277,8 +286,8 @@ trait RevisionableTrait
             //Since there is only one revision because it's deleted, let's just merge into revision[0]
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
 
-            $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            $revision = static::newModel();
+            \DB::connection($revision->getConnectionName())->table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
@@ -308,8 +317,8 @@ trait RevisionableTrait
                 'updated_at' => new \DateTime(),
             );
 
-            $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
+            $revision = static::newModel();
+            \DB::connection($revision->getConnectionName())->table($revision->getTable())->insert($revisions);
             \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
