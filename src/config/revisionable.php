@@ -10,6 +10,6 @@ return [
 
     'additional_fields' => [],
 
-    'db_connection' => env('REVISIONS_CONN'),
+    'db_connection' => env('LOGS_DB_CONNECTION'),
 
 ];
