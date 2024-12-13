@@ -6,8 +6,10 @@ return [
     | Revision Model
     |--------------------------------------------------------------------------
     */
-    'model' => Venturecraft\Revisionable\Revision::class,
+    'model' => App\Services\Revisionable\Revision::class,
 
     'additional_fields' => [],
+
+    'db_connection' => env('REVISIONS_CONN'),
 
 ];
