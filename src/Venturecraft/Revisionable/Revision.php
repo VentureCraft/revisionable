@@ -47,6 +47,16 @@ class Revision extends Eloquent
     }
 
     /**
+     * User Responsible.
+     *
+     * @return User user responsible for the change
+     */
+    public function user()
+    {
+        return $this->morphTo();
+    }
+
+    /**
      * Field Name
      *
      * Returns the field that was updated, in the case that it's a foreign key
@@ -228,6 +238,9 @@ class Revision extends Eloquent
      */
     public function userResponsible()
     {
+        if($this->user_type != null) {
+            return $this->user;
+        }
         if (empty($this->user_id)) { return false; }
         if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
             || class_exists($class = '\Cartalyst\Sentinel\Laravel\Facades\Sentinel')
