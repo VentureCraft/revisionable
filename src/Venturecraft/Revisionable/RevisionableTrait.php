@@ -193,7 +193,7 @@ trait RevisionableTrait
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
                     'old_value' => Arr::get($this->originalData, $key),
-                    'new_value' => $this->updatedData[$key],
+                    'new_value' => stripslashes($this->updatedData[$key]),
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
