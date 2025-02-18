@@ -97,6 +97,27 @@ trait RevisionableTrait
     }
 
     /**
+     * @return mixed
+     */
+    public function revisionHistoryMapped()
+    {
+        $out = [];
+        $data = $this->revisionHistory()->get()->sortByDesc(function ($item) {
+            return $item->created_at;
+        });
+        foreach ($data as $key => $item) {
+            $out[$item->revision_id]['item'] = $item;
+            $out[$item->revision_id]['revision_data'][] = [
+                'key' => $item->key,
+                'old_value' => $item->oldValue(),
+                'new_value' => $item->newValue()
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
      * Generates a list of the last $limit revisions made to any objects of the class it is being called from.
      *
      * @param int $limit
@@ -186,11 +207,13 @@ trait RevisionableTrait
             $changes_to_record = $this->changedRevisionableFields();
 
             $revisions = array();
-
+            $uniqid = uniqid();
+            
             foreach ($changes_to_record as $key => $change) {
                 $original = array(
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
+                    'revision_id' => $uniqid,
                     'key' => $key,
                     'old_value' => Arr::get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
@@ -232,9 +255,11 @@ trait RevisionableTrait
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
+            $uniqid = uniqid();
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
+                'revision_id' => $uniqid,
                 'key' => self::CREATED_AT,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
@@ -263,9 +288,11 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
         ) {
+            $uniqid = uniqid();
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
+                'revision_id' => $uniqid,
                 'key' => $this->getDeletedAtColumn(),
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
