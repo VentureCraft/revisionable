@@ -97,6 +97,17 @@ trait RevisionableTrait
     }
 
     /**
+     * Restrict the result to include only records which has pending revision
+     * history which are not accepted yet.
+     */
+    public function scopeHasPendingRevisionHistory($query)
+    {
+        $query->whereHas('revisionHistory', function($q){
+            $q->whereNull('accepted_at');
+        });
+    }
+
+    /**
      * Generates a list of the last $limit revisions made to any objects of the class it is being called from.
      *
      * @param int $limit
@@ -121,7 +132,9 @@ trait RevisionableTrait
             // if there's no revisionEnabled. Or if there is, if it's true
 
             $this->originalData = $this->original;
+
             $this->updatedData = $this->attributes;
+            $this->updating = $this->exists;
 
             // we can only safely compare basic items,
             // so for now we drop any object based items, like DateTime
@@ -156,7 +169,17 @@ trait RevisionableTrait
             unset($this->attributes['keepRevisionOf']);
 
             $this->dirtyData = $this->getDirty();
-            $this->updating = $this->exists;
+
+            $changes_to_record = $this->changedRevisionableFields(); 
+            foreach ($changes_to_record as $key => $value) {
+                if($this->updating && $this->autoAccept == false && in_array($key, $this->keepRevisionOf)){
+                    if(isset($this->originalData[$key])){
+                        \Log::debug('Changing value for key '.$key);
+                        $this->attributes[$key] = $this->originalData[$key];
+                    }
+                }
+            }
+
         }
     }
 
@@ -197,6 +220,7 @@ trait RevisionableTrait
                     'user_id' => $this->getSystemUserId(),
                     'created_at' => new \DateTime(),
                     'updated_at' => new \DateTime(),
+                    'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
                 );
 
                 $revisions[] = array_merge($original, $this->getAdditionalFields());
@@ -204,7 +228,13 @@ trait RevisionableTrait
 
             if (count($revisions) > 0) {
                 if($LimitReached && $RevisionCleanup){
-                    $toDelete = $this->revisionHistory()->orderBy('id','asc')->limit(count($revisions))->get();
+                    $columns = collect($revisions)->pluck('key');
+                    $toDelete = $this->revisionHistory()
+                        ->whereIn('key', $columns)
+                        ->orderBy('id','asc')
+                        ->limit(count($revisions))
+                        ->get();
+                    
                     foreach($toDelete as $delete){
                         $delete->delete();
                     }
@@ -241,6 +271,8 @@ trait RevisionableTrait
                 'user_id' => $this->getSystemUserId(),
                 'created_at' => new \DateTime(),
                 'updated_at' => new \DateTime(),
+                'accepted_at' => (($this->autoAccept == false) ? null : new \DateTime())
+
             );
 
             //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
