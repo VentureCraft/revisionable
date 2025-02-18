@@ -245,7 +245,7 @@ trait RevisionableTrait
 
             //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
             //get them into an array.
-            $revisions = array_merge($revisions[0], $this->getAdditionalFields());
+            $revisions = array_merge($revisions[0], $this->getAdditionalFields(false));
 
             $revision = Revisionable::newModel();
             \DB::table($revision->getTable())->insert($revisions);
@@ -339,15 +339,17 @@ trait RevisionableTrait
     }
 
 
-    public function getAdditionalFields()
+    public function getAdditionalFields($useOriginalData = true)
     {
         $additional = [];
+        // If this is coming from postCreate, we shouldn't use original data as there is no original data.
+        $dataToUse = $useOriginalData ? $this->originalData : $this->toArray();
         //Determine if there are any additional fields we'd like to add to our model contained in the config file, and
         //get them into an array.
         $fields = config('revisionable.additional_fields', []);
         foreach($fields as $field) {
-            if(Arr::has($this->originalData, $field)) {
-                $additional[$field]  =  Arr::get($this->originalData, $field);
+            if(Arr::has($dataToUse, $field)) {
+                $additional[$field]  =  Arr::get($dataToUse, $field);
             }
         }
 
