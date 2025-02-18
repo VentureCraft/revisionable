@@ -1,6 +1,9 @@
 <?php namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Venturecraft\Revisionable\Revisionable;
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -210,8 +213,8 @@ trait RevisionableTrait
                     }
                 }
                 $revision = Revisionable::newModel();
-                \DB::table($revision->getTable())->insert($revisions);
-                \Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
+                DB::table($revision->getTable())->insert($revisions);
+                Event::dispatch('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
         }
     }
@@ -248,8 +251,8 @@ trait RevisionableTrait
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
 
             $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
-            \Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
+            DB::table($revision->getTable())->insert($revisions);
+            Event::dispatch('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
 
     }
@@ -278,8 +281,8 @@ trait RevisionableTrait
             $revisions = array_merge($revisions[0], $this->getAdditionalFields());
 
             $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
-            \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
+            DB::table($revision->getTable())->insert($revisions);
+            Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
 
@@ -309,8 +312,8 @@ trait RevisionableTrait
             );
 
             $revision = Revisionable::newModel();
-            \DB::table($revision->getTable())->insert($revisions);
-            \Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
+            DB::table($revision->getTable())->insert($revisions);
+            Event::dispatch('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
     }
 
@@ -520,7 +523,7 @@ trait RevisionableTrait
      *
      * @return mixed
      */
-    private function sortJsonKeys($attribute)
+    private function sortJsonKeys($attribute)DB
     {
         if(empty($attribute)) return $attribute;
 
