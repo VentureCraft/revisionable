@@ -1,6 +1,8 @@
 <?php namespace Venturecraft\Revisionable;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -186,12 +188,13 @@ trait RevisionableTrait
             $changes_to_record = $this->changedRevisionableFields();
 
             $revisions = array();
-
+            $group_id = (string) Str::uuid();
             foreach ($changes_to_record as $key => $change) {
                 $original = array(
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
+                    'group_id' => $group_id,
                     'old_value' => Arr::get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getSystemUserId(),
@@ -230,12 +233,14 @@ trait RevisionableTrait
             return false;
         }
 
+        $group_id = (string) Str::uuid();
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => self::CREATED_AT,
+                'group_id' => $group_id,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
                 'user_id' => $this->getSystemUserId(),
@@ -259,6 +264,7 @@ trait RevisionableTrait
      */
     public function postDelete()
     {
+        $group_id = (string) Str::uuid();
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
@@ -267,6 +273,7 @@ trait RevisionableTrait
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => $this->getDeletedAtColumn(),
+                'group_id' => $group_id,
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
                 'user_id' => $this->getSystemUserId(),
@@ -293,7 +300,8 @@ trait RevisionableTrait
         if (empty($this->revisionForceDeleteEnabled)) {
             return false;
         }
-
+        
+        $group_id = (string) Str::uuid();
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && (($this->isSoftDelete() && $this->isForceDeleting()) || !$this->isSoftDelete())) {
 
@@ -301,6 +309,7 @@ trait RevisionableTrait
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
                 'key' => self::CREATED_AT,
+                'group_id' => $group_id,
                 'old_value' => $this->{self::CREATED_AT},
                 'new_value' => null,
                 'user_id' => $this->getSystemUserId(),
