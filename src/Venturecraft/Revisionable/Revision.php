@@ -290,4 +290,8 @@ class Revision extends Eloquent
             return $value;
         }
     }
+
+    public function user(){
+        return $this->belongsTo(app('config')->get('auth.model'), 'user_id','id');
+    }
 }
