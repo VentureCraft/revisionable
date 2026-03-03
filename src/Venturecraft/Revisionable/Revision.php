@@ -21,6 +21,15 @@ class Revision extends Eloquent
      */
     public $table = 'revisions';
 
+
+    /**
+     * @var array
+     */
+    protected $fillable = array(
+        'revisionable_type', 'revisionable_id', 'user_id', 'key', 'old_value', 'new_value',
+        'created_at', 'updated_at',
+    );
+
     /**
      * @var array
      */
