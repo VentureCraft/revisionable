@@ -2,22 +2,19 @@
 
 namespace Venturecraft\Revisionable\Tests;
 
+use Carbon\Carbon;
 use Venturecraft\Revisionable\Tests\Models\User;
 
 class RevisionTest extends \Orchestra\Testbench\TestCase
 {
-    /**
-     * Setup the test environment.
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->loadLaravelMigrations(['--database' => 'testing']);
+        $this->loadLaravelMigrations();
 
         // call migrations specific to our tests, e.g. to seed the db
         // the path option should be an absolute path.
         $this->loadMigrationsFrom([
-            '--database' => 'testing',
             '--path' => realpath(__DIR__.'/../src/migrations'),
         ]);
     }
@@ -78,6 +75,49 @@ class RevisionTest extends \Orchestra\Testbench\TestCase
 
         // we should have two revisions to my name
         $this->assertCount(2, $user->revisionHistory);
+
+        $firstRevision = $user->revisionHistory->first();
+        $this->assertEquals('name', $firstRevision->key);
+        $this->assertEquals('James Judd', $firstRevision->old_value);
+        $this->assertEquals('Judd', $firstRevision->new_value);
+        $secondRevision = $user->revisionHistory->last();
+        $this->assertEquals('name', $secondRevision->key);
+        $this->assertEquals('Judd', $secondRevision->old_value);
+        $this->assertEquals('James', $secondRevision->new_value);
+    }
+
+    public function testDatesRespectCarbonConfiguration(): void
+    {
+        $testDate1 = Carbon::create(2024, 1, 1, 12, 0, 0);
+        Carbon::setTestNow($testDate1);
+
+        $user = User::create([
+            'name' => 'James Judd',
+            'email' => 'james.judd@revisionable.test',
+            'password' => \Hash::make('456'),
+        ]);
+
+        $user->update([
+            'name' => 'Judd'
+        ]);
+
+        $testDate2 = Carbon::create(2026, 1, 1, 12, 0, 0);
+        Carbon::setTestNow($testDate2);
+
+        $user->update([
+            'name' => 'James'
+        ]);
+
+        $firstRevision = $user->revisionHistory->first();
+        static::assertInstanceOf(Carbon::class, $firstRevision->created_at);
+        static::assertInstanceOf(Carbon::class, $firstRevision->updated_at);
+        $this->assertEquals($testDate1, $firstRevision->created_at);
+        $this->assertEquals($testDate1, $firstRevision->updated_at);
+        $secondRevision = $user->revisionHistory->last();
+        static::assertInstanceOf(Carbon::class, $secondRevision->created_at);
+        static::assertInstanceOf(Carbon::class, $secondRevision->updated_at);
+        $this->assertEquals($testDate2, $secondRevision->created_at);
+        $this->assertEquals($testDate2, $secondRevision->updated_at);
     }
 
     /**
@@ -86,7 +126,6 @@ class RevisionTest extends \Orchestra\Testbench\TestCase
     public function testRevisionStoredAdditionalFields()
     {
         $this->loadMigrationsFrom([
-            '--database' => 'testing',
             '--path' => realpath(__DIR__.'/migrations'),
         ]);
 
@@ -117,7 +156,6 @@ class RevisionTest extends \Orchestra\Testbench\TestCase
     public function testRevisionSkipsAdditionalFieldsWhenNotAvailable()
     {
         $this->loadMigrationsFrom([
-            '--database' => 'testing',
             '--path' => realpath(__DIR__.'/migrations'),
         ]);
 
@@ -147,7 +185,6 @@ class RevisionTest extends \Orchestra\Testbench\TestCase
     public function testRevisionSkipsAdditionalFieldsWhenMisconfigured()
     {
         $this->loadMigrationsFrom([
-            '--database' => 'testing',
             '--path' => realpath(__DIR__.'/migrations'),
         ]);
 

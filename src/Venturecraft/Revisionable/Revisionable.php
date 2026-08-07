@@ -1,7 +1,8 @@
 <?php namespace Venturecraft\Revisionable;
 
-use Illuminate\Support\Arr;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Arr;
 
 /*
  * This file is part of the Revisionable package by Venture Craft
@@ -163,8 +164,8 @@ class Revisionable extends Eloquent
                     'old_value'             => Arr::get($this->originalData, $key),
                     'new_value'             => $this->updatedData[$key],
                     'user_id'               => $this->getSystemUserId(),
-                    'created_at'            => new \DateTime(),
-                    'updated_at'            => new \DateTime(),
+                    'created_at'            => Carbon::now(),
+                    'updated_at'            => Carbon::now(),
                 );
             }
 
@@ -198,8 +199,8 @@ class Revisionable extends Eloquent
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
                 'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             );
 
             $revision = static::newModel();
@@ -222,8 +223,8 @@ class Revisionable extends Eloquent
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
                 'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             );
             $revision = static::newModel();
             \DB::table($revision->getTable())->insert($revisions);
@@ -251,8 +252,8 @@ class Revisionable extends Eloquent
                 'old_value' => $this->{self::CREATED_AT},
                 'new_value' => null,
                 'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             );
 
             $revision = Revisionable::newModel();
