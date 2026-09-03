@@ -91,11 +91,43 @@ trait RevisionableTrait
     }
 
     /**
+     * Type strings this model's revisions were recorded under before its
+     * current class name - e.g. a model promoted from a shared package
+     * namespace into an app's own namespace. revisionable_type is stamped
+     * with get_class() at write time, so a class rename orphans every row
+     * written under the old name; nothing rewrites history on a rename.
+     * Empty by default - override on a model that has been renamed.
+     *
+     * @return array<string>
+     */
+    public function legacyRevisionableTypes(): array
+    {
+        return [];
+    }
+
+    /**
      * @return mixed
      */
     public function revisionHistory()
     {
-        return $this->morphMany(get_class(Revisionable::newModel()), 'revisionable');
+        $relatedClass = get_class(Revisionable::newModel());
+        $legacyTypes = $this->legacyRevisionableTypes();
+
+        if (empty($legacyTypes)) {
+            return $this->morphMany($relatedClass, 'revisionable');
+        }
+
+        $types = array_merge([$this->getMorphClass()], $legacyTypes);
+
+        /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+        $relation = \Illuminate\Database\Eloquent\Relations\Relation::noConstraints(
+            fn () => $this->morphMany($relatedClass, 'revisionable')
+        );
+
+        return $relation->where(function ($query) use ($relation, $types) {
+            $query->whereIn($relation->getMorphType(), $types)
+                ->where($relation->getForeignKeyName(), $this->getKey());
+        });
     }
 
     /**
